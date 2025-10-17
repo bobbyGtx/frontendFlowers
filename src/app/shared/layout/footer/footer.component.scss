@@ -1,0 +1,107 @@
+@import "variables";//Чтоб работало без путей, добавил раздел в angular.json
+
+footer.footer{
+  padding-top: 39px;
+  padding-bottom: 50px;
+  background-color: $base-bg-color;
+  .container{
+    display: flex;
+
+    .logo{
+      display: flex;
+      justify-content: center;
+      margin-right: 63px;
+
+      .logo-link{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        object-fit: contain;
+        flex-shrink: 0;
+        width: 150px;
+        height: 90px;
+        img{
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+
+    .footer-block{
+      margin-top: 11px;
+      &.footer-menu{
+        margin-right: 57px;
+      }
+      &.footer-categories{
+        margin-right: 34px;
+      }
+      &.footer-info{
+        margin-right: 66px;
+        .footer-head{
+          margin-bottom: 15px;
+        }
+        .footer-social{
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 55px;
+        }
+        .footer-payment{
+          display: grid;
+          grid-template-columns: repeat(3, 70px);
+          gap: 10px;
+          max-width: 230px;
+          .payment-item{
+            height: 35px;
+            background-position: top;
+            background-size: cover;
+          }
+        }
+
+      }
+      &.footer-contacts{
+        max-width: 253px;
+        .footer-contact{
+          margin-bottom: 15px;
+          color:$gray-text-color;
+          &:last-child{
+            margin-bottom: 0;
+          }
+          .footer-contact-head{
+            margin-bottom: 6px;
+            font-weight: 500;
+          }
+          .footer-contact-info{
+          }
+        }
+      }
+      .footer-head{
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: $gray-text-color;
+      }
+      .footer-items{
+        ul{
+          list-style: none;
+          padding-left: 0;
+          li{
+            margin-bottom: 11px;
+            &:last-child{
+              margin-bottom: 0;
+            }
+
+            a{
+              font-size: 16px;
+              color: $gray-text-color;
+
+            }
+          }
+        }
+      }
+
+    }
+
+  }
+}
+
