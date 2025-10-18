@@ -9,7 +9,7 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class CategoryService {
-  http= inject(HttpClient);
+  http:HttpClient= inject(HttpClient);
 
   getCategories():Observable<DefaultResponseType | CategoriesResponseType>{
     return this.http.get<DefaultResponseType | CategoriesResponseType>(environment.api+'categories.php');

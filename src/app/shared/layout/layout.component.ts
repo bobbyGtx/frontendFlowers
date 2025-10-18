@@ -4,12 +4,14 @@ import {CategoryType} from '../../../types/category.type';
 import {DefaultResponseType} from '../../../types/responses/default-response.type';
 import {CategoriesResponseType} from '../../../types/responses/categories-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html'
 })
 export class LayoutComponent implements OnInit {
+  _snackbar:MatSnackBar = inject(MatSnackBar);
   categoryService= inject(CategoryService);
   categories:CategoryType[]=[];
 
@@ -24,6 +26,7 @@ export class LayoutComponent implements OnInit {
         }
         if (error){
           alert(error);
+          this._snackbar.open(error, 'ok');
           throw new Error(error);
         }//Если ошибка есть - выводим её и завершаем функцию
         this.categories = categoriesResponse.categories;
@@ -31,9 +34,9 @@ export class LayoutComponent implements OnInit {
       error: (errorResponse:HttpErrorResponse) => {
         if (errorResponse.error && errorResponse.error.message){
           //Если есть ошибка - выводим это пользователю
-          alert(errorResponse.error.message);
+          this._snackbar.open(`Error: ${errorResponse.status} ${errorResponse.error.message}`,'ok')
         }else{
-          alert('Ошибка запроса категорий!');
+          this._snackbar.open(`Error: ${errorResponse.status} Unexpected error (get Categories)!`, 'ok');
         }//Если сообщения нет - выводим это
       }
     });
