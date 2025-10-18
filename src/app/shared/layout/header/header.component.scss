@@ -74,6 +74,9 @@ header.header{
           a{
             margin-right: 8px;
             position: relative;
+            .login-icon{
+              fill:none;
+            }
             span{
               position: absolute;
               top: 10px;

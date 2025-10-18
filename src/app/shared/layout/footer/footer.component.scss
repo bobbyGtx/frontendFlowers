@@ -45,6 +45,68 @@ footer.footer{
           align-items: center;
           gap: 12px;
           margin-bottom: 55px;
+          a{
+            position: relative;
+            width: 24px;
+            height: 24px;
+            &:before{
+              content: "";
+              position: absolute;
+              z-index: 2;
+              left: 0;
+              top: 0;
+              box-sizing: border-box;
+              width: 18px;
+              height: 18px;
+              background-color: $base-bg-color;
+            }
+            &:after{
+              content: "";
+              position: absolute;
+              z-index: 1;
+              border-radius: 50%;
+              left: 0;
+              top: 0;
+              border:1px solid $green-text-color;
+              width: 18px;
+              height: 18px;
+              box-sizing: border-box;
+            }
+            svg{
+              position: relative;
+              fill: $gray-text-color;
+
+              z-index: 3;
+              width: 18px;
+              height: 18px;
+              &.tiktok{
+                fill: none;
+                width: 21px;
+                height: 21px;
+                left: -2px;
+                top: -2px;
+                stroke: $gray-text-color;
+              }
+            }
+            &:hover{
+              &:after{
+                z-index: 3;
+                -webkit-animation: circle 0.6s ease-in-out both;
+                animation: circle 0.6s ease-in-out both;
+              }
+              svg{
+                transform: scale(1.2);
+                transition: transform .2s;
+                fill: $green-text-color;
+                &.tiktok{
+                    fill: none;
+                    stroke: $green-text-color;
+                }
+              }
+            }
+
+          }
+
         }
         .footer-payment{
           display: grid;
@@ -57,7 +119,6 @@ footer.footer{
             background-size: cover;
           }
         }
-
       }
       &.footer-contacts{
         max-width: 253px;
@@ -105,3 +166,13 @@ footer.footer{
   }
 }
 
+@keyframes circle {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
