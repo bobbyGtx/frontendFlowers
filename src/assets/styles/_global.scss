@@ -25,6 +25,7 @@ input[type=password]{
   font-size: 14px;
   line-height: 1;
   color: $gray-text-color;
+  outline: none;
 }
 .button{
   text-align: center;
@@ -44,3 +45,22 @@ input[type=password]{
     cursor: not-allowed;
   }
 }
+
+.mat-mdc-menu-item{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  .mat-mdc-menu-item-text{
+    display: flex;
+    align-items: center;
+    gap:8px;
+    a{
+      text-decoration: none;
+      color: $gray-text-color;
+      &:visited{
+        color: $gray-text-color;
+      }
+    }
+  }//Выравннивание иконки в мат меню
+}
+
+
