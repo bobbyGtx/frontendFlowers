@@ -1,11 +1,11 @@
 import {Component, inject} from '@angular/core';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../core/auth/auth.service';
 import {Subscription} from 'rxjs';
 import {DefaultResponseType} from '../../../../types/responses/default-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
+import {ShowSnackService} from '../../../core/show-snack.service';
 
 @Component({
   selector: 'app-signup',
@@ -13,16 +13,22 @@ import {HttpErrorResponse} from '@angular/common/http';
   styleUrl: './signup.component.scss'
 })
 export class SignupComponent {
-  _snackbar:MatSnackBar = inject(MatSnackBar);
+  showSnackService:ShowSnackService = inject(ShowSnackService);
   router:Router = inject(Router);
   fb:FormBuilder = inject(FormBuilder);
   authService:AuthService=inject(AuthService);
   subscriptions$:Subscription=new Subscription();
 
+  // signUpForm: FormGroup=this.fb.group({
+  //   email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
+  //   password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
+  //   passwordRepeat: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
+  //   agree: [false, Validators.requiredTrue],
+  // });
   signUpForm: FormGroup=this.fb.group({
-    email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
-    password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
-    passwordRepeat: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
+    email: ['', Validators.required ],
+    password: ['', Validators.required],
+    passwordRepeat: ['', Validators.required],
     agree: [false, Validators.requiredTrue],
   });
 
@@ -46,23 +52,18 @@ export class SignupComponent {
           .subscribe({
             next: (data:DefaultResponseType)=> {
               if (data.error){
-                if (data.messages && Array.isArray(data.messages.length) && data.messages.length > 0){
-                  console.log(data.message,data.messages);
-                  this._snackbar.open(`${data.message}. ${data.messages}`,'ok');
-                }else{
-                  this._snackbar.open(data.message,'ok');
-                }
+                this.showSnackService.error(data.message);
                 throw new Error(data.message);
               }
-
-              this._snackbar.open('Регистрация прошла успешно. Войдите в систему.','ok');
+              this.showSnackService.success('Регистрация прошла успешно. Войдите в систему.');
               this.router.navigate(['/login']);
             },
             error: (errorResponse:HttpErrorResponse)=> {
               if (errorResponse.error && errorResponse.error.message){
-                this._snackbar.open(`${errorResponse.error.message}`,'Ok')
+                //тут может прийти ответ с массивом ошибок
+                this.showSnackService.errorObj(errorResponse.error);
               }else{
-                this._snackbar.open(`Error: ${errorResponse.status} Unexpected Sign Up error!`, 'ok');
+                this.showSnackService.error(`Unexpected Sign Up error!`,errorResponse.status);
               }
             },
           })

@@ -1,4 +1,7 @@
+@use '@angular/material' as mat;
+
 @import "variables";
+@import "fonts";
 html, body {
   margin: 0;
   padding: 0;
@@ -31,7 +34,7 @@ input[type=password]{
   text-align: center;
   padding: 15px;
   border-radius: 5px;
-  background-color: #456F49;
+  background-color: $green-button-color;
   box-sizing: border-box;
   cursor: pointer;
   border: 0;
@@ -63,4 +66,35 @@ input[type=password]{
   }//Выравннивание иконки в мат меню
 }
 
-
+:root {
+  @include mat.snack-bar-overrides((
+    container-color: $gray-text-color,
+    supporting-text-font: 'Montserrat',
+    supporting-text-line-height:1,
+    button-color:$snackbar-btn-color,
+  ));
+}//Миксин с настройками снакбара
+.snackbar-error {
+  .mat-mdc-snackbar-surface{
+    color: $snackbar-err-color !important;
+    .mat-mdc-snack-bar-label{
+      font-weight: 500;
+    }
+  }
+}
+.snackbar-success {
+  .mat-mdc-snackbar-surface{
+    .mat-mdc-snack-bar-label{
+      color: $link-color !important;
+      font-weight: 500 !important;
+    }
+  }
+}
+.snackbar-info {
+  .mat-mdc-snackbar-surface{
+    .mat-mdc-snack-bar-label{
+      color: white !important;
+      font-weight: 400 !important;
+    }
+  }
+}

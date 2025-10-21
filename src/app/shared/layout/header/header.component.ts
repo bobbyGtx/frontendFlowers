@@ -2,10 +2,8 @@ import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {CategoryType} from '../../../../types/category.type';
 import {Subscription} from 'rxjs';
 import {AuthService} from '../../../core/auth/auth.service';
-import {DefaultResponseType} from '../../../../types/responses/default-response.type';
-import {HttpErrorResponse} from '@angular/common/http';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
+import {ShowSnackService} from '../../../core/show-snack.service';
 
 @Component({
   selector: 'app-header',
@@ -15,14 +13,12 @@ import {Router} from '@angular/router';
 export class HeaderComponent implements OnInit, OnDestroy {
   @Input() categories: CategoryType[] = [];
   authService: AuthService = inject(AuthService);
-  _snackbar: MatSnackBar = inject(MatSnackBar);
+  showSnackService: ShowSnackService = inject(ShowSnackService);
   router:Router=inject(Router);
-  isLogged: boolean;
+  isLogged: boolean=false;
   subscriptions$: Subscription = new Subscription();
 
-  constructor() {
-    this.isLogged = this.authService.getIsLoggedIn();
-  }
+  constructor() {}
 
   ngOnInit() {
     this.subscriptions$.add(
@@ -45,7 +41,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   doLogout():void{
     this.authService.removeTokens();
     this.authService.userId=null;
-    this._snackbar.open(`You have successfully logged out.`, 'Ok');
+    this.showSnackService.info(`You have successfully logged out.`);
     this.router.navigate(['/']);
   }
 

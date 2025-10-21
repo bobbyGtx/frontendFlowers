@@ -4,15 +4,15 @@ import {CategoryType} from '../../../types/category.type';
 import {DefaultResponseType} from '../../../types/responses/default-response.type';
 import {CategoriesResponseType} from '../../../types/responses/categories-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {Subscription} from 'rxjs';
+import {ShowSnackService} from '../../core/show-snack.service';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html'
 })
 export class LayoutComponent implements OnInit, OnDestroy {
-  _snackbar:MatSnackBar = inject(MatSnackBar);
+  showSnackService:ShowSnackService = inject(ShowSnackService);
   categoryService= inject(CategoryService);
   categories:CategoryType[]=[];
   subscriptions$:Subscription=new Subscription();
@@ -28,7 +28,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
         }
         if (error){
           alert(error);
-          this._snackbar.open(error, 'ok');
+          this.showSnackService.error(error);
           throw new Error(error);
         }//Если ошибка есть - выводим её и завершаем функцию
         this.categories = categoriesResponse.categories;
@@ -36,9 +36,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
       error: (errorResponse:HttpErrorResponse) => {
         if (errorResponse.error && errorResponse.error.message){
           //Если есть ошибка - выводим это пользователю
-          this._snackbar.open(`Error: ${errorResponse.status} ${errorResponse.error.message}`,'ok')
+          this.showSnackService.error(errorResponse.error.message);
         }else{
-          this._snackbar.open(`Error: ${errorResponse.status} Unexpected error (get Categories)!`, 'ok');
+          this.showSnackService.error(`Unexpected error (get Categories)!`,errorResponse.status);
         }//Если сообщения нет - выводим это
       }
     }));

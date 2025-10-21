@@ -1,12 +1,12 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../core/auth/auth.service';
 import {DefaultResponseType} from '../../../../types/responses/default-response.type';
 import {LoginResponseType} from '../../../../types/responses/login-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 import {Subscription} from 'rxjs';
+import {ShowSnackService} from '../../../core/show-snack.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +14,7 @@ import {Subscription} from 'rxjs';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnDestroy {
-  _snackbar:MatSnackBar = inject(MatSnackBar);
+  showSnackService:ShowSnackService = inject(ShowSnackService);
   router:Router = inject(Router);
   fb:FormBuilder = inject(FormBuilder);
   authService:AuthService=inject(AuthService);
@@ -44,21 +44,21 @@ export class LoginComponent implements OnDestroy {
               error='Unexpected data from server. User section not found!'+loginResponse.user;
             }
             if (error){
-              this._snackbar.open(error,'ok');
+              this.showSnackService.error(error);
               throw new Error(error);
             }//Если ошибка есть - выводим её и завершаем функцию
 
             this.authService.setTokens(loginResponse.user.accessToken, loginResponse.user.refreshToken);
             this.authService.userId = loginResponse.user.userId;
 
-            this._snackbar.open('Успешная авторизация!','ok');
+            this.showSnackService.success('Успешная авторизация!');
             this.router.navigate(['/']).then();
           },
           error: (errorResponse:HttpErrorResponse) => {
             if (errorResponse.error && errorResponse.error.message){
-              this._snackbar.open(`${errorResponse.error.message}`,'Ok')
+              this.showSnackService.error(errorResponse.error.message);
             }else{
-              this._snackbar.open(`Error: ${errorResponse.status} Unexpected Login error!`, 'ok');
+              this.showSnackService.error(`Unexpected Login error!`,errorResponse.status);
             }
           }
         }));

@@ -1,0 +1,39 @@
+@import "variables";
+@import "fonts";
+.snackbar-container {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  line-height: 1;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  gap: 6px;
+  .snackbar-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .snackbar-title {
+      margin-top: -2px;
+      font-size: 16px;
+      font-weight: 500;
+      color: $snackbar-err-color;
+    }
+    .snackbar-close-btn {
+      padding: 0;
+      box-sizing: border-box;
+      max-height: 20px;
+      color: $snackbar-btn-color ;
+      font-weight: 500;
+    }
+  }
+  ul {
+    margin: 0;
+    padding-left: 20px;
+    li {
+      font-size: 14px;
+    }
+  }
+}
+.mdc-button__label{
+  padding-top: 2px;
+}

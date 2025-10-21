@@ -1,25 +1,22 @@
 import {inject, Injectable} from '@angular/core';
-import {Observable, Subject, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {DefaultResponseType} from '../../../types/responses/default-response.type';
 import {LoginResponseType} from '../../../types/responses/login-response.type';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
+
 export class AuthService {
   http: HttpClient = inject(HttpClient);
   rememberMe: boolean = false;
   public accessTokenKey: string = 'accessToken';
   public refreshTokenKey: string = 'refreshToken';
   public userIdKey: string = 'userId';
-  public isLogged$: Subject<boolean> = new Subject<boolean>();
-  private isLogged: boolean = false;
+  public isLogged$:BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor() {
-    this.isLogged = !!localStorage.getItem(this.accessTokenKey);
-
+    this.isLogged$.next(!!localStorage.getItem(this.accessTokenKey));
   }
 
   get userId(): number | null {
@@ -58,10 +55,6 @@ export class AuthService {
     throw throwError(() => 'Can not find token.');
   }
 
-  public getIsLoggedIn() {
-    return this.isLogged;
-  }
-
   public setTokens(accessToken: string, refreshToken: string) {
     if (this.rememberMe) {
       localStorage.setItem(this.accessTokenKey, accessToken);
@@ -70,8 +63,7 @@ export class AuthService {
       sessionStorage.setItem(this.accessTokenKey, accessToken);
       sessionStorage.setItem(this.refreshTokenKey, refreshToken);
     }
-    this.isLogged = true;
-    this.isLogged$.next(this.isLogged);
+    this.isLogged$.next(true);
   }
 
   public getTokens(): { accessToken: string | null, refreshToken: string | null } {
@@ -94,8 +86,7 @@ export class AuthService {
     localStorage.removeItem(this.refreshTokenKey);
     sessionStorage.removeItem(this.accessTokenKey);
     sessionStorage.removeItem(this.refreshTokenKey);
-    this.isLogged = false;
+    this.isLogged$.next(false);
     this.rememberMe = false;
-    this.isLogged$.next(this.isLogged);
   }
 }
