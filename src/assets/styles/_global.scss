@@ -30,6 +30,21 @@ input[type=password]{
   color: $gray-text-color;
   outline: none;
 }
+.small-input[type=text],
+.small-input[type=number]{
+  box-sizing: border-box;
+  border: 1px solid $small-input-border;
+  border-radius: 5px;
+  text-align: center;
+  padding: 2px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  color: $green-text-color;
+  font-size: 18px;
+  width: 40px;
+  height: 28px;
+}
+
 .button{
   text-align: center;
   padding: 15px;
@@ -47,6 +62,9 @@ input[type=password]{
     background-color: gray;
     cursor: not-allowed;
   }
+}
+a.button{
+  display: inline-block;
 }
 
 .mat-mdc-menu-item{

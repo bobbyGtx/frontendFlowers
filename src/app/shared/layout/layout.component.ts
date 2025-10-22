@@ -20,14 +20,13 @@ export class LayoutComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscriptions$.add(this.categoryService.getCategories().subscribe({
       next: (data:DefaultResponseType|CategoriesResponseType) => {
-        let error=null;
+        let error:null|string=null;
         if ((data as DefaultResponseType).error) {error=(data as DefaultResponseType).message;}
         const categoriesResponse:CategoriesResponseType = data as CategoriesResponseType;
         if (!categoriesResponse.categories || !Array.isArray(categoriesResponse.categories) || categoriesResponse.categories.length <1) {
           error='Unexpected data from server. Categories not found!';
         }
         if (error){
-          alert(error);
           this.showSnackService.error(error);
           throw new Error(error);
         }//Если ошибка есть - выводим её и завершаем функцию

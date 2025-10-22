@@ -11,6 +11,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatIcon} from '@angular/material/icon';
+import {SharedModule} from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -24,8 +25,9 @@ import {MatIcon} from '@angular/material/icon';
     BrowserModule,
     MatSnackBarModule,
     MatMenuModule,
-    AppRoutingModule,
-    MatIcon
+    MatIcon,
+    SharedModule,
+    AppRoutingModule
   ],
   providers: [provideHttpClient(), provideAnimationsAsync()],
   bootstrap: [AppComponent]
