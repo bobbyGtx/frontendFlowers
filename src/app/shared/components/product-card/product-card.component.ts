@@ -20,6 +20,7 @@ class ProductCardComponent {
       this.count = this.product.count;
       this.showSnackService.error(`Доступно ${this.product.count} единиц товара!`);
     }
+    if (!newValue || newValue < 1) this.count = 1;
   }
 
 }

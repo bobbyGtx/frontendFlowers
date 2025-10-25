@@ -15,6 +15,6 @@ import {FormsModule} from '@angular/forms';
     RouterLink,
     FormsModule
   ],
-  exports: [PasswordRepeatDirective, ProductCardComponent],
+  exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent],
 })
 export class SharedModule { }
