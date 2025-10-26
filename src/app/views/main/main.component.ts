@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../shared/services/product.service';
 import {Subscription} from 'rxjs';
-import {ProductsResponseType} from '../../../types/responses/products-response.type';
+import {BestProductsResponseType} from '../../../types/responses/best-products-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../core/show-snack.service';
 import {ProductType} from '../../../types/product.type';
@@ -111,7 +111,7 @@ export class MainComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscriptions$.add(
       this.productService.getBestProducts().subscribe({
-        next: (data:ProductsResponseType) => {
+        next: (data:BestProductsResponseType) => {
           let error:null|string=null;
           if(data.error)error=data.message;
           if (!data.products || !Array.isArray(data.products) || data.products.length===0) error='Unexpected data from server. Best products not found!';
@@ -119,7 +119,7 @@ export class MainComponent implements OnInit, OnDestroy {
             this.showSnackService.error(error);
             throw new Error(error);
           }
-          this.bestProducts=data.products!;
+          if (data.products)this.bestProducts=data.products;
         },
         error: (errorResponse:HttpErrorResponse) => {
           if (errorResponse.error && errorResponse.error.message){
