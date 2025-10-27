@@ -1,6 +1,6 @@
 import {CategoryType} from './category.type';
-import {ProductTypeType} from './product-type.type';
+import {TypeType} from './type.type';
 
 export interface CategoryWithTypesType extends CategoryType {
-  types:Array<ProductTypeType>;
+  types:Array<TypeType>;
 }
