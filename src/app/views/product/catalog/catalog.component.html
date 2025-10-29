@@ -42,8 +42,12 @@
         <category-filter [type]="CategoryFiltersEnum.height"></category-filter>
         <category-filter [type]="CategoryFiltersEnum.price"></category-filter>
       </div>
-      <div class="catalog-products">
+      <div class="catalog-products" *ngIf="products.length>0">
         <product-card [product]="product" *ngFor="let product of products"></product-card>
+      </div>
+      <div class="products-not-found" *ngIf="products.length==0">
+        <div class="title">Товары не найдены!</div>
+        <div class="recommendations">Попробуйте изменить параметры поиска или <a (click)="clearFilters()"> очистить фильтры</a>!</div>
       </div>
     </div>
     <div class="pagination" *ngIf="pages.length>1">

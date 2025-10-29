@@ -40,7 +40,7 @@ export class ProductService {
   private prepareParameters(activeParams:ActiveParamsType):RequestParamsType {
     return Object.entries(activeParams).reduce((acc, [key, value]) => {
       if (value) {
-        if (key === 'types') acc.types = (value as string[]).join(',');
+        if (key === 'types' && Array.isArray(value) && value.length>0 ) acc.types = (value as string[]).join(',');
         else (acc as any)[key] = value;
       }
       return acc;

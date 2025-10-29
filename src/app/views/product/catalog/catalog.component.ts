@@ -120,9 +120,9 @@ export class CatalogComponent implements OnInit, OnDestroy {
                   next: (data:ProductsResponseType) => {
                     let error:null|string=null;
                     if(data.error)error=data.message;
-                    if (!data.response || !data.response.page || !data.response.totalPages || !data.response.totalProducts
-                      || !data.response.products || !Array.isArray(data.response.products) || data.response.products.length===0){
-                      error='Unexpected data from server. Products not found!';
+                    if (!data.response || !data.response.page || !data.response.totalPages
+                      || !data.response.products || !Array.isArray(data.response.products)){
+                      error='Unexpected data from server.';
                     }
                     if (error){
                       this.showSnackService.error(error);
@@ -210,6 +210,14 @@ export class CatalogComponent implements OnInit, OnDestroy {
     }
   }
 
+  clearFilters(){
+    let clearParams:ActiveParamsType={types:[]};
+    if (this.activeParams.sort)clearParams.sort=this.activeParams.sort;
+
+    this.router.navigate(['/catalog'], {
+      queryParams: clearParams
+    });
+  }
   ngOnDestroy() {
     this.subscriptions$.unsubscribe();
   }

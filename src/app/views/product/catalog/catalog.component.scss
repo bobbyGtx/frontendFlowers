@@ -152,6 +152,22 @@
         grid-template-columns: repeat(auto-fill,291px);
         gap: 30px 26px;
       }
+      .products-not-found{
+        width: 100%;
+        text-align: center;
+        padding: 20px 15px 0 0;
+        .title{
+          @include head-lora(32px);
+          margin-bottom: 10px;
+        }
+        .recommendations{
+          @include head-lora(26px);
+          a{
+            color:$link-color;
+          }
+        }
+
+      }
 
     }
     .pagination{
