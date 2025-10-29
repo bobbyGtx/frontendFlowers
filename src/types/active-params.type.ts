@@ -1,4 +1,4 @@
-export interface ActiveParamsType {
+export type ActiveParamsType ={
   types: string[];
   diameterFrom?: string;
   diameterTo?: string;

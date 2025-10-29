@@ -7,6 +7,7 @@ import {Subscription} from 'rxjs';
 import {UrlParamsEnum} from '../../../../enums/url-params.enum';
 import {CategoryFiltersEnum} from '../../../../enums/category-filters.enum';
 import {TypeType} from '../../../../types/type.type';
+import {ActiveParamsUtil} from '../../utils/active-params.util';
 
 
 @Component({
@@ -77,47 +78,16 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscriptions$.add(
       this.activatedRoute.queryParams.subscribe((params) => {
-        const activeParams: ActiveParamsType = {types: []};
-        if (params.hasOwnProperty(UrlParamsEnum.types)) {
-          activeParams.types = Array.isArray(params[UrlParamsEnum.types]) ? params[UrlParamsEnum.types] : [params[UrlParamsEnum.types]];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.heightFrom)) {
-          activeParams.heightFrom = params[UrlParamsEnum.heightFrom];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.heightTo)) {
-          activeParams.heightTo = params[UrlParamsEnum.heightTo];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.diameterFrom)) {
-          activeParams.diameterFrom = params[UrlParamsEnum.diameterFrom];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.diameterTo)) {
-          activeParams.diameterTo = params[UrlParamsEnum.diameterTo];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.priceFrom)) {
-          activeParams.priceFrom = params[UrlParamsEnum.priceFrom];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.priceTo)) {
-          activeParams.priceTo = params[UrlParamsEnum.priceTo];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.sort)) {
-          activeParams.sort = params[UrlParamsEnum.sort];
-        }
-        if (params.hasOwnProperty(UrlParamsEnum.page)) {
-          activeParams.page = +params[UrlParamsEnum.page];
-        }
-        this.activeParams = activeParams;
-
+        this.activeParams = ActiveParamsUtil.processParams(params);
         if (this.type) {
           if (params.hasOwnProperty(this.type + 'From') || params.hasOwnProperty(this.type + 'To')) this.open = !this.manualClosed;//только отображает если есть данные
           //this.open = (params.hasOwnProperty(this.type + 'From') || params.hasOwnProperty(this.type + 'To'));//скрывает компонент при очистке
           this.from = params.hasOwnProperty(this.type + 'From')?params[this.type + 'From']:null;
           this.to = params.hasOwnProperty(this.type + 'To')?params[this.type + 'To']:null;
         }else{
-          this.activeParams.types = activeParams.types;
           if(this.categoryWithTypes && this.categoryWithTypes.types && this.categoryWithTypes.types.length > 0) {
-
             this.categoryWithTypes.types.some((typeItem:TypeType) => {
-              if (activeParams.types.indexOf(typeItem.url)!==-1){
+              if (this.activeParams.types.indexOf(typeItem.url)!==-1){
                 this.open = !this.manualClosed;
                 return true;
               }else {
@@ -141,11 +111,12 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
       if (existingTypeInParams > -1 && !checked) {
         this.activeParams.types.splice(existingTypeInParams, 1);
       } else if (existingTypeInParams == -1 && checked) {
-        this.activeParams.types.push(url);
+        this.activeParams.types=[...this.activeParams.types,url];//dont use push
       }
     } else if (checked) {
       this.activeParams.types = [url];
     }
+    if (this.activeParams.page)this.activeParams.page=1;
     this.router.navigate(['/catalog'], {
       queryParams: this.activeParams
     });
@@ -159,6 +130,7 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
         this.activeParams[param] = value;
       }
     }
+    if (this.activeParams.page)this.activeParams.page=1;
     this.router.navigate(['/catalog'], {
       queryParams: this.activeParams
     });
