@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {debounceTime, Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {BestProductsResponseType} from '../../../types/responses/best-products-response.type';
 import {ProductsResponseType} from '../../../types/responses/products-response.type';
@@ -32,9 +32,7 @@ export class ProductService {
 
   getProducts(activeParams:ActiveParamsType):Observable<ProductsResponseType>{
     const params:RequestParamsType = this.prepareParameters(activeParams);
-    return this.http.get<ProductsResponseType>(environment.api+'products',{
-      params
-    });
+    return this.http.get<ProductsResponseType>(environment.api+'products',{params});
   }
 
   private prepareParameters(activeParams:ActiveParamsType):RequestParamsType {

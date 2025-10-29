@@ -1,9 +1,9 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {CategoryType} from '../../../../types/category.type';
 import {Subscription} from 'rxjs';
 import {AuthService} from '../../../core/auth/auth.service';
 import {Router} from '@angular/router';
 import {ShowSnackService} from '../../../core/show-snack.service';
+import {CategoryWithTypesType} from '../../../../types/category-with-types.type';
 
 @Component({
   selector: 'app-header',
@@ -11,7 +11,7 @@ import {ShowSnackService} from '../../../core/show-snack.service';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  @Input() categories: CategoryType[] = [];
+  @Input() categories: CategoryWithTypesType[] = [];
   authService: AuthService = inject(AuthService);
   showSnackService: ShowSnackService = inject(ShowSnackService);
   router:Router=inject(Router);

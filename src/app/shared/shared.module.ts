@@ -9,7 +9,7 @@ import {FormsModule} from '@angular/forms';
 import { CategoryFilterComponent } from './components/category-filter/category-filter.component';
 
 @NgModule({
-  declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent],
+    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent],
   imports: [
     CommonModule,
     MatButton,

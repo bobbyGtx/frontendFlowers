@@ -23,8 +23,7 @@
       </div>
       <nav class="footer-items">
         <ul>
-          <li *ngFor="let category of categories"><a>{{category.name}}</a></li>
-
+          <li routerLink="/catalog" [queryParams]="{types:category.typesUrl}" *ngFor="let category of categories"><a>{{category.name}}</a></li>
         </ul>
       </nav>
     </div>

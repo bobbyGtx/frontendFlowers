@@ -130,10 +130,10 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
         this.activeParams[param] = value;
       }
     }
-    if (this.activeParams.page)this.activeParams.page=1;
-    this.router.navigate(['/catalog'], {
-      queryParams: this.activeParams
-    });
+      if (this.activeParams.page)this.activeParams.page=1;
+      this.router.navigate(['/catalog'], {
+        queryParams: this.activeParams
+      });
   }
 
   ngOnDestroy(): void {

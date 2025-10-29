@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../../shared/services/product.service';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {Subscription} from 'rxjs';
+import {debounce, fromEvent, Subscription, timer} from 'rxjs';
 import {ProductType} from '../../../../types/product.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProductsResponseType} from '../../../../types/responses/products-response.type';
@@ -40,6 +40,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   pages:Array<number>=[];
   totalProducts:number=0;
   sortingOpened:boolean=false;
+  debounce:boolean=false;
   sortingOptions:Array<SortingOptionsType>=[
     {name:'От А до Я',value:'name-asc'},
     {name:'От Я до А',value:'name-desc'},
@@ -48,6 +49,10 @@ export class CatalogComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit() {
+    const clicks = fromEvent(document, 'click');
+    this.subscriptions$.add(clicks.subscribe(x=>{
+      this.sortingOpened=false;
+    }));
     this.subscriptions$.add(
       this.categoryService.getCategoriesWithTypes().subscribe({
         next:(data:CategoriesWithTypesResponseType)=>{
@@ -63,7 +68,15 @@ export class CatalogComponent implements OnInit, OnDestroy {
           if (data.categories) this.categoriesWithTypes = data.categories;
 
           this.subscriptions$.add(
-            this.activatedRoute.queryParams.subscribe(params => {
+            this.activatedRoute.queryParams
+              .pipe(
+                debounce(() => {
+                  if (this.debounce) return timer(600);
+                  this.debounce = true;
+                  return timer(0);
+                })
+              )
+              .subscribe(params => {
               this.activeParams = ActiveParamsUtil.processParams(params);
               this.appliedFilters=[];
               this.activeParams.types.forEach((urlItem:string)=> {
@@ -115,6 +128,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
                 });
               }
 
+              this.debounce=true;
+
               this.subscriptions$.add(
                 this.productService.getProducts(this.activeParams).subscribe({
                   next: (data:ProductsResponseType) => {
@@ -161,8 +176,9 @@ export class CatalogComponent implements OnInit, OnDestroy {
     );
   }
 
-  toggleSorting(){
+  toggleSorting(event:MouseEvent) {
     this.sortingOpened = !this.sortingOpened;
+    event.stopPropagation();
   }
 
   removeAppliedFilter(appliedFilter:AppliedFilterType){
