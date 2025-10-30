@@ -68,6 +68,13 @@
     }
 
     .catalog-filter-body {
+      .catalog-filter-checkbox{
+        svg{
+          width: 14px;
+          height: 14px;
+          fill: none;
+        }
+      }
 
     }
   }

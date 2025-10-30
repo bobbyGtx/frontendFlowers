@@ -77,6 +77,11 @@ a.button{
 .mat-mdc-menu-item{
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
+  svg{
+    fill:#1f1f1f;
+    width:24px;
+    height:24px;
+  }
   .mat-mdc-menu-item-text{
     display: flex;
     align-items: center;
@@ -84,6 +89,7 @@ a.button{
     a{
       text-decoration: none;
       color: $gray-text-color;
+
       &:visited{
         color: $gray-text-color;
       }
