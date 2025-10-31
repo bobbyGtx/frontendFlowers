@@ -4,9 +4,10 @@ $gray-text-color: #2C2C2C;
 $black-text-color: #000;
 $base-bg-color: #648F64;
 $green-bg-color-sections: #A4CBA3;
+$small-input-border:#6CAC72;
+$transparent-btn-border:$small-input-border;
 
 $input-border:#2A592E;//reviews-border
-$small-input-border:#6CAC72;
 $link-color: #519057;
 $applied-filter-border: #E7F1E8;
 $applied-filter-close: #A8ABA7;
@@ -24,3 +25,10 @@ $active-sort-bg-color:#B6D5B9;
 $pagination-arrows-color: $gray-text-color;
 $pagination-active-page-bg: #C5E6C8;
 $pagination-font-color: #292D32;
+
+//Details
+$main-title-color: $black-text-color;
+$separator-color:#E7F1E8;
+$info-text-title-color:#202B21;
+$description-text-color:$gray-text-color;
+$price-font-color: #313131;

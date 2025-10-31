@@ -7,16 +7,19 @@ import ProductCardComponent from './components/product-card/product-card.compone
 import {RouterLink} from "@angular/router";
 import {FormsModule} from '@angular/forms';
 import { CategoryFilterComponent } from './components/category-filter/category-filter.component';
+import { ProductsCarouselComponent } from './components/products-carousel/products-carousel.component';
+import {CarouselModule} from 'ngx-owl-carousel-o';
 
 @NgModule({
-    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent],
+    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent],
   imports: [
     CommonModule,
     MatButton,
     RouterLink,
-    FormsModule
+    FormsModule,
+    CarouselModule
   ],
-    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent],
+    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent],
 })
 export class SharedModule {
 }

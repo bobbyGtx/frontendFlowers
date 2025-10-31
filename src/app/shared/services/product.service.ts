@@ -1,10 +1,12 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {debounceTime, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {BestProductsResponseType} from '../../../types/responses/best-products-response.type';
 import {ProductsResponseType} from '../../../types/responses/products-response.type';
 import {ActiveParamsType} from '../../../types/active-params.type';
+import {RecommendedProductsResponseType} from '../../../types/responses/recommended-products-response.type';
+import {ProductResponseType} from '../../../types/responses/product-response.type';
 
 type RequestParamsType={
   types?: string;
@@ -30,9 +32,19 @@ export class ProductService {
     return this.http.get<BestProductsResponseType>(environment.api+'products/best');
   }
 
+  getRecommendedProducts(categoryId:number,productId:number):Observable<RecommendedProductsResponseType>{
+    return this.http.get<RecommendedProductsResponseType>(environment.api+'products/recommended',{
+      params:{categoryId,productId}
+    });
+  }
+
   getProducts(activeParams:ActiveParamsType):Observable<ProductsResponseType>{
     const params:RequestParamsType = this.prepareParameters(activeParams);
     return this.http.get<ProductsResponseType>(environment.api+'products',{params});
+  }
+
+  getProduct(url:string):Observable<ProductResponseType>{
+    return this.http.get<ProductsResponseType>(environment.api+'products/'+url);
   }
 
   private prepareParameters(activeParams:ActiveParamsType):RequestParamsType {

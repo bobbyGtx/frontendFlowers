@@ -7,6 +7,7 @@ import {ShowSnackService} from '../../core/show-snack.service';
 import {CategoriesWithTypesResponseType} from '../../../types/responses/categories-with-types-response.type';
 import {CategoryWithTypesType} from '../../../types/category-with-types.type';
 import {TypeType} from '../../../types/type.type';
+import {ResponseDataValidatorService} from '../services/response-data-validator.service';
 
 @Component({
   selector: 'app-layout',
@@ -15,6 +16,7 @@ import {TypeType} from '../../../types/type.type';
 export class LayoutComponent implements OnInit, OnDestroy {
   showSnackService:ShowSnackService = inject(ShowSnackService);
   categoryService= inject(CategoryService);
+  responseDataValidatorService:ResponseDataValidatorService=inject(ResponseDataValidatorService);
   categories:CategoryWithTypesType[]=[];
   subscriptions$:Subscription=new Subscription();
 
@@ -24,7 +26,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
         let error:null|string=null;
         if ((data as DefaultResponseType).error) {error=(data as DefaultResponseType).message;}
         const categoriesWithTypesResponse:CategoriesWithTypesResponseType = data as CategoriesWithTypesResponseType;
-        if (!categoriesWithTypesResponse.categories || !Array.isArray(categoriesWithTypesResponse.categories) || categoriesWithTypesResponse.categories.length <1) {
+        if (!categoriesWithTypesResponse.categories || !this.responseDataValidatorService.validateRequiredFields(categoriesWithTypesResponse.categories)) {
           error='Unexpected data from server. Categories not found!';
         }
         if (error){

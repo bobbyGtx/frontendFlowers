@@ -6,6 +6,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../core/show-snack.service';
 import {ProductType} from '../../../types/product.type';
 import {OwlOptions} from 'ngx-owl-carousel-o';
+import {ResponseDataValidatorService} from '../../shared/services/response-data-validator.service';
 
 type ReviewType={
   name: string,
@@ -21,33 +22,9 @@ type ReviewType={
 export class MainComponent implements OnInit, OnDestroy {
   productService: ProductService=inject(ProductService);
   showSnackService: ShowSnackService=inject(ShowSnackService);
+  responseDataValidatorService:ResponseDataValidatorService=inject(ResponseDataValidatorService);
   subscriptions$: Subscription=new Subscription();
   bestProducts:ProductType[]=[];
-  customOptions: OwlOptions = {
-    loop: true,
-    mouseDrag: false,
-    touchDrag: false,
-    pullDrag: false,
-    margin: 24,
-    dots: false,
-    navSpeed: 700,
-    navText: ['', ''],
-    responsive: {
-      0: {
-        items: 1
-      },
-      400: {
-        items: 2
-      },
-      740: {
-        items: 3
-      },
-      940: {
-        items: 4
-      }
-    },
-    nav: false
-  };
   customOptionsReviews: OwlOptions = {
     loop: true,
     mouseDrag: false,
@@ -114,7 +91,7 @@ export class MainComponent implements OnInit, OnDestroy {
         next: (data:BestProductsResponseType) => {
           let error:null|string=null;
           if(data.error)error=data.message;
-          if (!data.products || !Array.isArray(data.products) || data.products.length===0) error='Unexpected data from server. Best products not found!';
+          if (!data.products || !this.responseDataValidatorService.validateRequiredFields(data.products)) error='Unexpected data from server. Best products not found!';
           if (error){
             this.showSnackService.error(error);
             throw new Error(error);

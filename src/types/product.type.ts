@@ -9,6 +9,7 @@ export type ProductType = {
   height: number,
   diameter: number,
   url: string,
+  category_id:number,
   count: number,
   disabled: boolean,
   type: {

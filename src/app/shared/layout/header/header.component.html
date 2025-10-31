@@ -10,7 +10,7 @@
         <div class="header-top-menu">
           <nav>
             <ul>
-              <li><a routerLink="/" [routerLinkActive]="'active'">Главная</a></li>
+              <li><a routerLink="/" [routerLinkActive]="'active'" [routerLinkActiveOptions]="{exact:true}">Главная</a></li>
               <li><a routerLink="/catalog" [routerLinkActive]="'active'">Каталог</a></li>
               <li><a  [routerLinkActive]="'active'">Отзывы</a></li>
               <li><a  [routerLinkActive]="'active'">Доставка и оплата</a></li>

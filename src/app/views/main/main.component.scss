@@ -117,32 +117,6 @@
 .best-products {
   padding-top: 120px;
   padding-bottom: 130px;
-
-  .container {
-    .carousel-header {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 50px;
-
-      .carousel-title {
-        @include head-lora(32px);
-      }
-
-      .carousel-arrows {
-        display: flex;
-        align-items: center;
-        gap: 30px;
-        width: 62px;
-      }
-    }
-
-    .carousel-items {
-
-    }
-  }
-
 }
 
 .info {
@@ -285,6 +259,7 @@
 
 .move-backward,
 .move-forward {
+  user-select: none;
   svg {
     fill: none;
     width: 16px;

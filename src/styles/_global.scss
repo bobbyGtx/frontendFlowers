@@ -44,6 +44,7 @@ input[type=password]{
   width: 40px;
   height: 28px;
   outline: none;
+  // noinspection CssUnknownProperty
   -moz-appearance:textfield;
 }
 input::-webkit-outer-spin-button,
@@ -65,6 +66,19 @@ input::-webkit-inner-spin-button {
   line-height: 1;
   font-size: 16px;
   color: #FFFFFF;
+  &.button-transparent{
+    background-color: transparent;
+    border:1px solid $transparent-btn-border;
+    color:$green-text-color;
+  }
+  &.button-icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    span{
+      margin-left: 16px;
+    }
+  }
   &:disabled{
     background-color: gray;
     cursor: not-allowed;
