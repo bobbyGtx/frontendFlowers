@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {map, Observable, of, shareReplay, tap} from 'rxjs';
+import {map, Observable, of, shareReplay} from 'rxjs';
 import {CategoriesResponseType} from '../../../types/responses/categories-response.type';
 import {environment} from '../../../environments/environment';
 import {CategoriesWithTypesResponseType} from '../../../types/responses/categories-with-types-response.type';
