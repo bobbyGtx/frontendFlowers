@@ -50,7 +50,6 @@ export class ShowSnackService {
         [AppLanguages.ru]:'Введен некорректный E-Mail!',
         [AppLanguages.en]:'Entered email is incorrect!',
         [AppLanguages.de]:'Falsche E-Mail-Adresse eingegeben!',
-
       },
       {
         error: 'Password wrong!',

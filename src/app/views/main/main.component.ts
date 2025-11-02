@@ -88,15 +88,14 @@ export class MainComponent implements OnInit, OnDestroy {
       this.productService.getBestProducts().subscribe({
         next: (data:BestProductsResponseType) => {
           if (data.error){
-            this.showSnackService.error(this.productService.userErrors.getBestProducts);
+            this.showSnackService.error(this.productService.getBestProductsError);
             throw new Error(data.message);
           }
           if (data.products)this.bestProducts=data.products;
         },
         error: (errorResponse:HttpErrorResponse) => {
-          this.showSnackService.error(this.productService.userErrors.getBestProducts);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-            else console.log(`Unexpected error (getBestProducts)!`+ ` Code:${errorResponse.status}`);
+          this.showSnackService.error(this.productService.getBestProductsError);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getBestProducts)! Code:${errorResponse.status}`);
         }
       }));
   }

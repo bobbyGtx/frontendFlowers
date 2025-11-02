@@ -76,7 +76,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
                   this.productService.getProducts(this.activeParams).subscribe({
                     next: (data: ProductsResponseType) => {
                       if (data.error) {
-                        this.showSnackService.error(this.productService.userErrors.getProducts);
+                        this.showSnackService.error(this.productService.getProductsError);
                         throw new Error(data.message);
                       }
                       if (data.response) {
@@ -88,9 +88,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
                       }
                     },
                     error: (errorResponse: HttpErrorResponse) => {
-                      this.showSnackService.error(this.productService.userErrors.getProducts);
-                      if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message);
-                        else console.log(`Unexpected error (getProducts)!`+ ` Code:${errorResponse.status}`);
+                      this.showSnackService.error(this.productService.getProductsError);
+                      console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getProducts)! Code:${errorResponse.status}`);
                     }
                   }));
               })

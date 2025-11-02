@@ -30,7 +30,7 @@ export class DetailComponent implements OnInit, OnDestroy {
         this.productService.getProduct(params['url']).subscribe({
           next: (data: ProductResponseType) => {
             if (data.error) {
-              this.showSnackService.error(this.productService.userErrors.getProduct);
+              this.showSnackService.error(this.productService.getProductError);
               throw new Error(data.message);
             }
             if (!data.product) throw new Error(data.message);
@@ -40,22 +40,20 @@ export class DetailComponent implements OnInit, OnDestroy {
               this.productService.getRecommendedProducts(this.product.category_id, this.product.id).subscribe({
                 next: (data: RecommendedProductsResponseType) => {
                   if (data.error) {
-                    this.showSnackService.error(this.productService.userErrors.getRecommendedProducts);
+                    this.showSnackService.error(this.productService.getRecommendedProductsError);
                     throw new Error(data.message);
                   }
                   if (data.products) this.recommendedProducts = data.products;
                 },
                 error: (errorResponse: HttpErrorResponse) => {
-                  this.showSnackService.error(this.productService.userErrors.getRecommendedProducts);
-                  if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message);
-                  else console.log('Unexpected error (getRecommendedProducts)!' + ` Code:${errorResponse.status}`);
+                  this.showSnackService.error(this.productService.getRecommendedProductsError);
+                  console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getRecommendedProducts)! Code:${errorResponse.status}`);
                 }
               }));
           },
           error: (errorResponse: HttpErrorResponse) => {
-            this.showSnackService.error(this.productService.userErrors.getProduct);
-            if (errorResponse.error && errorResponse.error.message) this.showSnackService.error(errorResponse.error.message);
-            else console.log(`Unexpected error (getRecommendedProducts)!` + ` Code:${errorResponse.status}`);
+            this.showSnackService.error(this.productService.getProductError);
+            console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getProduct)! Code:${errorResponse.status}`);
           }
         });
       })

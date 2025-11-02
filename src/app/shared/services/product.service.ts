@@ -9,6 +9,8 @@ import {RecommendedProductsResponseType} from '../../../types/responses/recommen
 import {ProductResponseType} from '../../../types/responses/product-response.type';
 import {ProductType} from '../../../types/product.type';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
+import {AppLanguages} from '../../../enums/app-languages.enum';
+import {LanguageService} from '../../core/language.service';
 
 type RequestParamsType = {
   types?: string;
@@ -22,13 +24,28 @@ type RequestParamsType = {
   page?: number;
 };
 
+type userErrorsType = {
+  getBestProducts:{
+    [key in AppLanguages]:string;
+  },
+  getRecommendedProducts:{
+    [key in AppLanguages]:string;
+  },
+  getProducts:{
+    [key in AppLanguages]:string;
+  },
+  getProduct:{
+    [key in AppLanguages]:string;
+  },
+}
+
 @Injectable({
   providedIn: 'root'
 })
 
-
 export class ProductService {
   http: HttpClient = inject(HttpClient);
+  languageService:LanguageService= inject(LanguageService);
 
   productTemplate: ProductType = {
     id: 0,
@@ -50,12 +67,41 @@ export class ProductService {
       url: ''
     }
   };
-  userErrors = {
-    getBestProducts: 'Лучшие продукты не найдены, обновите страницу.',
-    getRecommendedProducts: 'Рекомендуемые продукты не найдены, обновите страницу.',
-    getProducts: 'Ошибка при запросе товаров. Обновите страницу.',
-    getProduct: 'Запрашиваемый товар не найден.',
+  userErrors:userErrorsType = {
+    getBestProducts: {
+      [AppLanguages.ru]:'Лучшие продукты не найдены, обновите страницу.',
+      [AppLanguages.en]:'Best products not found, try refresh the page.',
+      [AppLanguages.de]:'Die besten Produkte wurden nicht gefunden, bitte aktualisieren Sie die Seite.',
+    },
+    getRecommendedProducts: {
+      [AppLanguages.ru]:'Рекомендуемые продукты не найдены, обновите страницу.',
+      [AppLanguages.en]:'Recommended products not found, try refresh the page.',
+      [AppLanguages.de]:'Empfohlene Produkte nicht gefunden, bitte aktualisieren Sie die Seite.',
+    },
+    getProducts:{
+      [AppLanguages.ru]:'Ошибка при запросе товаров. Обновите страницу.',
+      [AppLanguages.en]:'Error while requesting products. Refresh the page.',
+      [AppLanguages.de]:'Fehler beim Anfordern der Produkte. Bitte aktualisieren Sie die Seite.',
+    },
+    getProduct: {
+      [AppLanguages.ru]:'Запрашиваемый товар не найден.',
+      [AppLanguages.en]:'Requested product was not found.',
+      [AppLanguages.de]:'Das angeforderte Produkt wurde nicht gefunden.',
+    },
   };
+
+  get getBestProductsError():string{
+    return this.userErrors.getBestProducts[this.languageService.appLang]
+  };
+  get getRecommendedProductsError():string{
+    return this.userErrors.getRecommendedProducts[this.languageService.appLang]
+  };
+  get getProductsError():string{
+    return this.userErrors.getProducts[this.languageService.appLang]
+  }
+  get getProductError():string{
+    return this.userErrors.getProduct[this.languageService.appLang]
+  }
 
   getBestProducts(): Observable<BestProductsResponseType> {
     return this.http.get<BestProductsResponseType>(environment.api + 'products/best')
