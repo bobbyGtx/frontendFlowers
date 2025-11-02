@@ -41,7 +41,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   doLogout():void{
     this.authService.removeTokens();
     this.authService.userId=null;
-    this.showSnackService.info(`You have successfully logged out.`);
+    this.showSnackService.success(`You have successfully logged out.`);
     this.router.navigate(['/']);
   }
 

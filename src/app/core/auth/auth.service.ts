@@ -1,9 +1,11 @@
 import {inject, Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {BehaviorSubject, map, Observable, throwError} from 'rxjs';
 import {DefaultResponseType} from '../../../types/responses/default-response.type';
 import {LoginResponseType} from '../../../types/responses/login-response.type';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
+import {ResponseDataValidator} from '../../shared/utils/response-data-validator.util';
+import {UserType} from '../../../types/user.type';
 
 @Injectable({providedIn: 'root'})
 
@@ -13,7 +15,13 @@ export class AuthService {
   public accessTokenKey: string = 'accessToken';
   public refreshTokenKey: string = 'refreshToken';
   public userIdKey: string = 'userId';
-  public isLogged$:BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public isLogged$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  userTemplate: UserType = {
+    userId: 0,
+    accessToken: '',
+    refreshToken: '',
+  }
 
   constructor() {
     this.isLogged$.next(!!localStorage.getItem(this.accessTokenKey));
@@ -42,9 +50,20 @@ export class AuthService {
     return this.http.post<DefaultResponseType>(environment.api + 'register.php', {email, password, passwordRepeat});
   }
 
-  login(email: string, password: string, rememberMe: boolean): Observable<DefaultResponseType | LoginResponseType> {
+  login(email: string, password: string, rememberMe: boolean): Observable<LoginResponseType> {
     this.rememberMe = rememberMe;
-    return this.http.post<DefaultResponseType | LoginResponseType>(environment.api + 'login.php', {email, password});
+    return this.http.post<LoginResponseType>(environment.api + 'login.php', {email, password})
+      .pipe(
+        map((response: LoginResponseType): LoginResponseType => {
+          if (response.error) return response
+          //Если от сервера пришел нормальный ответ, но данные потеряны
+          if (!response.user || !ResponseDataValidator.validateRequiredFields(this.userTemplate, response.user)) {
+            response.error = true;
+            response.message = 'Login error. User data not found in response or have invalid structure.';
+          }
+          return response;
+        })
+      );
   }
 
   logout(): Observable<DefaultResponseType> {
@@ -75,8 +94,8 @@ export class AuthService {
       };
     } else {
       return {
-        accessToken: localStorage.getItem(this.accessTokenKey),
-        refreshToken: localStorage.getItem(this.refreshTokenKey)
+        accessToken: sessionStorage.getItem(this.accessTokenKey),
+        refreshToken: sessionStorage.getItem(this.refreshTokenKey)
       };
     }
   }

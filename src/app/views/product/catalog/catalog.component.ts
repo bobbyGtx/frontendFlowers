@@ -8,7 +8,7 @@ import {ProductsResponseType} from '../../../../types/responses/products-respons
 import {CategoryService} from '../../../shared/services/category.service';
 import {CategoriesWithTypesResponseType} from '../../../../types/responses/categories-with-types-response.type';
 import {CategoryWithTypesType} from '../../../../types/category-with-types.type';
-import {CategoryFiltersEnum} from '../../../../enums/category-filters.enum';
+import {CategoryFilters} from '../../../../enums/category-filters.enum';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ActiveParamsUtil} from '../../../shared/utils/active-params.util';
 import {ActiveParamsType} from '../../../../types/active-params.type';
@@ -225,5 +225,5 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.subscriptions$.unsubscribe();
   }
 
-  protected readonly CategoryFiltersEnum = CategoryFiltersEnum;
+  protected readonly CategoryFilters = CategoryFilters;
 }

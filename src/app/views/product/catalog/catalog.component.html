@@ -38,9 +38,9 @@
     <div class="catalog-layout">
       <div class="catalog-filters">
         <category-filter [categoryWithTypes]="categoryWithTypes" *ngFor="let categoryWithTypes of categoriesWithTypes"></category-filter>
-        <category-filter [type]="CategoryFiltersEnum.diameter"></category-filter>
-        <category-filter [type]="CategoryFiltersEnum.height"></category-filter>
-        <category-filter [type]="CategoryFiltersEnum.price"></category-filter>
+        <category-filter [type]="CategoryFilters.diameter"></category-filter>
+        <category-filter [type]="CategoryFilters.height"></category-filter>
+        <category-filter [type]="CategoryFilters.price"></category-filter>
       </div>
       <div class="catalog-products" *ngIf="products.length>0">
         <product-card [product]="product" *ngFor="let product of products"></product-card>

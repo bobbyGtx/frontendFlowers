@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ActiveParamsType} from '../../../../types/active-params.type';
 import {Subscription} from 'rxjs';
 import {UrlParamsEnum} from '../../../../enums/url-params.enum';
-import {CategoryFiltersEnum} from '../../../../enums/category-filters.enum';
+import {CategoryFilters} from '../../../../enums/category-filters.enum';
 import {TypeType} from '../../../../types/type.type';
 import {ActiveParamsUtil} from '../../utils/active-params.util';
 
@@ -44,7 +44,7 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
   router: Router = inject(Router);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   @Input() categoryWithTypes: CategoryWithTypesType | null = null;
-  @Input() type: CategoryFiltersEnum | null = null;
+  @Input() type: CategoryFilters | null = null;
 
   subscriptions$: Subscription = new Subscription();
 
@@ -60,11 +60,11 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
     if (this.categoryWithTypes) {
       return this.categoryWithTypes.name;
     } else if (this.type) {
-      if (this.type === CategoryFiltersEnum.height) {
+      if (this.type === CategoryFilters.height) {
         return 'Высота';
-      } else if (this.type === CategoryFiltersEnum.diameter) {
+      } else if (this.type === CategoryFilters.diameter) {
         return 'Диаметр';
-      } else if (this.type === CategoryFiltersEnum.price) {
+      } else if (this.type === CategoryFilters.price) {
         return 'Цена';
       }
     }
@@ -72,7 +72,7 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
   }
 
   get units(): string {
-    return this.type === CategoryFiltersEnum.price ? 'евро' : 'см'
+    return this.type === CategoryFilters.price ? 'евро' : 'см'
   }
 
   ngOnInit() {

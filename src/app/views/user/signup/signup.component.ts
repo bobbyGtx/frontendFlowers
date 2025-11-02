@@ -6,6 +6,7 @@ import {Subscription} from 'rxjs';
 import {DefaultResponseType} from '../../../../types/responses/default-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
+import {ReqErrorTypes} from '../../../../enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-signup',
@@ -19,16 +20,10 @@ export class SignupComponent {
   authService:AuthService=inject(AuthService);
   subscriptions$:Subscription=new Subscription();
 
-  // signUpForm: FormGroup=this.fb.group({
-  //   email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
-  //   password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
-  //   passwordRepeat: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
-  //   agree: [false, Validators.requiredTrue],
-  // });
   signUpForm: FormGroup=this.fb.group({
-    email: ['', Validators.required ],
-    password: ['', Validators.required],
-    passwordRepeat: ['', Validators.required],
+    email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
+    password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
+    passwordRepeat: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
     agree: [false, Validators.requiredTrue],
   });
 
@@ -52,19 +47,15 @@ export class SignupComponent {
           .subscribe({
             next: (data:DefaultResponseType)=> {
               if (data.error){
-                this.showSnackService.error(data.message);
+                this.showSnackService.error(data.message,ReqErrorTypes.authSignUp);
                 throw new Error(data.message);
               }
-              this.showSnackService.success('Регистрация прошла успешно. Войдите в систему.');
+              this.showSnackService.success(data.message);
               this.router.navigate(['/login']);
             },
             error: (errorResponse:HttpErrorResponse)=> {
-              if (errorResponse.error && errorResponse.error.message){
-                //тут может прийти ответ с массивом ошибок
-                this.showSnackService.errorObj(errorResponse.error);
-              }else{
-                this.showSnackService.error(`Unexpected Sign Up error!`,errorResponse.status);
-              }
+              console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected Sign Up error! Code:${errorResponse.status}`);
+              this.showSnackService.errorObj(errorResponse.error,ReqErrorTypes.authSignUp);
             },
           })
       );
