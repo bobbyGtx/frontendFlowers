@@ -3,5 +3,3 @@ export interface CategoryType {
   name:string;
   url:string;
 }
-
-

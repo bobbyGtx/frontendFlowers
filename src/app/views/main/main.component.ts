@@ -6,7 +6,6 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../core/show-snack.service';
 import {ProductType} from '../../../types/product.type';
 import {OwlOptions} from 'ngx-owl-carousel-o';
-import {ResponseDataValidatorService} from '../../shared/services/response-data-validator.service';
 
 type ReviewType={
   name: string,
@@ -22,7 +21,6 @@ type ReviewType={
 export class MainComponent implements OnInit, OnDestroy {
   productService: ProductService=inject(ProductService);
   showSnackService: ShowSnackService=inject(ShowSnackService);
-  responseDataValidatorService:ResponseDataValidatorService=inject(ResponseDataValidatorService);
   subscriptions$: Subscription=new Subscription();
   bestProducts:ProductType[]=[];
   customOptionsReviews: OwlOptions = {
@@ -89,22 +87,16 @@ export class MainComponent implements OnInit, OnDestroy {
     this.subscriptions$.add(
       this.productService.getBestProducts().subscribe({
         next: (data:BestProductsResponseType) => {
-          let error:null|string=null;
-          if(data.error)error=data.message;
-          if (!data.products || !this.responseDataValidatorService.validateRequiredFields(data.products)) error='Unexpected data from server. Best products not found!';
-          if (error){
-            this.showSnackService.error(error);
-            throw new Error(error);
+          if (data.error){
+            this.showSnackService.error(this.productService.userErrors.getBestProducts);
+            throw new Error(data.message);
           }
           if (data.products)this.bestProducts=data.products;
         },
         error: (errorResponse:HttpErrorResponse) => {
-          if (errorResponse.error && errorResponse.error.message){
-            //Если есть ошибка - выводим это пользователю
-            this.showSnackService.error(errorResponse.error.message);
-          }else{
-            this.showSnackService.error(`Unexpected error (getBestProducts)!`,errorResponse.status);
-          }//Если сообщения нет - выводим это
+          this.showSnackService.error(this.productService.userErrors.getBestProducts);
+          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
+            else console.log(`Unexpected error (getBestProducts)!`+ ` Code:${errorResponse.status}`);
         }
       }));
   }
