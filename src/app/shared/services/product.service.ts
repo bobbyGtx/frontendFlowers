@@ -2,15 +2,16 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
-import {BestProductsResponseType} from '../../../types/responses/best-products-response.type';
-import {ProductsResponseType} from '../../../types/responses/products-response.type';
-import {ActiveParamsType} from '../../../types/active-params.type';
-import {RecommendedProductsResponseType} from '../../../types/responses/recommended-products-response.type';
-import {ProductResponseType} from '../../../types/responses/product-response.type';
-import {ProductType} from '../../../types/product.type';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
-import {AppLanguages} from '../../../enums/app-languages.enum';
 import {LanguageService} from '../../core/language.service';
+import {ProductType} from '../../../assets/types/product.type';
+import {AppLanguages} from '../../../assets/enums/app-languages.enum';
+import {BestProductsResponseType} from '../../../assets/types/responses/best-products-response.type';
+import {RecommendedProductsResponseType} from '../../../assets/types/responses/recommended-products-response.type';
+import {ActiveParamsType} from '../../../assets/types/active-params.type';
+import {ProductResponseType} from '../../../assets/types/responses/product-response.type';
+import {ProductsResponseType} from '../../../assets/types/responses/products-response.type';
+
 
 type RequestParamsType = {
   types?: string;
@@ -23,8 +24,7 @@ type RequestParamsType = {
   sort?: string;
   page?: number;
 };
-
-type userErrorsType = {
+export type userErrorsType = {
   getBestProducts:{
     [key in AppLanguages]:string;
   },

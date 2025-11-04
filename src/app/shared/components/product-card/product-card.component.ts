@@ -1,7 +1,6 @@
-import {Component, inject, Input} from '@angular/core';
-import {ProductType} from '../../../../types/product.type';
+import {Component, Input} from '@angular/core';
 import {environment} from '../../../../environments/environment.development';
-import {ShowSnackService} from '../../../core/show-snack.service';
+import {ProductType} from '../../../../assets/types/product.type';
 
 @Component({
   selector: 'product-card',
@@ -9,20 +8,8 @@ import {ShowSnackService} from '../../../core/show-snack.service';
   styleUrl: './product-card.component.scss'
 })
 class ProductCardComponent {
-  showSnackService: ShowSnackService=inject(ShowSnackService);
   @Input() product!:ProductType;
   images:string = environment.images;
-  count:number = 1;
-
-  onChangeCount(event:Event){
-    let newValue:number=Number((event.target as HTMLInputElement).value)
-    if (newValue > this.product.count){
-      this.count = this.product.count;
-      this.showSnackService.error(`Доступно ${this.product.count} единиц товара!`);
-    }
-    if (!newValue || newValue < 1) this.count = 1;
-  }
-
 }
 
 export default ProductCardComponent

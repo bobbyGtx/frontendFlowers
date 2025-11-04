@@ -1,0 +1,38 @@
+@import "variables";
+.count-selector {
+  width: 97px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .svg-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 12px;
+    height: 20px;
+    user-select: none;
+    svg {
+      fill:$svg-color;
+      &:first-child {
+        margin-left: 1px;
+        margin-top: 1px;
+      }
+    }
+    &:hover {
+      svg{
+        fill: $svg-color-h;
+      }
+    }
+
+  }
+  &.disabled {
+    .svg-btn{
+      cursor: not-allowed;
+    }
+    input{
+      cursor: not-allowed;
+    }
+  }
+}

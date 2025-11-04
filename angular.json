@@ -42,12 +42,12 @@
               "./node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.carousel.min.css",
               "./node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.theme.default.min.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles/styles.scss"
+              "src/assets/styles/styles.scss"
             ],
             "scripts": [],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "src/styles"
+                "src/assets/styles"
               ]
             }
           },

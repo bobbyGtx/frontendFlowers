@@ -27,6 +27,17 @@
     border-radius: 5px;
     background-size: cover;
     background-position: center;
+    &.disabled {
+      filter: grayscale(1);
+      -webkit-filter: grayscale(1);
+      -moz-filter: grayscale(1);
+      -o-filter: grayscale(1);
+      -ms-filter: gray(1);
+
+      &:hover {
+        filter: unset;
+      }
+    }
   }
 
   .product-card-name {
@@ -54,6 +65,8 @@
       font-weight: 600;
       line-height: 1;
       margin-left: 4px;
+      cursor: default;
+      user-select: none;
     }
 
     .product-card-action {
@@ -72,21 +85,6 @@
 
     svg {
       fill: none;
-    }
-
-    .product-card-count {
-      width: 97px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-
-      }
     }
 
     .product-card-detail {

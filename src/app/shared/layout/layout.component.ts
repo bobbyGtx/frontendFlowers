@@ -3,8 +3,8 @@ import {CategoryService} from '../services/category.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Subscription} from 'rxjs';
 import {ShowSnackService} from '../../core/show-snack.service';
-import {CategoriesWithTypesResponseType} from '../../../types/responses/categories-with-types-response.type';
-import {CategoryWithTypesType} from '../../../types/category-with-types.type';
+import {CategoryWithTypesType} from '../../../assets/types/category-with-types.type';
+import {CategoriesWithTypesResponseType} from '../../../assets/types/responses/categories-with-types-response.type';
 
 @Component({
   selector: 'app-layout',

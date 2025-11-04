@@ -2,10 +2,10 @@
   <div class="container" *ngIf="product">
     <div class="detail-title">{{product.name}}</div>
     <div class="detail-product">
-      <div class="detail-image" [style.background-image]="'url('+images+product.image+')'"></div>
+      <div class="detail-image" [class.disabled]="product.disabled || product.count===0" [style.background-image]="'url('+images+product.image+')'"></div>
       <div class="detail-info">
         <div class="detail-info-items">
-          <div class="detail-info-item">
+          <div class="detail-info-item" *ngIf="product.lightning">
             <div class="detail-info-item-icon">
               <svg viewBox="0 0 53 55" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M37.4048 28.1161C37.0958 21.732 32.0783 16.7854 26.0972 16.7854C20.116 16.7854 15.0985 21.732 14.7896 28.1161H13C13.3116 20.8158 19.0562 14.9976 26.0972 14.9976C33.1381 14.9976 38.8828 20.8158 39.1943 28.1161H37.4048Z" fill="#519157"/>
@@ -22,7 +22,7 @@
               <div class="detail-info-item-description">{{product.lightning}}</div>
             </div>
           </div>
-          <div class="detail-info-item">
+          <div class="detail-info-item" *ngIf="product.humidity">
             <div class="detail-info-item-icon">
               <svg viewBox="0 0 53 55" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="26.2338" cy="27.5" rx="26.2338" ry="27.5" fill="white"/>
@@ -33,14 +33,13 @@
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M30.0855 34.7566C28.7479 38.5128 25.6229 40.9624 22.2926 40.9624C17.8737 40.9624 13.8163 36.6496 13.8163 30.6946C13.8163 27.7932 15.0002 24.3411 16.8519 21.2488C18.4669 18.5518 20.4573 16.3487 22.306 15.1063C24.4804 16.4933 26.4952 18.7295 28.027 21.3851C28.063 21.4474 28.0987 21.51 28.134 21.5727L28.6651 19.6418L29.1961 19.8023C27.3817 16.8817 24.9704 14.4035 22.2926 13C17.3522 15.5895 12 24.0207 12 30.6946C12 37.3685 16.6082 42.7788 22.2926 42.7788C26.5945 42.7788 30.28 39.6802 31.8182 35.2803L30.0855 34.7566Z" fill="#1D1D1D"/>
                 <path d="M30.0855 34.7566L30.6109 33.018L28.9548 32.5175L28.3744 34.1473L30.0855 34.7566ZM16.8519 21.2488L15.2936 20.3157L16.8519 21.2488ZM22.306 15.1063L23.2827 13.5749L22.28 12.9353L21.2928 13.5988L22.306 15.1063ZM28.027 21.3851L26.4537 22.2926L26.4537 22.2926L28.027 21.3851ZM28.134 21.5727L26.552 22.465L28.7169 26.3029L29.8853 22.0543L28.134 21.5727ZM28.6651 19.6418L29.1905 17.9031L27.4077 17.3643L26.9138 19.1601L28.6651 19.6418ZM29.1961 19.8023L28.6706 21.541L33.2799 22.934L30.7389 18.8438L29.1961 19.8023ZM22.2926 13L23.1358 11.3912L22.2926 10.9493L21.4494 11.3912L22.2926 13ZM31.8182 35.2803L33.5328 35.8798L34.1585 34.0901L32.3437 33.5417L31.8182 35.2803ZM22.2926 42.7788C26.5504 42.7788 30.2591 39.6834 31.7966 35.366L28.3744 34.1473C27.2367 37.3421 24.6955 39.1461 22.2926 39.1461V42.7788ZM12 30.6946C12 37.3852 16.6225 42.7788 22.2926 42.7788V39.1461C19.1249 39.1461 15.6327 35.914 15.6327 30.6946H12ZM15.2936 20.3157C13.338 23.5815 12 27.3578 12 30.6946H15.6327C15.6327 28.2286 16.6625 25.1006 18.4103 22.182L15.2936 20.3157ZM21.2928 13.5988C19.1631 15.0301 17.0038 17.4599 15.2936 20.3157L18.4103 22.182C19.9301 19.6438 21.7515 17.6674 23.3191 16.6138L21.2928 13.5988ZM29.6004 20.4775C27.9563 17.6273 25.7543 15.1514 23.2827 13.5749L21.3292 16.6376C23.2065 17.8351 25.0341 19.8316 26.4537 22.2926L29.6004 20.4775ZM29.716 20.6803C29.6778 20.6125 29.6393 20.5449 29.6004 20.4775L26.4537 22.2926C26.4867 22.3499 26.5195 22.4074 26.552 22.465L29.716 20.6803ZM29.8853 22.0543L30.4164 20.1235L26.9138 19.1601L26.3827 21.091L29.8853 22.0543ZM28.1396 21.3805L28.6706 21.541L29.7215 18.0636L29.1905 17.9031L28.1396 21.3805ZM30.7389 18.8438C28.8024 15.7267 26.173 12.9831 23.1358 11.3912L21.4494 14.6088C23.7679 15.824 25.9609 18.0368 27.6532 20.7608L30.7389 18.8438ZM21.4494 11.3912C18.5749 12.8979 15.7865 15.9572 13.7353 19.3825C11.6758 22.8217 10.1837 26.9221 10.1837 30.6946H13.8163C13.8163 27.7932 15.0002 24.3411 16.8519 21.2488C18.712 18.1427 21.0699 15.6916 23.1358 14.6088L21.4494 11.3912ZM10.1837 30.6946C10.1837 38.0874 15.3426 44.5951 22.2926 44.5951V40.9624C17.8737 40.9624 13.8163 36.6496 13.8163 30.6946H10.1837ZM22.2926 44.5951C27.5339 44.5951 31.7997 40.8369 33.5328 35.8798L30.1037 34.6809C28.7602 38.5235 25.6551 40.9624 22.2926 40.9624V44.5951ZM32.3437 33.5417L30.6109 33.018L29.56 36.4953L31.2928 37.019L32.3437 33.5417Z" fill="#519157" mask="url(#path-3-inside-1_361_2119)"/>
               </svg>
-
             </div>
             <div class="detail-info-item-text">
               <div class="detail-info-item-title">Влажность</div>
               <div class="detail-info-item-description">{{product.humidity}}</div>
             </div>
           </div>
-          <div class="detail-info-item">
+          <div class="detail-info-item" *ngIf="product.temperature">
             <div class="detail-info-item-icon">
               <svg viewBox="0 0 53 55" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="26.2338" cy="27.5" rx="26.2338" ry="27.5" fill="white"/>
@@ -55,23 +54,25 @@
             </div>
           </div>
         </div>
-        <div class="detail-info-param">
+        <div class="detail-info-param" *ngIf="product.height">
           <div class="detail-info-param-name">Высота:</div>
           <div class="detail-info-param-data">{{product.height}}см</div>
         </div>
-        <div class="detail-info-param">
+        <div class="detail-info-param" *ngIf="product.diameter">
           <div class="detail-info-param-name">Диаметр (горшка):</div>
           <div class="detail-info-param-data">{{product.diameter}}см</div>
         </div>
-        <div class="detail-info-param">
+        <div class="detail-info-param" *ngIf="!product.disabled && product.count >0">
           <div class="detail-info-param-name">Доступно:</div>
           <div class="detail-info-param-data">{{product.count}} единиц</div>
         </div>
         <div class="detail-info-params">
-          <div class="detail-info-params-count">
+          <div class="detail-info-params-count" *ngIf="!product.disabled && product.count>0">
             <span>Количество: </span>
+            <count-selector (onCountChange)="updateCount($event)" [count]="count" [maxCount]="product.count" [disabled]="product.disabled"></count-selector>
           </div>
-          <div class="detail-info-params-price">{{product.price}} EUR</div>
+          <div class="product-not-allowed" *ngIf="product.disabled || product.count===0">Товар не доступен!</div>
+          <div class="detail-info-params-price" [style.opacity]="product.disabled || product.count==0?0.4:1">{{product.price}} EUR</div>
         </div>
         <div class="detail-info-actions">
           <button class="button button-transparent button-icon">
@@ -82,7 +83,8 @@
 
             <span>В избранное</span>
             </button>
-          <button class="button">В корзину</button>
+          <button class="button" [disabled]="product.disabled || product.count===0"
+          (click)="addToCart()">В корзину</button>
         </div>
       </div>
     </div>

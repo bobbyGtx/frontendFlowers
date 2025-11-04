@@ -9,9 +9,10 @@ import {FormsModule} from '@angular/forms';
 import { CategoryFilterComponent } from './components/category-filter/category-filter.component';
 import { ProductsCarouselComponent } from './components/products-carousel/products-carousel.component';
 import {CarouselModule} from 'ngx-owl-carousel-o';
+import { CountSelectorComponent } from './components/count-selector/count-selector.component';
 
 @NgModule({
-    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent],
+    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent],
   imports: [
     CommonModule,
     MatButton,
@@ -19,7 +20,7 @@ import {CarouselModule} from 'ngx-owl-carousel-o';
     FormsModule,
     CarouselModule
   ],
-    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent],
+    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent],
 })
 export class SharedModule {
 }

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {CategoryWithTypesType} from '../../../../types/category-with-types.type';
+import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
 
 @Component({
   selector: 'app-footer',

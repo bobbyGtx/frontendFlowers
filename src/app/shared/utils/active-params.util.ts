@@ -1,6 +1,6 @@
-import {UrlParamsEnum} from '../../../enums/url-params.enum';
-import {ActiveParamsType} from '../../../types/active-params.type';
 import {Params} from '@angular/router';
+import {ActiveParamsType} from '../../../assets/types/active-params.type';
+import {UrlParamsEnum} from '../../../assets/enums/url-params.enum';
 
 export class ActiveParamsUtil{
   static processParams(params:Params):ActiveParamsType{

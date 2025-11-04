@@ -12,28 +12,16 @@
 <!--      </svg>-->
 <!--    </span>-->
   </div>
-  <div class="product-card-image" [style.background-image]="'url('+images+product.image+')'"></div>
+  <div class="product-card-image" [class.disabled]="product.disabled" [style.background-image]="'url('+images+product.image+')'"></div>
   <div class="product-card-name">{{product.name}}</div>
   <div class="product-card-info">
     <div class="product-card-price">{{product.price}} EUR</div>
     <div class="product-card-action">
-      <button class="button">В корзину</button>
+      <button class="button" [disabled]="product.disabled">В корзину</button>
     </div>
   </div>
   <div class="product-card-extra">
-    <div class="product-card-count">
-      <div>
-        <svg width="10" height="3" viewBox="0 0 10 3" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9.14019 3V0H0V3H9.14019Z" fill="#9AA89B"/>
-        </svg>
-      </div>
-      <input type="number" class="small-input" [(ngModel)]="count" (keyup)="onChangeCount($event)">
-      <div>
-        <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7.20871 12V7.20896H12V4.81343H7.20871V0H4.81307V4.81343H0V7.20896H4.81307V12H7.20871Z" fill="#9AA89B"/>
-        </svg>
-      </div>
-    </div>
+    <count-selector [maxCount]="product.count" [disabled]="product.disabled"></count-selector>
     <a [routerLink]="'/product/' + product.url" class="product-card-detail">
       <svg width="18" height="4" viewBox="0 0 18 4" xmlns="http://www.w3.org/2000/svg">
         <circle cx="2" cy="2" r="2" fill="#9AA89B"/>

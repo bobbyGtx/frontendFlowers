@@ -1,11 +1,16 @@
 import {inject, Injectable} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {DefaultResponseType} from '../../types/responses/default-response.type';
 import {SnackbarMessageComponent} from '../shared/components/snackbar-message/snackbar-message.component';
-import {UserErrorsGroupType, UserErrorType, UserInfoMsgType, UserSuccessMsgType} from '../../types/user-errors.type';
-import {ReqErrorTypes} from '../../enums/auth-req-error-types.enum';
-import {AppLanguages} from '../../enums/app-languages.enum';
 import {LanguageService} from './language.service';
+import {
+  UserErrorsGroupType,
+  UserErrorType,
+  UserInfoMsgType,
+  UserSuccessMsgType
+} from '../../assets/types/user-errors.type';
+import {ReqErrorTypes} from '../../assets/enums/auth-req-error-types.enum';
+import {AppLanguages} from '../../assets/enums/app-languages.enum';
+import {DefaultResponseType} from '../../assets/types/responses/default-response.type';
 
 type SnackSettingsType = {
   data?: {

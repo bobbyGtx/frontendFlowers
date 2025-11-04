@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {ProductType} from '../../../../types/product.type';
 import {OwlOptions} from 'ngx-owl-carousel-o';
+import {ProductType} from '../../../../assets/types/product.type';
 
 @Component({
   selector: 'products-carousel',

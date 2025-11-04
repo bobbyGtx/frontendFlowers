@@ -2,20 +2,20 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../../shared/services/product.service';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {debounce, fromEvent, Subscription, timer} from 'rxjs';
-import {ProductType} from '../../../../types/product.type';
 import {HttpErrorResponse} from '@angular/common/http';
-import {ProductsResponseType} from '../../../../types/responses/products-response.type';
 import {CategoryService} from '../../../shared/services/category.service';
-import {CategoriesWithTypesResponseType} from '../../../../types/responses/categories-with-types-response.type';
-import {CategoryWithTypesType} from '../../../../types/category-with-types.type';
-import {CategoryFilters} from '../../../../enums/category-filters.enum';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ActiveParamsUtil} from '../../../shared/utils/active-params.util';
-import {ActiveParamsType} from '../../../../types/active-params.type';
-import {AppliedFilterType} from '../../../../types/applied-filter.type';
-import {TypeType} from '../../../../types/type.type';
-import {UrlParamsEnum} from '../../../../enums/url-params.enum';
-import {SortingOptionsType} from '../../../../types/sorting-options.type';
+import {ActiveParamsType} from '../../../../assets/types/active-params.type';
+import {AppliedFilterType} from '../../../../assets/types/applied-filter.type';
+import {ProductType} from '../../../../assets/types/product.type';
+import {SortingOptionsType} from '../../../../assets/types/sorting-options.type';
+import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
+import {CategoriesWithTypesResponseType} from '../../../../assets/types/responses/categories-with-types-response.type';
+import {ProductsResponseType} from '../../../../assets/types/responses/products-response.type';
+import {UrlParamsEnum} from '../../../../assets/enums/url-params.enum';
+import {TypeType} from '../../../../assets/types/type.type';
+import {CategoryFilters} from '../../../../assets/enums/category-filters.enum';
 
 @Component({
   selector: 'app-catalog',
@@ -55,7 +55,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
       this.categoryService.getCategoriesWithTypes().subscribe({
         next: (data: CategoriesWithTypesResponseType) => {
           if (data.error) {
-            this.showSnackService.error(this.categoryService.userErrorMessages.catWithTypes);
+            this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
             throw new Error(data.message);
           }
           if (data.categories) this.categoriesWithTypes = data.categories;
@@ -96,9 +96,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
           );
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.categoryService.userErrorMessages.catWithTypes);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-            else console.log(`Unexpected error (get Categories)!`+ ` Code:${errorResponse.status}`);
+          this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (get Categories)! Code:${errorResponse.status}`);
         }
       })
     );

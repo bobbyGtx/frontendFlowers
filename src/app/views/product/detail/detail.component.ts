@@ -1,13 +1,13 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {environment} from '../../../../environments/environment.development';
-import {ProductType} from '../../../../types/product.type';
 import {Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProductService} from '../../../shared/services/product.service';
-import {RecommendedProductsResponseType} from '../../../../types/responses/recommended-products-response.type';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {ActivatedRoute} from '@angular/router';
-import {ProductResponseType} from '../../../../types/responses/product-response.type';
+import {ProductType} from '../../../../assets/types/product.type';
+import {ProductResponseType} from '../../../../assets/types/responses/product-response.type';
+import {RecommendedProductsResponseType} from '../../../../assets/types/responses/recommended-products-response.type';
 
 @Component({
   selector: 'app-detail',
@@ -24,6 +24,18 @@ export class DetailComponent implements OnInit, OnDestroy {
   product: ProductType | null = null;
   subscriptions$: Subscription = new Subscription();
 
+  count:number = 1;
+
+  updateCount(value:number) {
+    this.count = value;
+  }
+
+  addToCart() {
+    if (!this.product?.disabled) {
+      alert(`Добавлено в карзину: ${this.count} шт`);
+    }
+  }
+
   ngOnInit(): void {
     this.subscriptions$.add(
       this.activatedRoute.params.subscribe(params => {
@@ -35,7 +47,6 @@ export class DetailComponent implements OnInit, OnDestroy {
             }
             if (!data.product) throw new Error(data.message);
             this.product = data.product;
-
             this.subscriptions$.add(
               this.productService.getRecommendedProducts(this.product.category_id, this.product.id).subscribe({
                 next: (data: RecommendedProductsResponseType) => {

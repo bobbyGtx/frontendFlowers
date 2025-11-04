@@ -3,7 +3,7 @@ import {Subscription} from 'rxjs';
 import {AuthService} from '../../../core/auth/auth.service';
 import {Router} from '@angular/router';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {CategoryWithTypesType} from '../../../../types/category-with-types.type';
+import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
 
 @Component({
   selector: 'app-header',

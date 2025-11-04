@@ -21,3 +21,5 @@ export type UserErrorType = {
 } & {
   [key in AppLanguages]: string;
 };
+
+

@@ -1,11 +1,11 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../shared/services/product.service';
 import {Subscription} from 'rxjs';
-import {BestProductsResponseType} from '../../../types/responses/best-products-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../core/show-snack.service';
-import {ProductType} from '../../../types/product.type';
 import {OwlOptions} from 'ngx-owl-carousel-o';
+import {ProductType} from '../../../assets/types/product.type';
+import {BestProductsResponseType} from '../../../assets/types/responses/best-products-response.type';
 
 type ReviewType={
   name: string,

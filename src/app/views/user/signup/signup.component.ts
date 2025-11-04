@@ -3,10 +3,10 @@ import {Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../core/auth/auth.service';
 import {Subscription} from 'rxjs';
-import {DefaultResponseType} from '../../../../types/responses/default-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {ReqErrorTypes} from '../../../../enums/auth-req-error-types.enum';
+import {DefaultResponseType} from '../../../../assets/types/responses/default-response.type';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-signup',

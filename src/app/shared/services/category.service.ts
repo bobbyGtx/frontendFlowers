@@ -1,20 +1,27 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {map, Observable, of, shareReplay} from 'rxjs';
-import {CategoriesResponseType} from '../../../types/responses/categories-response.type';
 import {environment} from '../../../environments/environment';
-import {CategoriesWithTypesResponseType} from '../../../types/responses/categories-with-types-response.type';
-import {CategoryWithTypesType} from '../../../types/category-with-types.type';
-import {TypeType} from '../../../types/type.type';
-import {DefaultResponseType} from '../../../types/responses/default-response.type';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
+import {LanguageService} from '../../core/language.service';
+import {CategoryWithTypesType} from '../../../assets/types/category-with-types.type';
+import {AppLanguages} from '../../../assets/enums/app-languages.enum';
+import {CategoriesWithTypesResponseType} from '../../../assets/types/responses/categories-with-types-response.type';
+import {TypeType} from '../../../assets/types/type.type';
+import {CategoriesResponseType} from '../../../assets/types/responses/categories-response.type';
 
+export type userErrorsType = {
+  getCategoriesWithTypes:{
+    [key in AppLanguages]:string;
+  },
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
   http: HttpClient = inject(HttpClient);
+  languageService:LanguageService = inject(LanguageService);
   categoryWithTypesTemplate: CategoryWithTypesType = {
     id: 0,
     name: '',
@@ -30,6 +37,17 @@ export class CategoryService {
   };
   userErrorMessages = {
     catWithTypes: 'Ошибка при запросе категорий. Обновите страницу.',
+  }
+  userErrors:userErrorsType = {
+    getCategoriesWithTypes: {
+      [AppLanguages.ru]:'Ошибка при запросе категорий. Обновите страницу.',
+      [AppLanguages.en]:'Error retrieving categories. Please refresh the page.',
+      [AppLanguages.de]:'Fehler beim Abrufen der Kategorien. Bitte aktualisieren Sie die Seite.',
+    },
+  };
+
+  get getCategoriesWithTypesError():string{
+    return this.userErrors.getCategoriesWithTypes[this.languageService.appLang];
   }
 
   categoriesWithTypesCash: CategoryWithTypesType[] | null = null;
@@ -50,10 +68,8 @@ export class CategoryService {
             if (response.error) return response;
             if (!response.categories || !ResponseDataValidator.validateRequiredFields(this.categoryWithTypesTemplate, response.categories)) {
               response.error = true;
-              response.message = 'Unexpected response from server. Try again!';
-              console.log('getCategoriesWithTypes error. Categories or Types not found in response or have invalid structure.')
+              response.message = 'getCategoriesWithTypes error. Categories or Types not found in response or have invalid structure.';
             }
-
             if (!response.error && response.categories) {
               response.categories = response.categories!.map(item => {
                 return Object.assign({typesUrl: item.types.map((typeItem: TypeType) => typeItem.url)}, item)
@@ -68,8 +84,8 @@ export class CategoryService {
     return this.categoriesWithTypesRequest$;
   }
 
-  getCategories(): Observable<DefaultResponseType | CategoriesResponseType> {
-    return this.http.get<DefaultResponseType | CategoriesResponseType>(environment.api + 'categories.php');
+  getCategories(): Observable<CategoriesResponseType> {
+    return this.http.get<CategoriesResponseType>(environment.api + 'categories.php');
   }
 
 }

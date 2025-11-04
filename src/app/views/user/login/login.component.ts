@@ -1,12 +1,12 @@
 import {Component, inject, OnDestroy} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../core/auth/auth.service';
-import {LoginResponseType} from '../../../../types/responses/login-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {ReqErrorTypes} from '../../../../enums/auth-req-error-types.enum';
+import {LoginResponseType} from '../../../../assets/types/responses/login-response.type';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-login',
@@ -33,26 +33,28 @@ export class LoginComponent implements OnDestroy {
   }
 
   login():void{
-    if (this.loginForm.valid && this.loginForm.value.email && this.loginForm.value.password) {
-      this.subscriptions$.add(this.authService.login(this.loginForm.value.email,this.loginForm.value.password, !!this.loginForm.value.rememberMe)
-        .subscribe({
-          next:(data:LoginResponseType)=>{
-            if (data.error || !data.user){
-              this.showSnackService.error(data.message,ReqErrorTypes.authLogin);
-              throw new Error(data.message);
-            }//Если ошибка есть - выводим её и завершаем функцию
+    if (this.loginForm.valid && this.loginForm.value.email) {
+      if (this.loginForm.value.password) {
+        this.subscriptions$.add(this.authService.login(this.loginForm.value.email, this.loginForm.value.password, !!this.loginForm.value.rememberMe)
+          .subscribe({
+            next: (data: LoginResponseType) => {
+              if (data.error || !data.user) {
+                this.showSnackService.error(data.message, ReqErrorTypes.authLogin);
+                throw new Error(data.message);
+              }//Если ошибка есть - выводим её и завершаем функцию
 
-            this.authService.setTokens(data.user.accessToken, data.user.refreshToken);
-            this.authService.userId = data.user.userId;
+              this.authService.setTokens(data.user.accessToken, data.user.refreshToken);
+              this.authService.userId = data.user.userId;
 
-            this.showSnackService.success(data.message);
-            this.router.navigate(['/']).then();
-          },
-          error: (errorResponse:HttpErrorResponse) => {
-            console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected Login error! Code:${errorResponse.status}`);
-            this.showSnackService.error(errorResponse.error.message, ReqErrorTypes.authLogin);
-          }
-        }));
+              this.showSnackService.success(data.message);
+              this.router.navigate(['/']).then();
+            },
+            error: (errorResponse: HttpErrorResponse) => {
+              console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected Login error! Code:${errorResponse.status}`);
+              this.showSnackService.error(errorResponse.error.message, ReqErrorTypes.authLogin);
+            }
+          }));
+      }
     }
   }
   ngOnDestroy() {

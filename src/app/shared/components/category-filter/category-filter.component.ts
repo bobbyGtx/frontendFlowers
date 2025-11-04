@@ -1,13 +1,13 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {CategoryWithTypesType} from '../../../../types/category-with-types.type';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ActiveParamsType} from '../../../../types/active-params.type';
 import {Subscription} from 'rxjs';
-import {UrlParamsEnum} from '../../../../enums/url-params.enum';
-import {CategoryFilters} from '../../../../enums/category-filters.enum';
-import {TypeType} from '../../../../types/type.type';
 import {ActiveParamsUtil} from '../../utils/active-params.util';
+import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
+import {CategoryFilters} from '../../../../assets/enums/category-filters.enum';
+import {ActiveParamsType} from '../../../../assets/types/active-params.type';
+import {TypeType} from '../../../../assets/types/type.type';
+import {UrlParamsEnum} from '../../../../assets/enums/url-params.enum';
 
 
 @Component({
