@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
@@ -13,17 +13,6 @@ import {ProductResponseType} from '../../../assets/types/responses/product-respo
 import {ProductsResponseType} from '../../../assets/types/responses/products-response.type';
 
 
-type RequestParamsType = {
-  types?: string;
-  diameterFrom?: string;
-  diameterTo?: string;
-  heightFrom?: string;
-  heightTo?: string;
-  priceFrom?: string;
-  priceTo?: string;
-  sort?: string;
-  page?: number;
-};
 export type userErrorsType = {
   getBestProducts:{
     [key in AppLanguages]:string;
@@ -133,8 +122,7 @@ export class ProductService {
   }
 
   getProducts(activeParams: ActiveParamsType): Observable<ProductsResponseType> {
-    const params: RequestParamsType = this.prepareParameters(activeParams);
-    return this.http.get<ProductsResponseType>(environment.api + 'products', {params})
+    return this.http.get<ProductsResponseType>(environment.api + 'products', {params:this.buildQueryParams(activeParams)})
       .pipe(
         map((response: ProductsResponseType) => {
           if (response.error) return response;
@@ -166,14 +154,22 @@ export class ProductService {
       );
   }
 
-  private prepareParameters(activeParams: ActiveParamsType): RequestParamsType {
-    return Object.entries(activeParams).reduce((acc, [key, value]) => {
-      if (value) {
-        if (key === 'types' && Array.isArray(value) && value.length > 0) acc.types = (value as string[]).join(',');
-        else (acc as any)[key] = value;
+  private buildQueryParams(params: ActiveParamsType): HttpParams {
+    let httpParams = new HttpParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+
+      if (key === 'types' && Array.isArray(value)) {
+        // для массива types используем types[]=val
+        value.forEach(val => {
+          httpParams = httpParams.append('types[]', val);
+        });
+      } else {
+        httpParams = httpParams.set(key, value as string);
       }
-      return acc;
-    }, {} as RequestParamsType);
+    });
+    return httpParams;
   }
 
 }
