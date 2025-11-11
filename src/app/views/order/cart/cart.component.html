@@ -1,0 +1,47 @@
+<div class="cart">
+  <div class="container">
+    <div class="cart-title">Корзина</div>
+    <div class="cart-info" *ngIf="cartItems.length">
+      <div class="cart-products">
+        <div class="cart-product" *ngFor="let cartProduct of cartItems">
+          <div class="cart-product-image" [class.disabled]="cartProduct.product.disabled" [style.background-image]="'url('+serverImagesPath + cartProduct.product.image + ')'"></div>
+          <div class="cart-product-name">{{cartProduct.product.name}}</div>
+          <count-selector (onCountChange)="updateCount($event,cartProduct.product.id)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled"></count-selector>
+          <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
+          <div class="cart-product-remove" (click)="delProductFromCart(cartProduct.product.id)">
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+              <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
+              <line x1="13.9238" y1="2.62996" x2="1.90301" y2="14.6508" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="cart-details">
+        <div class="cart-details-info">
+          <div class="cart-details-info-title">Ваш заказ</div>
+          <div class="cart-details-info-item first">
+            <div class="cart-details-info-item-caption">Товаров:</div>
+            <div class="cart-details-info-item-data">{{totalCount}}</div>
+          </div>
+          <div class="cart-details-info-item">
+            <div class="cart-details-info-item-caption">Общая стоимость:</div>
+            <div class="cart-details-info-item-data">{{totalAmount}} EUR</div>
+          </div>
+          <div class="cart-details-info-delivery">* без учета доставки</div>
+        </div>
+        <div class="cart-details-actions">
+          <button class="button button-transparent" routerLink="/catalog">Продолжить покупки</button>
+          <button class="button" routerLink="/order">Оформить заказ</button>
+        </div>
+      </div>
+    </div>
+    <div class="cart-empty" *ngIf="!cartItems.length">
+      <div class="cart-empty-message">В корзине нет товаров</div>
+      <button class="button" routerLink="/catalog">В каталог</button>
+    </div>
+
+    <div class="extra-products" *ngIf="extraProducts.length">
+      <products-carousel [title]="'С этими товарами также покупают'" [products]="extraProducts" [lightMode]="true"></products-carousel>
+    </div>
+  </div>
+</div>

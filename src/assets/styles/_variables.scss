@@ -11,7 +11,7 @@ $input-border:#2A592E;//reviews-border
 $link-color: #519057;
 $applied-filter-border: #E7F1E8;
 $applied-filter-close: #A8ABA7;
-$applied-filter-close-h: #2C2C2C;
+$applied-filter-close-h: $gray-text-color;
 
 $more-link-color: #9AA89B;//info-card
 $green-button-color : #456F49;
@@ -33,6 +33,13 @@ $info-text-title-color:#202B21;
 $description-text-color:$gray-text-color;
 $price-font-color: #313131;
 $alert-text-color:$snackbar-err-color;
+
+//Cart
+$cart-header-color:$black-text-color;
+$remove-btn-color:$applied-filter-close;
+$remove-btn-color-h:$applied-filter-close-h;
+$details-info-bg:#E7F1E8;
+$transp-button-font-color: #6CAC72;
 
 //count-selector
 $svg-color: #9AA89B;

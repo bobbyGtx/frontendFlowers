@@ -5,6 +5,27 @@
   height: 498px;
   box-sizing: border-box;
   position: relative;
+  &.clickable{
+    cursor: pointer;
+    height: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    .product-card-image{
+      transition: all .2s ease-in;
+      overflow: hidden;
+      background-size: 100%;
+    }
+
+    &:hover{
+      -webkit-box-shadow: 0 0 8px 0 $filter-header-bg;
+      -moz-box-shadow: 0 0 8px 0 $filter-header-bg;
+      box-shadow: 0 0 8px 0 $filter-header-bg;
+      .product-card-image{
+        background-size: 102%;
+
+      }
+    }
+  }
 
   .product-card-favorite {
     position: absolute;
@@ -42,6 +63,7 @@
 
   .product-card-name {
     margin-top: 15px;
+    padding: 0 10px;
     height: 52px;
     color: $green-text-color;
     font-family: 'Montserrat', sans-serif;

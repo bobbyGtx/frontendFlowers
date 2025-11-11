@@ -10,10 +10,11 @@ import {ProductType} from '../../../../assets/types/product.type';
 export class ProductsCarouselComponent {
   @Input() title: string = '';
   @Input() products:ProductType[]=[];
+  @Input() lightMode:boolean = false;
 
   customOptions: OwlOptions = {
     loop: true,
-    mouseDrag: true,
+    mouseDrag: this.lightMode,
     touchDrag: true,
     pullDrag: false,
     margin: 24,

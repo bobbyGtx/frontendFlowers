@@ -19,7 +19,7 @@ export class DetailComponent implements OnInit, OnDestroy {
   showSnackService: ShowSnackService = inject(ShowSnackService);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
 
-  images: string = environment.images;
+  serverImagesPath: string = environment.images;
   recommendedProducts: ProductType[] = [];
   product: ProductType | null = null;
   subscriptions$: Subscription = new Subscription();

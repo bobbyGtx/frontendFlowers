@@ -30,8 +30,8 @@ import {NgOptimizedImage} from "@angular/common";
     MatMenuModule,
     MatIcon,
     CarouselModule,
-    AppRoutingModule,
-    NgOptimizedImage
+    NgOptimizedImage,
+    AppRoutingModule
   ],
   providers: [provideHttpClient(), provideAnimationsAsync()],
   bootstrap: [AppComponent]
