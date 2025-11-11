@@ -8,7 +8,7 @@
           <div class="cart-product-name">{{cartProduct.product.name}}</div>
           <count-selector (onCountChange)="updateCount($event,cartProduct.product.id)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled"></count-selector>
           <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
-          <div class="cart-product-remove" (click)="delProductFromCart(cartProduct.product.id)">
+          <div class="cart-product-remove" (click)="editCount(cartProduct.product.id,0)">
             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
               <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
               <line x1="13.9238" y1="2.62996" x2="1.90301" y2="14.6508" stroke-linecap="round"/>
@@ -40,7 +40,7 @@
       <button class="button" routerLink="/catalog">В каталог</button>
     </div>
 
-    <div class="extra-products" *ngIf="extraProducts.length">
+    <div class="extra-products" *ngIf="cartItems.length && extraProducts.length">
       <products-carousel [title]="'С этими товарами также покупают'" [products]="extraProducts" [lightMode]="true"></products-carousel>
     </div>
   </div>

@@ -1,8 +1,8 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../../shared/services/product.service';
-import {Subscription} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {BestProductsResponseType} from '../../../../assets/types/responses/best-products-response.type';
-import {HttpErrorResponse} from '@angular/common/http';
+import {HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {ProductType} from '../../../../assets/types/product.type';
 import {CartService} from '../../../shared/services/cart.service';
@@ -64,17 +64,30 @@ export class CartComponent implements OnInit , OnDestroy {
       }));
   }
 
-  delProductFromCart(productId:number):void{
-
+  editCount(id:number, count:number){
+    this.subscriptions$.add(
+      this.cartService.updateCart(id,count).subscribe({
+        next: (data: CartResponseType) => {
+          if (data.error) {
+            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+            throw new Error(data.message);
+          }//Если ошибка есть - выводим её и завершаем функцию
+          if (data.cart){
+            this.cartItems = data.cart.items;
+            this.calculateTotal();
+          }
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
+          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
+          else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
+        }
+      })
+    );
   }
 
   updateCount(value:number,productId:number) {
-    let productIndex:number = this.cartItems.findIndex((cartItem:CartItemType)=>cartItem.product.id === productId);
-    if (productIndex > -1) {
-      this.cartItems[productIndex].quantity=value;
-      this.calculateTotal();
-    }
-
+    this.editCount(productId,value);
   }
 
   calculateTotal():void{

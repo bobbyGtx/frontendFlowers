@@ -34,6 +34,7 @@ export class CartService {
     },
   };
 
+
   getCart():Observable<CartResponseType>{
     const headers = new HttpHeaders().set("x-access-token", this.token);
     return this.http.get<CartResponseType>(environment.api+'cart.php',{headers});

@@ -1,10 +1,9 @@
-import {Component, inject, Input, OnDestroy} from '@angular/core';
+import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {environment} from '../../../../environments/environment.development';
 import {ProductType} from '../../../../assets/types/product.type';
 import {CartService} from '../../services/cart.service';
 import {Subscription} from 'rxjs';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
-import {BestProductsResponseType} from '../../../../assets/types/responses/best-products-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
 
@@ -13,37 +12,72 @@ import {ShowSnackService} from '../../../core/show-snack.service';
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
-class ProductCardComponent implements OnDestroy {
+class ProductCardComponent implements OnInit, OnDestroy{
   @Input() product!:ProductType;
   @Input() isLight:boolean=false;
+  countInCart:number = 0;
   cartService:CartService=inject(CartService);
   showSnackService:ShowSnackService=inject(ShowSnackService);
   subscriptions$:Subscription=new Subscription();
   images:string = environment.images;
   count:number=1;
 
-  addToCart(){
+  ngOnInit():void{
+    if (this.product.countInCart) {
+      this.countInCart=this.product.countInCart;
+    }
+  }
+
+  updateCart(){
     this.subscriptions$.add(
       this.cartService.updateCart(this.product.id,this.count).subscribe({
-          next: (data: CartResponseType) => {
-            if (data.error) {
-              this.showSnackService.error(this.cartService.userErrorMessages.getCart);
-              throw new Error(data.message);
-            }//Если ошибка есть - выводим её и завершаем функцию
-            if (data.cart){
-
+        next: (data: CartResponseType) => {
+          if (data.error) {
+            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+            throw new Error(data.message);
+          }//Если ошибка есть - выводим её и завершаем функцию
+          if (data.cart){
+            const itemIndexInResp:number = data.cart.items.findIndex((item)=>item.product.id === this.product.id);
+            if (itemIndexInResp > -1) {
+              this.countInCart = data.cart.items[itemIndexInResp].quantity;
             }
-          },
-          error: (errorResponse: HttpErrorResponse) => {
-            this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
-            if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-            else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
           }
-        })
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
+          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
+          else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
+        }
+      })
     );
   }
+
+  removeFromCart(){
+    this.count=1;
+    this.countInCart=0;
+    this.subscriptions$.add(
+      this.cartService.updateCart(this.product.id,0).subscribe({
+        next: (data: CartResponseType) => {
+          if (data.error) {
+            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+            throw new Error(data.message);
+          }//Если ошибка есть - выводим её и завершаем функцию
+          if (data.cart){
+            this.countInCart = 0;
+          }
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
+          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
+          else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
+        }
+      })
+    );
+  }
+
   updateCount(count:number){
     this.count=count;
+    if (this.countInCart)this.updateCart();
   }
 
   ngOnDestroy() {

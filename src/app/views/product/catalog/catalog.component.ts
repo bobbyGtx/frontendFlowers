@@ -16,6 +16,9 @@ import {ProductsResponseType} from '../../../../assets/types/responses/products-
 import {UrlParamsEnum} from '../../../../assets/enums/url-params.enum';
 import {TypeType} from '../../../../assets/types/type.type';
 import {CategoryFilters} from '../../../../assets/enums/category-filters.enum';
+import {CartService} from '../../../shared/services/cart.service';
+import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
+import {CartItemType} from '../../../../assets/types/cart-item.type';
 
 @Component({
   selector: 'app-catalog',
@@ -27,6 +30,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   categoryService: CategoryService = inject(CategoryService);
   showSnackService: ShowSnackService = inject(ShowSnackService);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  cartService: CartService = inject(CartService);
   router: Router = inject(Router);
   subscriptions$: Subscription = new Subscription();
 
@@ -35,6 +39,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   products: Array<ProductType> = [];
   categoriesWithTypes: Array<CategoryWithTypesType> = [];
+  cartItems:CartItemType[]=[]
 
   activePage: number = 1;
   pages: Array<number> = [];
@@ -51,8 +56,25 @@ export class CatalogComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const clicks = fromEvent(document, 'click');
     this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
-    this.subscriptions$.add(
-      this.categoryService.getCategoriesWithTypes().subscribe({
+
+    this.subscriptions$.add(this.cartService.getCart().subscribe({
+        next: (data: CartResponseType) => {
+          if (data.error) {
+            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+            throw new Error(data.message);
+          }//Если ошибка есть - выводим её и завершаем функцию
+          if (data.cart){
+            this.cartItems = data.cart.items;
+          }
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
+          else console.log(`Unexpected error (get Cart)!` + ` Code:${errorResponse.status}`);
+        }
+      }));
+
+    this.subscriptions$.add(this.categoryService.getCategoriesWithTypes().subscribe({
         next: (data: CategoriesWithTypesResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
@@ -80,6 +102,17 @@ export class CatalogComponent implements OnInit, OnDestroy {
                         throw new Error(data.message);
                       }
                       if (data.response) {
+                        if (this.cartItems && this.cartItems.length > 0){
+                          this.products=data.response.products.map((productItem:ProductType)=>{
+                            const productIndexInCart:number = this.cartItems.findIndex((cartItem:CartItemType)=>cartItem.product.id===productItem.id);
+                            if (productIndexInCart!==-1){
+                              productItem.countInCart = this.cartItems[productIndexInCart].quantity;
+                            }
+                            return productItem;
+                          });
+                        }else{
+                          this.products = data.response.products;
+                        }
                         this.products = data.response.products;
                         this.activePage = data.response.page;
                         this.pages = [];
@@ -99,8 +132,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
           this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (get Categories)! Code:${errorResponse.status}`);
         }
-      })
-    );
+      }));
+
   }
 
   toggleSorting(event: MouseEvent) {

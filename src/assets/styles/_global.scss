@@ -79,6 +79,27 @@ input::-webkit-inner-spin-button {
       margin-left: 16px;
     }
   }
+  &.button-in-cart {
+    span{
+      &:first-child{
+        display: block;
+      }
+      &:last-child{
+        display: none;
+      }
+    }
+    &:hover{
+      span{
+        &:first-child{
+          display: none;
+        }
+        &:last-child{
+          display: block;
+        }
+      }
+    }
+  }
+
   &:disabled{
     background-color: gray;
     cursor: not-allowed;

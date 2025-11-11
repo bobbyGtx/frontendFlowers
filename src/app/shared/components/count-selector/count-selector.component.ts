@@ -8,7 +8,6 @@ import {ShowSnackService} from '../../../core/show-snack.service';
 })
 export class CountSelectorComponent implements OnInit {
   showSnackService: ShowSnackService=inject(ShowSnackService);
-
   @Input() maxCount:number= 0;
   @Input() disabled:boolean = true;
   @Input() count:number = 1;
@@ -45,6 +44,7 @@ export class CountSelectorComponent implements OnInit {
       this.countChange();
     }
   }
+
   increaseCount(){
     if (!this.disabled && this.count < this.maxCount) {
       this.count++;
