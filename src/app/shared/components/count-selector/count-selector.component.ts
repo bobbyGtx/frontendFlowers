@@ -1,5 +1,6 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
 import {ShowSnackService} from '../../../core/show-snack.service';
+import {debounceTime, Subject,} from 'rxjs';
 
 @Component({
   selector: 'count-selector',
@@ -12,12 +13,20 @@ export class CountSelectorComponent implements OnInit {
   @Input() disabled:boolean = true;
   @Input() count:number = 1;
   @Output() onCountChange:EventEmitter<number> = new EventEmitter<number>();
+  filter:Subject<number> = new Subject<number>();
 
   ngOnInit() {
     if (this.disabled) {
       this.count = 0;
       this.maxCount=0;
     }
+    this.filter
+      .pipe(
+        debounceTime(500),
+      )
+      .subscribe(cartCount => {
+        this.onCountChange.emit(cartCount);
+      });
   }
 
   onChangeCount(event:Event){
@@ -31,24 +40,20 @@ export class CountSelectorComponent implements OnInit {
       this.showSnackService.error(`Доступно ${this.maxCount} единиц товара!`);
     }
     if (!newValue || newValue < 1) this.count = 1;
-    this.countChange();
-  }
-
-  countChange(){
-    this.onCountChange.emit(this.count);
+    this.filter.next(this.count);
   }
 
   decreaseCount(){
     if (!this.disabled && this.count>1) {
       this.count--;
-      this.countChange();
+      this.filter.next(this.count);
     }
   }
 
   increaseCount(){
     if (!this.disabled && this.count < this.maxCount) {
       this.count++;
-      this.countChange();
+      this.filter.next(this.count);
     }
   }
 }
