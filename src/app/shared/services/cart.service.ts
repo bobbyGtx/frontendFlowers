@@ -24,13 +24,13 @@ export class CartService {
     return this.cartCount$.pipe(
       switchMap(count => {
         // если значение не загружено — грузим с бэкенда
-        if (!this.cartCountIsLoaded || count===0){
+        if (!this.cartCountIsLoaded){
           return this.getCartCount().pipe(
             tap((response: CartCountResponseType) => {
               //После запроса отправляем старым подписчкам новое значение
+              this.cartCountIsLoaded=true;
               if (response.count){
                 this.cartCount$.next(response.count);
-                this.cartCountIsLoaded=true;
               }else{
                 this.cartCount$.next(0);
               }

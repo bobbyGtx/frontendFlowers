@@ -1,11 +1,14 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../shared/services/product.service';
-import {Subscription} from 'rxjs';
+import {combineLatest, Observable, Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../core/show-snack.service';
 import {OwlOptions} from 'ngx-owl-carousel-o';
 import {ProductType} from '../../../assets/types/product.type';
 import {BestProductsResponseType} from '../../../assets/types/responses/best-products-response.type';
+import {CartResponseType} from '../../../assets/types/responses/cart-response.type';
+import {CartService} from '../../shared/services/cart.service';
+import {CartItemType} from '../../../assets/types/cart-item.type';
 
 type ReviewType={
   name: string,
@@ -21,6 +24,7 @@ type ReviewType={
 export class MainComponent implements OnInit, OnDestroy {
   productService: ProductService=inject(ProductService);
   showSnackService: ShowSnackService=inject(ShowSnackService);
+  cartService: CartService=inject(CartService);
   subscriptions$: Subscription=new Subscription();
   bestProducts:ProductType[]=[];
   customOptionsReviews: OwlOptions = {
@@ -84,20 +88,36 @@ export class MainComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit() {
-    this.subscriptions$.add(
-      this.productService.getBestProducts().subscribe({
-        next: (data:BestProductsResponseType) => {
-          if (data.error){
-            this.showSnackService.error(this.productService.getBestProductsError);
-            throw new Error(data.message);
-          }
-          if (data.products)this.bestProducts=data.products;
-        },
-        error: (errorResponse:HttpErrorResponse) => {
+    const combinedRequest$:Observable<[BestProductsResponseType,CartResponseType]> = combineLatest([
+      this.productService.getBestProducts(),
+      this.cartService.getCart()
+    ]);
+    this.subscriptions$.add(combinedRequest$.subscribe({
+      next: (data:[BestProductsResponseType,CartResponseType]) => {
+        if (data[0].error){
           this.showSnackService.error(this.productService.getBestProductsError);
-          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getBestProducts)! Code:${errorResponse.status}`);
+          throw new Error(data[0].message);
+        }//Обработка ошибки запроса лучших продуктов
+        if (data[1].error) {
+          this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+          throw new Error(data[1].message);
+        }//Обработка ошибки корзины пользователя
+        let bestProducts: ProductType[]=data[0].products?data[0].products:[];
+
+        if (data[1].cart && data[1].cart.items.length > 0){
+          data[1].cart.items.forEach((cartItem:CartItemType)=>{
+            const bestProductIndex:number = bestProducts.findIndex((bestProductItem:ProductType)=> bestProductItem.id==cartItem.product.id);
+            if (bestProductIndex!==-1) bestProducts[bestProductIndex].countInCart=cartItem.quantity;
+          })
         }
-      }));
+        this.bestProducts = bestProducts;
+      },
+      error: (errorResponse: HttpErrorResponse) => {
+        this.showSnackService.error('Request Error!');
+        if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
+        else console.log(`Unexpected error (get Cart + getBestProducts)!` + ` Code:${errorResponse.status}`);
+      }
+    }));
   }
 
   ngOnDestroy() {
