@@ -1,8 +1,8 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../../shared/services/product.service';
-import {Observable, Subscription} from 'rxjs';
+import { Subscription} from 'rxjs';
 import {BestProductsResponseType} from '../../../../assets/types/responses/best-products-response.type';
-import {HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {ProductType} from '../../../../assets/types/product.type';
 import {CartService} from '../../../shared/services/cart.service';
@@ -28,7 +28,7 @@ export class CartComponent implements OnInit , OnDestroy {
 
   ngOnInit() {
     this.subscriptions$.add(
-      this.cartService.getCart().subscribe({
+      this.cartService.getCart(true).subscribe({
         next: (data: CartResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.cartService.userErrorMessages.getCart);

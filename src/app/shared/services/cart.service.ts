@@ -1,10 +1,9 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {BehaviorSubject, Observable, of, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import {CartResponseType} from '../../../assets/types/responses/cart-response.type';
 import {environment} from '../../../environments/environment';
 import {AppLanguages} from '../../../assets/enums/app-languages.enum';
-import {CartCountResponseType} from '../../../assets/types/responses/cart-count-response.type';
 import {CartItemType} from '../../../assets/types/cart-item.type';
 
 export type userErrorsType = {
@@ -18,37 +17,26 @@ export type userErrorsType = {
 export class CartService {
   http:HttpClient=inject(HttpClient);
   private cartCount$:BehaviorSubject<number>=new BehaviorSubject<number>(0);
-  private cartCountIsLoaded = false; // чтобы не вызывать запрос повторно
+  private cartCache:CartResponseType|null=null;
+  readonly cartCacheLifetime:number = 30000;
+  clearCartCacheTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  resetCacheTimer(){
+    if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
+    this.clearCartCacheTimeout = setTimeout(()=>{
+      this.cartCache=null;
+      if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
+    },this.cartCacheLifetime);
+  }
 
   getCartCount$():Observable<number>{
-    return this.cartCount$.pipe(
-      switchMap(count => {
-        // если значение не загружено — грузим с бэкенда
-        if (!this.cartCountIsLoaded){
-          return this.getCartCount().pipe(
-            tap((response: CartCountResponseType) => {
-              //После запроса отправляем старым подписчкам новое значение
-              this.cartCountIsLoaded=true;
-              if (response.count){
-                this.cartCount$.next(response.count);
-              }else{
-                this.cartCount$.next(0);
-              }
-            }),
-            switchMap(()=>this.cartCount$)//Отправляем текущему подписчику данные
-          );
-        }
-        // если значение уже есть — просто отдаём его
-        return of(count);
-      })
-    );
+    return this.cartCount$;
   }
   updateCartCount(newCount: number): void {
     this.cartCount$.next(newCount);
   }
   resetCartCount(): void {
     this.cartCount$.next(0);
-    this.cartCountIsLoaded = false;
   }//сброс после создания заказа например
 
   token:string="RlGjVuantSHRDCYuea9GFUy4jRp7zJTVvcqhbyVXg5IQr8Al4a2iASRB8atfKy2kbmWhwrffluyk0uhABpr0GjeEVH82kUqmM2hE";
@@ -70,15 +58,34 @@ export class CartService {
     },
   };
 
-  getCart():Observable<CartResponseType>{
+  getCart(forceUpdate:boolean=false):Observable<CartResponseType>{
+    if (!forceUpdate && this.cartCache) return of(this.cartCache);
     const headers = new HttpHeaders().set("x-access-token", this.token);
-    return this.http.get<CartResponseType>(environment.api+'cart.php',{headers});
-  }
+    return this.http.get<CartResponseType>(environment.api+'cart.php',{headers}).pipe(
+      tap((data: CartResponseType) => {
+        if (!data.error && data.cart){
+          this.cartCache=data;
+          if (data.cart.count===0){
+            this.updateCartCount(data.cart.count);
+          }else{
+            //коррекция кол-ва товаров в корзине с вычетом недоступных
+            let totalCount=0;
+            data.cart.items.forEach((cartItem:CartItemType) => {
+              if(cartItem.product.disabled) {
+                cartItem.quantity=0;
+              }else{
+                totalCount+=cartItem.quantity;
+              }
+            });
+            this.updateCartCount(totalCount);
+            this.cartCache = data;
+            this.resetCacheTimer();
+          }
 
-  private getCartCount():Observable<CartCountResponseType>{
-    this.cartCountIsLoaded = true;
-    const headers = new HttpHeaders().set("x-access-token", this.token);
-    return this.http.get<CartCountResponseType>(environment.api+'cart.php?cartCount=true',{headers});
+          this.resetCacheTimer();
+        }
+      })
+    );
   }
 
   updateCart(id:number, quantity:number):Observable<CartResponseType>{
@@ -100,6 +107,8 @@ export class CartService {
                 }
               });
               this.updateCartCount(totalCount);
+              this.cartCache = data;
+              this.resetCacheTimer();
             }
           }
         })
