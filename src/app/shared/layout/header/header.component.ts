@@ -4,6 +4,7 @@ import {AuthService} from '../../../core/auth/auth.service';
 import {Router} from '@angular/router';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
+import {CartService} from '../../services/cart.service';
 
 @Component({
   selector: 'app-header',
@@ -14,9 +15,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @Input() categories: CategoryWithTypesType[] = [];
   authService: AuthService = inject(AuthService);
   showSnackService: ShowSnackService = inject(ShowSnackService);
+  cartService:CartService = inject(CartService);
   router:Router=inject(Router);
-  isLogged: boolean=false;
   subscriptions$: Subscription = new Subscription();
+  isLogged: boolean=false;
+  count:number=0;
 
   constructor() {}
 
@@ -26,6 +29,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.isLogged = isLoggedIn;
       }),
     );
+    this.subscriptions$.add(
+      this.cartService.getCartCount$().subscribe(cartCount => {
+        console.log(cartCount);
+        this.count = cartCount;
+      }),
+    );
+
   }
 
   logout(): void {

@@ -15,7 +15,7 @@ import {ShowSnackService} from '../../../core/show-snack.service';
 class ProductCardComponent implements OnInit, OnDestroy{
   @Input() product!:ProductType;
   @Input() isLight:boolean=false;
-  countInCart:number = 0;
+  //countInCart:number = 0;
   cartService:CartService=inject(CartService);
   showSnackService:ShowSnackService=inject(ShowSnackService);
   subscriptions$:Subscription=new Subscription();
@@ -23,23 +23,23 @@ class ProductCardComponent implements OnInit, OnDestroy{
   count:number=1;
 
   ngOnInit():void{
-    if (this.product.countInCart) {
-      this.countInCart=this.product.countInCart;
-    }
+    if (this.product.countInCart) this.count=this.product.countInCart;
   }
 
-  updateCart(){
+  updateCart(count:number){
     this.subscriptions$.add(
-      this.cartService.updateCart(this.product.id,this.count).subscribe({
+      this.cartService.updateCart(this.product.id,count).subscribe({
         next: (data: CartResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.cartService.userErrorMessages.getCart);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
+          this.product.countInCart=0;
+          this.count=1;
           if (data.cart){
             const itemIndexInResp:number = data.cart.items.findIndex((item)=>item.product.id === this.product.id);
             if (itemIndexInResp > -1) {
-              this.countInCart = data.cart.items[itemIndexInResp].quantity;
+              this.product.countInCart = data.cart.items[itemIndexInResp].quantity;
             }
           }
         },
@@ -53,31 +53,16 @@ class ProductCardComponent implements OnInit, OnDestroy{
   }
 
   removeFromCart(){
+    if (!this.product.countInCart) return;
     this.count=1;
-    this.countInCart=0;
-    this.subscriptions$.add(
-      this.cartService.updateCart(this.product.id,0).subscribe({
-        next: (data: CartResponseType) => {
-          if (data.error) {
-            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
-            throw new Error(data.message);
-          }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.cart){
-            this.countInCart = 0;
-          }
-        },
-        error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-          else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
-        }
-      })
-    );
+    this.product.countInCart=0;
+    this.updateCart(0);
+
   }
 
   updateCount(count:number){
     this.count=count;
-    if (this.countInCart)this.updateCart();
+    if (this.product.countInCart)this.updateCart(count);
   }
 
   ngOnDestroy() {
