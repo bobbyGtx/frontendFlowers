@@ -98,12 +98,11 @@ export class MainComponent implements OnInit, OnDestroy {
           this.showSnackService.error(this.productService.getBestProductsError);
           throw new Error(data[0].message);
         }//Обработка ошибки запроса лучших продуктов
-        if (data[1].error) {
+        if (data[1].error && !data[1].cart) {
           this.showSnackService.error(this.cartService.userErrorMessages.getCart);
           throw new Error(data[1].message);
         }//Обработка ошибки корзины пользователя
         let bestProducts: ProductType[]=data[0].products?data[0].products:[];
-
         if (data[1].cart && data[1].cart.items.length > 0){
           data[1].cart.items.forEach((cartItem:CartItemType)=>{
             const bestProductIndex:number = bestProducts.findIndex((bestProductItem:ProductType)=> bestProductItem.id==cartItem.product.id);

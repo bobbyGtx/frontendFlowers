@@ -61,7 +61,7 @@ export class LoginComponent implements OnDestroy {
                   },
                 });
               }
-              this.showSnackService.success(data.message);
+              //this.showSnackService.success(data.message);
               this.router.navigate(['/']).then();
             },
             error: (errorResponse: HttpErrorResponse) => {

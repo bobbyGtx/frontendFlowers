@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
@@ -11,7 +11,6 @@ import {RecommendedProductsResponseType} from '../../../assets/types/responses/r
 import {ActiveParamsType} from '../../../assets/types/active-params.type';
 import {ProductResponseType} from '../../../assets/types/responses/product-response.type';
 import {ProductsResponseType} from '../../../assets/types/responses/products-response.type';
-
 
 export type userErrorsType = {
   getBestProducts:{
@@ -36,7 +35,7 @@ export class ProductService {
   http: HttpClient = inject(HttpClient);
   languageService:LanguageService= inject(LanguageService);
 
-  productTemplate: ProductType = {
+  private productTemplate: ProductType = {
     id: 0,
     name: '',
     price: 0,

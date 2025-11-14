@@ -5,6 +5,8 @@ import {Router} from '@angular/router';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
 import {CartService} from '../../services/cart.service';
+import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-header',
@@ -27,6 +29,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscriptions$.add(
       this.authService.isLogged$.subscribe(isLoggedIn => {
         this.isLogged = isLoggedIn;
+        this.subscriptions$.add(
+          this.cartService.getCart(true).subscribe({
+            next: (data: CartResponseType) => {
+              //Может быть error с нормальным ответом при проблемах с товарами
+              if (data.error && !data.cart) {
+                this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+                throw new Error(data.message);
+              }//Если ошибка есть и нет корзины в ответе - выводим её и завершаем функцию
+            },
+            error: (errorResponse: HttpErrorResponse) => {
+              this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+              console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
+            }
+          }));
       }),
     );
     this.subscriptions$.add(

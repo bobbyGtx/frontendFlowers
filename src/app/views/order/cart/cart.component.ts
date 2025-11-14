@@ -31,11 +31,13 @@ export class CartComponent implements OnInit , OnDestroy {
     this.subscriptions$.add(
       this.cartService.getCart(true).subscribe({
         next: (data: CartResponseType) => {
-          if (data.error) {
+          //Может быть error с нормальным ответом при проблемах с товарами
+          if (data.error && !data.cart) {
             this.showSnackService.error(this.cartService.userErrorMessages.getCart);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
           if (data.cart){
+            //Инфо выводится только в cartService компоненте, для предотвращения дублирования и снятия ошибки с кеша
             this.cartItems = data.cart.items;
             if (this.cartItems.length > 0){
               this.calculateTotal();
@@ -58,9 +60,8 @@ export class CartComponent implements OnInit , OnDestroy {
           }
         },
         error: (errorResponse: HttpErrorResponse) => {
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
           this.showSnackService.error(this.cartService.userErrorMessages.getCart);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-          else console.log(`Unexpected error (get Cart)!` + ` Code:${errorResponse.status}`);
         }
       }));
   }

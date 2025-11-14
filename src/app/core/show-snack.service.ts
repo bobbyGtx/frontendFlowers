@@ -55,11 +55,11 @@ export class ShowSnackService {
     panelClass: 'snackbar-success',
   };
   private infoSettings: SnackSettingsType = {
-    duration: 2500,
+    duration: 3500,
     panelClass: 'snackbar-info',
   };
 
-  private userErrors: UserErrorsGroupType = {
+  private userGroupErrors: UserErrorsGroupType = {
     [ReqErrorTypes.authLogin]: [
       {
         error: 'Email not correct!',
@@ -111,23 +111,9 @@ export class ShowSnackService {
         [AppLanguages.en]:'Registration error. Please try again.',
         [AppLanguages.de]:'Registrierungsfehler. Bitte versuchen Sie es erneut.',
       }
-    ],
-    [ReqErrorTypes.cartErrors]: [
-      {
-        error: 'Test error',
-        [AppLanguages.ru]:'Перенос корзины не возможен. Пользователь и!',
-        [AppLanguages.en]:'Data does not meet the requirements!',
-        [AppLanguages.de]:'Die Daten erfüllen die Anforderungen nicht!',
-      },
-      {
-        error: 'default',
-        [AppLanguages.ru]:'Введен некорректный E-Mail!',
-        [AppLanguages.en]:'Registration error. Please try again.',
-        [AppLanguages.de]:'Registrierungsfehler. Bitte versuchen Sie es erneut.',
-      }
-    ],
-  };//ошибки
-  private userValidMessages:Array<UserInfoMsgType> = [
+    ]
+  };//ошибки сгруппированные по запросам
+  private userMessages:Array<UserInfoMsgType> = [
     {
       info:'E-Mail is incorrect',
       [AppLanguages.ru]:'E-Mail не корректен',
@@ -141,9 +127,9 @@ export class ShowSnackService {
       [AppLanguages.de]:'Das Passwort ist zu kurz',
     },
     {
-      info:'Passwords don\'t match',
+      info:"Passwords don't match",
       [AppLanguages.ru]:'Пароли не совпадают',
-      [AppLanguages.en]:'Passwords don\'t match',
+      [AppLanguages.en]:"Passwords don't match",
       [AppLanguages.de]:'Die Passwörter stimmen nicht überein',
     },
     {
@@ -152,13 +138,13 @@ export class ShowSnackService {
       [AppLanguages.en]:'Agreements not accepted',
       [AppLanguages.de]:'Bedingungen nicht akzeptiert',
     },
-    {
-      info:'Some products were not found in the database and have been removed!',
-      [AppLanguages.ru]:'Некоторые товары удалены из корзины т.к. не были найдены!',
-      [AppLanguages.en]:'Some items have been removed from your cart because they were not found!',
-      [AppLanguages.de]:'Einige Artikel wurden aus Ihrem Warenkorb entfernt, da sie nicht gefunden wurden!',
+    {//это сообщение дублируется т.к. в разных запросах и в разных переменных
+      info:'Unrecognized products were removed.',
+      [AppLanguages.ru]:'Нераспознанные продукты были удалены из корзины.',
+      [AppLanguages.en]:'Unrecognized products have been removed from cart.',
+      [AppLanguages.de]:'Nicht erkannte Produkte wurden aus Ihrem Warenkorb entfernt.',
     },
-  ];//сообщения валидации
+  ];//сообщения из переменной [messages]
   private userSuccess:Array<UserSuccessMsgType> = [
     {
       success:'Authorization success!',
@@ -195,16 +181,27 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Ваша корзина перемещена на сервер!',
       [AppLanguages.en]:'Your cart has been moved to the server!',
       [AppLanguages.de]:'Ihr Warenkorb wurde auf den Server übertragen!',
+    },    {
+      info:'Unrecognized products were removed.',
+      [AppLanguages.ru]:'Нераспознанные продукты были удалены из корзины.',
+      [AppLanguages.en]:'Unrecognized products have been removed from cart.',
+      [AppLanguages.de]:'Nicht erkannte Produkte wurden aus Ihrem Warenkorb entfernt.',
+    },
+    {
+      info:'Cart has been cleared by the system.',
+      [AppLanguages.ru]:'Корзина очищена системой.',
+      [AppLanguages.en]:'Cart has been cleared by the system.',
+      [AppLanguages.de]:'Der Warenkorb wurde vom System geleert.',
     },
 
   ];//Информационные сообщения
 
-  private getUserError(reqType: ReqErrorTypes, message: string): string {
-    const errorIndex: number = this.userErrors[reqType].findIndex((errorItem: UserErrorType) => errorItem.error.toLowerCase() === message.toLowerCase());
+  private getUserGroupError(reqType: ReqErrorTypes, message: string): string {
+    const errorIndex: number = this.userGroupErrors[reqType].findIndex((errorItem: UserErrorType) => errorItem.error.toLowerCase() === message.toLowerCase());
     if (errorIndex === -1) {
-      return this.userErrors[reqType][this.userErrors[reqType].length - 1][this.languageService.appLang]?this.userErrors[reqType][this.userErrors[reqType].length - 1][this.languageService.appLang]:message;
+      return this.userGroupErrors[reqType][this.userGroupErrors[reqType].length - 1][this.languageService.appLang]?this.userGroupErrors[reqType][this.userGroupErrors[reqType].length - 1][this.languageService.appLang]:message;
     } else {
-      return this.userErrors[reqType][errorIndex][this.languageService.appLang];
+      return this.userGroupErrors[reqType][errorIndex][this.languageService.appLang];
     }
   }
   private getUserSuccessMsg(message: string): string {
@@ -219,20 +216,21 @@ export class ShowSnackService {
   }
   private getUserValidMessages(messages:string[]):string[]{
     messages = messages.map((message:string)=>{
-      const itemIndex:number = this.userValidMessages.findIndex((errorItem:UserInfoMsgType)=>errorItem.info.toLowerCase() === message.toLowerCase());
-      return itemIndex ===-1 ? message:this.userValidMessages[itemIndex][this.languageService.appLang];
+      const itemIndex:number = this.userMessages.findIndex((errorItem:UserInfoMsgType)=>errorItem.info.toLowerCase() === message.toLowerCase());
+      return itemIndex ===-1 ? message:this.userMessages[itemIndex][this.languageService.appLang];
     });
     return messages;
   }
 
   error(message: string, reqType: ReqErrorTypes | null = null, code: number | null = null): void {
-    if (reqType) message = this.getUserError(reqType, message);
+    if (message.length<2) return;
+    if (reqType) message = this.getUserGroupError(reqType, message);
     code ? message = `${message}  Code: ${code}` : null;
     this._snackbar.open(message, 'ok', this.errorSettings);
   }//Simple error with string
 
   errorObj(error: DefaultResponseType,reqType: ReqErrorTypes | null = null, code: number | null = null): void {
-    if (reqType) error.message = this.getUserError(reqType,error.message);
+    if (reqType) error.message = this.getUserGroupError(reqType,error.message);
     const errMessage = code ? `${error.message}  Code: ${code}` : error.message;
     if (error.messages && Array.isArray(error.messages) && error.messages.length > 0) {
       let multiErrorSettings: SnackSettingsType = this.multiErrorSettings;
@@ -244,7 +242,7 @@ export class ShowSnackService {
       this._snackbar.open(errMessage, 'ok', this.errorSettings);
     }
   }//Simple error msg & messages[]?
-  infoObj(info: DefaultResponseType,reqType: ReqErrorTypes | null = null, code: number | null = null): void {
+  infoObj(info: DefaultResponseType, code: number | null = null): void {
     info.message = this.getUserInfoMsg(info.message);
     const infMessage = code ? `${info.message}  Code: ${code}` : info.message;
     if (info.messages && Array.isArray(info.messages) && info.messages.length > 0) {
@@ -263,5 +261,5 @@ export class ShowSnackService {
 
   info(message: string): void {
     this._snackbar.open(this.getUserInfoMsg(message), 'ok', this.infoSettings);
-  }
+  }//Функция сначала ищет перевод в userInfos
 }
