@@ -6,9 +6,9 @@
         <div class="cart-product" *ngFor="let cartProduct of cartItems">
           <div class="cart-product-image" [class.disabled]="cartProduct.product.disabled" [style.background-image]="'url('+serverImagesPath + cartProduct.product.image + ')'"></div>
           <div class="cart-product-name">{{cartProduct.product.name}}</div>
-          <count-selector (onCountChange)="updateCount($event,cartProduct.product.id)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled"></count-selector>
+          <count-selector (onCountChange)="updateCount(cartProduct.product,$event)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled"></count-selector>
           <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
-          <div class="cart-product-remove" (click)="editCount(cartProduct.product.id,0)">
+          <div class="cart-product-remove" (click)="editCount(cartProduct.product,0)">
             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
               <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
               <line x1="13.9238" y1="2.62996" x2="1.90301" y2="14.6508" stroke-linecap="round"/>

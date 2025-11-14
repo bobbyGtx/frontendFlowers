@@ -9,6 +9,7 @@ import {CartService} from '../../../shared/services/cart.service';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 import {environment} from '../../../../environments/environment.development';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
+import {CartProductType} from '../../../../assets/types/cart-product.type';
 
 @Component({
   selector: 'app-cart',
@@ -64,9 +65,9 @@ export class CartComponent implements OnInit , OnDestroy {
       }));
   }
 
-  editCount(id:number, count:number){
+  editCount(cartProduct:CartProductType, count:number){
     this.subscriptions$.add(
-      this.cartService.updateCart(id,count).subscribe({
+      this.cartService.updateCart(cartProduct,count).subscribe({
         next: (data: CartResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.cartService.userErrorMessages.getCart);
@@ -86,8 +87,8 @@ export class CartComponent implements OnInit , OnDestroy {
     );
   }
 
-  updateCount(value:number,productId:number) {
-    this.editCount(productId,value);
+  updateCount(cartProduct:CartProductType,value:number) {
+    this.editCount(cartProduct,value);
   }
 
   calculateTotal():void{

@@ -28,7 +28,7 @@ class ProductCardComponent implements OnInit, OnDestroy{
 
   updateCart(count:number){
     this.subscriptions$.add(
-      this.cartService.updateCart(this.product.id,count).subscribe({
+      this.cartService.updateCart(this.product,count).subscribe({
         next: (data: CartResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.cartService.userErrorMessages.getCart);

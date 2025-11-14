@@ -17,6 +17,12 @@
       font-size: 16px;
       font-weight: 500;
       color: $snackbar-err-color;
+      &.info{
+        color:$snackbarTitle-info-color;
+      }
+      &.success{
+        color:$snackbarTitle-success-color;
+      }
     }
     .snackbar-close-btn {
       padding: 0;

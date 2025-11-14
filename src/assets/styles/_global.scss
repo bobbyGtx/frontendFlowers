@@ -151,7 +151,7 @@ a.button{
 .snackbar-success {
   .mat-mdc-snackbar-surface{
     .mat-mdc-snack-bar-label{
-      color: $link-color !important;
+      color: $snackbarTitle-success-color; !important;
       font-weight: 500 !important;
     }
   }
@@ -159,7 +159,7 @@ a.button{
 .snackbar-info {
   .mat-mdc-snackbar-surface{
     .mat-mdc-snack-bar-label{
-      color: white !important;
+      color: $snackbarTitle-info-color !important;
       font-weight: 400 !important;
     }
   }

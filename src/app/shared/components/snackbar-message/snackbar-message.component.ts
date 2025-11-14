@@ -6,11 +6,11 @@ import {MAT_SNACK_BAR_DATA, MatSnackBarRef} from '@angular/material/snack-bar';
   template: `
     <div class="snackbar-container">
       <div class="snackbar-header">
-        <div class="snackbar-title">{{ data.message }}</div>
+        <div class="snackbar-title" [class.info]="data.dlgType==='snackbar-info'" [class.success]="data.dlgType==='snackbar-success'">{{ data.message }}</div>
         <button mat-button class="snackbar-close-btn" (click)="close()">OK</button>
       </div>
-      <ul *ngIf="data.errors?.length">
-        <li *ngFor="let err of data.errors">{{ err }}</li>
+      <ul *ngIf="data.messages?.length">
+        <li *ngFor="let msg of data.messages">{{ msg }}</li>
       </ul>
     </div>
   `,
@@ -19,7 +19,7 @@ import {MAT_SNACK_BAR_DATA, MatSnackBarRef} from '@angular/material/snack-bar';
 export class SnackbarMessageComponent {
   constructor(
     public snackBarRef: MatSnackBarRef<SnackbarMessageComponent>,
-    @Inject(MAT_SNACK_BAR_DATA) public data: { message: string, errors?: string[] }
+    @Inject(MAT_SNACK_BAR_DATA) public data: { message: string, dlgType:string, messages?: string[] }
   ) {}
   close(): void {
     this.snackBarRef.dismiss();

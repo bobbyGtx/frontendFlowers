@@ -7,6 +7,8 @@ import {Subscription} from 'rxjs';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {LoginResponseType} from '../../../../assets/types/responses/login-response.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {CartService} from '../../../shared/services/cart.service';
+import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +20,7 @@ export class LoginComponent implements OnDestroy {
   router:Router = inject(Router);
   fb:FormBuilder = inject(FormBuilder);
   authService:AuthService=inject(AuthService);
+  cartService:CartService=inject(CartService);
   subscriptions$:Subscription=new Subscription();
 
   loginForm: FormGroup=this.fb.group({
@@ -46,6 +49,18 @@ export class LoginComponent implements OnDestroy {
               this.authService.setTokens(data.user.accessToken, data.user.refreshToken);
               this.authService.userId = data.user.userId;
 
+              if (this.cartService.checkLSCart()){
+                const request$ = this.cartService.rebaseCart(data.user.accessToken).subscribe({
+                  next: (data: CartResponseType) => {
+                    if (data.messages) this.showSnackService.infoObj(data);
+                    else this.showSnackService.info(data.message);
+                    request$.unsubscribe();
+                  },
+                  error: (data: CartResponseType) => {
+                    console.error(data.message);
+                  },
+                });
+              }
               this.showSnackService.success(data.message);
               this.router.navigate(['/']).then();
             },

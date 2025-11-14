@@ -15,7 +15,8 @@ import {DefaultResponseType} from '../../assets/types/responses/default-response
 type SnackSettingsType = {
   data?: {
     message: string;
-    errors: string[]
+    dlgType:string;
+    messages: string[]
   },
   duration: number,
   panelClass: string,
@@ -34,10 +35,20 @@ export class ShowSnackService {
   private multiErrorSettings: SnackSettingsType = {
     data: {
       message: '',
-      errors: [],
+      dlgType: 'snackbar-error',
+      messages: [],
     },
     duration: 100000,
     panelClass: 'snackbar-error',
+  };
+  private multiInfoSettings: SnackSettingsType = {
+    data: {
+      message: '',
+      dlgType: 'snackbar-info',
+      messages: [],
+    },
+    duration: 7000,
+    panelClass: 'snackbar-info',
   };
   private successSettings: SnackSettingsType = {
     duration: 2500,
@@ -100,7 +111,21 @@ export class ShowSnackService {
         [AppLanguages.en]:'Registration error. Please try again.',
         [AppLanguages.de]:'Registrierungsfehler. Bitte versuchen Sie es erneut.',
       }
-    ]
+    ],
+    [ReqErrorTypes.cartErrors]: [
+      {
+        error: 'Test error',
+        [AppLanguages.ru]:'Перенос корзины не возможен. Пользователь и!',
+        [AppLanguages.en]:'Data does not meet the requirements!',
+        [AppLanguages.de]:'Die Daten erfüllen die Anforderungen nicht!',
+      },
+      {
+        error: 'default',
+        [AppLanguages.ru]:'Введен некорректный E-Mail!',
+        [AppLanguages.en]:'Registration error. Please try again.',
+        [AppLanguages.de]:'Registrierungsfehler. Bitte versuchen Sie es erneut.',
+      }
+    ],
   };//ошибки
   private userValidMessages:Array<UserInfoMsgType> = [
     {
@@ -124,8 +149,14 @@ export class ShowSnackService {
     {
       info:'Agreements not accepted',
       [AppLanguages.ru]:'Условия не приняты',
-      [AppLanguages.en]:'greements not accepted',
+      [AppLanguages.en]:'Agreements not accepted',
       [AppLanguages.de]:'Bedingungen nicht akzeptiert',
+    },
+    {
+      info:'Some products were not found in the database and have been removed!',
+      [AppLanguages.ru]:'Некоторые товары удалены из корзины т.к. не были найдены!',
+      [AppLanguages.en]:'Some items have been removed from your cart because they were not found!',
+      [AppLanguages.de]:'Einige Artikel wurden aus Ihrem Warenkorb entfernt, da sie nicht gefunden wurden!',
     },
   ];//сообщения валидации
   private userSuccess:Array<UserSuccessMsgType> = [
@@ -154,6 +185,16 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Вы успешно вышли из системы.',
       [AppLanguages.en]:'You have successfully logged out.',
       [AppLanguages.de]:'Sie haben sich erfolgreich abgemeldet.',
+    },{
+      info:'User cart was rebased.',
+      [AppLanguages.ru]:'Ваша корзина перенесена на сервер.',
+      [AppLanguages.en]:'Your cart has been transferred to the server.',
+      [AppLanguages.de]:'Ihr Warenkorb wurde an den Server übertragen.',
+    },{
+      info:'Cart has been rebased!',
+      [AppLanguages.ru]:'Ваша корзина перемещена на сервер!',
+      [AppLanguages.en]:'Your cart has been moved to the server!',
+      [AppLanguages.de]:'Ihr Warenkorb wurde auf den Server übertragen!',
     },
 
   ];//Информационные сообщения
@@ -196,10 +237,23 @@ export class ShowSnackService {
     if (error.messages && Array.isArray(error.messages) && error.messages.length > 0) {
       let multiErrorSettings: SnackSettingsType = this.multiErrorSettings;
       multiErrorSettings['data']!['message'] = error.message;
-      multiErrorSettings['data']!['errors'] = this.getUserValidMessages(error.messages);
+      multiErrorSettings['data']!['dlgType'] = 'snackbar-info';
+      multiErrorSettings['data']!['messages'] = this.getUserValidMessages(error.messages);
       this._snackbar.openFromComponent(SnackbarMessageComponent, multiErrorSettings);
     } else {
       this._snackbar.open(errMessage, 'ok', this.errorSettings);
+    }
+  }//Simple error msg & messages[]?
+  infoObj(info: DefaultResponseType,reqType: ReqErrorTypes | null = null, code: number | null = null): void {
+    info.message = this.getUserInfoMsg(info.message);
+    const infMessage = code ? `${info.message}  Code: ${code}` : info.message;
+    if (info.messages && Array.isArray(info.messages) && info.messages.length > 0) {
+      let multiInfoSettings: SnackSettingsType = this.multiInfoSettings;
+      multiInfoSettings['data']!['message'] = info.message;
+      multiInfoSettings['data']!['messages'] = this.getUserValidMessages(info.messages);
+      this._snackbar.openFromComponent(SnackbarMessageComponent, multiInfoSettings);
+    } else {
+      this._snackbar.open(infMessage, 'ok', this.infoSettings);
     }
   }//Simple error msg & messages[]?
 
