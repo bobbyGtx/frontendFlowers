@@ -55,13 +55,22 @@
             }
           }
           .cart-product-name{
-            color: $black-text-color;
+
 
             font-size: 16px;
             font-weight: 500;
             line-height: 130%;
             width: 247px;
             margin-right: 10px;
+            a{
+              color: $black-text-color;
+              &:visited{
+                color: $black-text-color;
+              }
+              &:hover{
+                color:$link-color;
+              }
+            }
           }
           .cart-product-price{
             margin-left: 69px;

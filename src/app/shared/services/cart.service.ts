@@ -85,11 +85,11 @@ export class CartService {
         tap((data: CartResponseType) => {
           if (data.cart && data.cart.count >= 0) {
             //Инфо сообщение при наличии ошибки и корзины выводится только тут
-            if (data.error) this.showSnackService.info(data.message);
+            if (data.error) this.showSnackService.error(data.message);
             this.cartCache = data;
             //Если была ошибка и есть корзина, значит это информационное сообщение, которое удаляем из кеша
             this.cartCache.error = false;
-            this.cartCache.message = 'Request seccess!';
+            this.cartCache.message = 'Request success!';
             if (data.cart.count === 0) {
               this.updateCartCount(data.cart.count);
             } else {
@@ -279,4 +279,6 @@ export class CartService {
     }, this.cartCacheLifetime);
   }
 }
-
+//if (data.infoMessage) this.showSnackService.info(data.infoMessage);
+//this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
+//console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);

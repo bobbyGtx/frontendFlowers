@@ -31,22 +31,20 @@ class ProductCardComponent implements OnInit, OnDestroy{
     this.subscriptions$.add(
       this.cartService.updateCart(this.product,count).subscribe({
         next: (data: CartResponseType) => {
-          if (data.error && !data.cart) {
-            this.showSnackService.error(this.cartService.updateCartError,ReqErrorTypes.cartUpdate);
+          if (data.error || !data.cart) {
+            this.showSnackService.error(this.cartService.updateCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.error && data.cart) this.showSnackService.info(data.message);
+          if (data.infoMessage) this.showSnackService.info(data.infoMessage);
           this.product.countInCart=0;
           this.count=1;
-          if (data.cart){
-            const itemIndexInResp:number = data.cart.items.findIndex((item)=>item.product.id === this.product.id);
-            if (itemIndexInResp > -1) {
-              this.product.countInCart = data.cart.items[itemIndexInResp].quantity;
-            }
+          const itemIndexInResp:number = data.cart.items.findIndex((item)=>item.product.id === this.product.id);
+          if (itemIndexInResp > -1) {
+            this.product.countInCart = data.cart.items[itemIndexInResp].quantity;
           }
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.updateCartError);
+          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
@@ -63,6 +61,7 @@ class ProductCardComponent implements OnInit, OnDestroy{
 
   updateCount(count:number){
     this.count=count;
+    console.log(count);
     if (this.product.countInCart)this.updateCart(count);
   }
 

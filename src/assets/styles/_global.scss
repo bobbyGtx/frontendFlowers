@@ -46,6 +46,9 @@ input[type=password]{
   outline: none;
   // noinspection CssUnknownProperty
   -moz-appearance:textfield;
+  &.invalid{
+    border-color: $alert-text-color;
+  }
 }
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

@@ -57,7 +57,11 @@ export class LoginComponent implements OnDestroy {
                       this.showSnackService.error(this.cartService.rebaseCartError);
                       throw new Error(data.message);
                     }
-                    this.showSnackService.info(data.message);
+                    if (data.messages){
+                      data.error?this.showSnackService.errorObj(data): this.showSnackService.infoObj(data);
+                    }else{
+                      this.showSnackService.info(data.message);
+                    }
                     request$.unsubscribe();
                   },
                   error: (errorResponse: HttpErrorResponse) => {

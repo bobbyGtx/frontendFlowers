@@ -28,6 +28,7 @@ export class CartComponent implements OnInit , OnDestroy {
   totalAmount:number=0;
   totalCount:number=0;
 
+
   ngOnInit() {
     this.subscriptions$.add(
       this.cartService.getCart(true).subscribe({
@@ -37,6 +38,8 @@ export class CartComponent implements OnInit , OnDestroy {
             this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
+          if (data.infoMessage) this.showSnackService.info(data.infoMessage);
+          if (data.messages) data.error?this.showSnackService.errorObj(data):this.showSnackService.infoObj(data);
           //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
           if (data.cart){
             this.cartItems = data.cart.items;
@@ -71,19 +74,17 @@ export class CartComponent implements OnInit , OnDestroy {
     this.subscriptions$.add(
       this.cartService.updateCart(cartProduct,count).subscribe({
         next: (data: CartResponseType) => {
-          if (data.error) {
+          if (data.error || !data.cart) {
             this.showSnackService.error(this.cartService.updateCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.cart){
-            this.cartItems = data.cart.items;
-            this.calculateTotal();
-          }
+          if (data.infoMessage) this.showSnackService.info(data.infoMessage);
+          this.cartItems = data.cart.items;
+          this.calculateTotal();
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.updateCartError);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-          else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
+          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
     );

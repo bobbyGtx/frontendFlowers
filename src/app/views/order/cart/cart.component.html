@@ -5,7 +5,7 @@
       <div class="cart-products">
         <div class="cart-product" *ngFor="let cartProduct of cartItems">
           <div class="cart-product-image" [class.disabled]="cartProduct.product.disabled" [style.background-image]="'url('+serverImagesPath + cartProduct.product.image + ')'"></div>
-          <div class="cart-product-name">{{cartProduct.product.name}}</div>
+          <div class="cart-product-name"><a [routerLink]="'/product/'+cartProduct.product.url">{{cartProduct.product.name}}</a></div>
           <count-selector (onCountChange)="updateCount(cartProduct.product,$event)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled"></count-selector>
           <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
           <div class="cart-product-remove" (click)="editCount(cartProduct.product,0)">

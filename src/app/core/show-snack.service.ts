@@ -122,12 +122,11 @@ export class ShowSnackService {
     ],
     [ReqErrorTypes.cartUpdate]:[
       {
-        error: 'User with this email is already registered!',
-        [AppLanguages.ru]:'Пользователь с таким E-mail уде зарегистрирован!',
-        [AppLanguages.en]:'User with this email is already registered!',
-        [AppLanguages.de]:'Dieser Benutzer ist bereits registriert!',
-      },
-      {
+        error: 'Requested product is currently unavailable!',
+        [AppLanguages.ru]:'Один или несколько товаров в корзины не доступен!',
+        [AppLanguages.en]:'One or more items in your cart are not available!',
+        [AppLanguages.de]:'Mindestens ein Artikel in Ihrem Warenkorb ist nicht verfügbar!',
+      },{
         error: 'default',
         [AppLanguages.ru]: 'Ошибка изменения корзины. Повторите попытку.',
         [AppLanguages.en]: 'Error editing cart. Please try again.',
@@ -166,7 +165,6 @@ export class ShowSnackService {
         [AppLanguages.de]:'Fehler beim Übertragen des Warenkorbs an den Server!',
       }
     ],//Вывод ошибок снакбаром отключен в логине
-
   };//ошибки сгруппированные по запросам
 
   private userMessages:Array<UserInfoMsgType> = [
@@ -200,7 +198,7 @@ export class ShowSnackService {
       [AppLanguages.en]:'Unrecognized products have been removed from cart.',
       [AppLanguages.de]:'Nicht erkannte Produkte wurden aus Ihrem Warenkorb entfernt.',
     },
-  ];//сообщения из переменной [messages]
+  ];//сообщения валидации из переменной [messages]
   private userSuccess:Array<UserSuccessMsgType> = [
     {
       success:'Authorization success!',
@@ -223,6 +221,11 @@ export class ShowSnackService {
   ];//Подтверждения
   private userInfos:Array<UserInfoMsgType> = [
     {
+      info:'Attention',
+      [AppLanguages.ru]:'Уведомление:',
+      [AppLanguages.en]:'Notification:',
+      [AppLanguages.de]:'Benachrichtigung:',
+    },{
       info:'You have successfully logged out.',
       [AppLanguages.ru]:'Вы успешно вышли из системы.',
       [AppLanguages.en]:'You have successfully logged out.',
@@ -243,12 +246,22 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Корзина очищена системой.',
       [AppLanguages.en]:'Cart has been cleared by the system.',
       [AppLanguages.de]:'Der Warenkorb wurde vom System geleert.',
-    },
+    },{
+      info: 'Not enough goods in stock.',
+      [AppLanguages.ru]:'Не достаточно товара на складе.',
+      [AppLanguages.en]:'Not enough goods in stock.',
+      [AppLanguages.de]:'Nicht genügend Ware auf Lager.',
+    },{
+      info: 'Requested product is currently unavailable!',
+      [AppLanguages.ru]:'Один или несколько товаров в корзины не доступен!',
+      [AppLanguages.en]:'One or more items in your cart are not available!',
+      [AppLanguages.de]:'Mindestens ein Artikel in Ihrem Warenkorb ist nicht verfügbar!',
+    }
 
   ];//Информационные сообщения
 
   private getUserGroupError(reqType: ReqErrorTypes, message: string): string {
-    const errorIndex: number = this.userGroupErrors[reqType].findIndex((errorItem: UserErrorType) => errorItem.error.toLowerCase() === message.toLowerCase());
+    const errorIndex: number = this.userGroupErrors[reqType].findIndex((errorItem: UserErrorType) => message.toLowerCase().includes(errorItem.error.toLowerCase()));
     if (errorIndex === -1) {
       return this.userGroupErrors[reqType][this.userGroupErrors[reqType].length - 1][this.languageService.appLang]?this.userGroupErrors[reqType][this.userGroupErrors[reqType].length - 1][this.languageService.appLang]:message;
     } else {
@@ -256,19 +269,26 @@ export class ShowSnackService {
     }
   }
   private getUserSuccessMsg(message: string): string {
-    const itemIndex:number = this.userSuccess.findIndex(item=>item.success.toLowerCase() === message.toLowerCase());
+    const itemIndex:number = this.userSuccess.findIndex(item=>message.toLowerCase().includes(item.success.toLowerCase()));
     if (itemIndex >= 0) message = this.userSuccess[itemIndex][AppLanguages.de];
     return message;
   }
   private getUserInfoMsg(message: string): string {
-    const itemIndex:number = this.userInfos.findIndex(item=>item.info.toLowerCase() === message.toLowerCase());
+    const itemIndex:number = this.userInfos.findIndex(item=>message.toLowerCase().includes(item.info.toLowerCase()));
     if (itemIndex >= 0) message = this.userInfos[itemIndex][this.languageService.appLang];
     return message;
   }
   private getUserValidMessages(messages:string[]):string[]{
     messages = messages.map((message:string)=>{
-      const itemIndex:number = this.userMessages.findIndex((errorItem:UserInfoMsgType)=>errorItem.info.toLowerCase() === message.toLowerCase());
+      const itemIndex:number = this.userMessages.findIndex((errorItem:UserInfoMsgType)=> message.toLowerCase().includes(errorItem.info.toLowerCase()));
       return itemIndex ===-1 ? message:this.userMessages[itemIndex][this.languageService.appLang];
+    });
+    return messages;
+  }
+  private getUserinfoMessages(messages:string[]):string[]{
+    messages = messages.map((message:string)=>{
+      const itemIndex:number = this.userInfos.findIndex((errorItem:UserInfoMsgType)=> message.toLowerCase().includes(errorItem.info.toLowerCase()));
+      return itemIndex ===-1 ? message:this.userInfos[itemIndex][this.languageService.appLang];
     });
     return messages;
   }
@@ -293,13 +313,18 @@ export class ShowSnackService {
       this._snackbar.open(errMessage, 'ok', this.errorSettings);
     }
   }//Simple error msg & messages[]?
+
   infoObj(info: DefaultResponseType, code: number | null = null): void {
-    info.message = this.getUserInfoMsg(info.message);
+    if (info.message == "Request success!"){
+      info.message = this.getUserInfoMsg('Attention');
+    }else{
+      info.message = this.getUserInfoMsg(info.message);
+    }
     const infMessage = code ? `${info.message}  Code: ${code}` : info.message;
     if (info.messages && Array.isArray(info.messages) && info.messages.length > 0) {
       let multiInfoSettings: SnackSettingsType = this.multiInfoSettings;
       multiInfoSettings['data']!['message'] = info.message;
-      multiInfoSettings['data']!['messages'] = this.getUserValidMessages(info.messages);
+      multiInfoSettings['data']!['messages'] = this.getUserinfoMessages(info.messages);
       this._snackbar.openFromComponent(SnackbarMessageComponent, multiInfoSettings);
     } else {
       this._snackbar.open(infMessage, 'ok', this.infoSettings);

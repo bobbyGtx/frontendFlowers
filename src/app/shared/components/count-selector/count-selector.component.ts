@@ -22,7 +22,7 @@ export class CountSelectorComponent implements OnInit {
     }
     this.filter
       .pipe(
-        debounceTime(500),
+        debounceTime(300),
       )
       .subscribe(cartCount => {
         this.onCountChange.emit(cartCount);

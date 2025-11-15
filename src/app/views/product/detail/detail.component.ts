@@ -48,13 +48,13 @@ export class DetailComponent implements OnInit, OnDestroy {
     this.subscriptions$.add(
       this.cartService.updateCart(this.product!, count).subscribe({
         next: (data: CartResponseType) => {
-          if (data.error && !data.cart) {
+          if (data.error || !data.cart) {
             this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
+          if (data.infoMessage) this.showSnackService.info(data.infoMessage);
           this.cartProducts = [];
           this.product!.countInCart = 0;
-          if (data.cart) {
             this.cartProducts = data.cart.items;
             if (data.cart.items.length) {
               const itemIndexInResp: number = data.cart.items.findIndex((item) => item.product.id === this.product!.id);
@@ -63,10 +63,10 @@ export class DetailComponent implements OnInit, OnDestroy {
               }
               this.checkRecommendedProducts();
             }
-          }
+
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.updateCartError);
+          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
           console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
