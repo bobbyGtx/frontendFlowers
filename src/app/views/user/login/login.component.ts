@@ -44,29 +44,34 @@ export class LoginComponent implements OnDestroy {
               if (data.error || !data.user) {
                 this.showSnackService.error(data.message, ReqErrorTypes.authLogin);
                 throw new Error(data.message);
-              }//Если ошибка есть - выводим её и завершаем функцию
+              }//Если ошибка есть и нед пользователя - выводим её и завершаем функцию
 
               this.authService.setTokens(data.user.accessToken, data.user.refreshToken);
               this.authService.userId = data.user.userId;
 
               if (this.cartService.checkLSCart()){
+                //При этом запросе чистится локальная корзина
                 const request$ = this.cartService.rebaseCart(data.user.accessToken).subscribe({
                   next: (data: CartResponseType) => {
-                    if (data.messages) this.showSnackService.infoObj(data);
-                    else this.showSnackService.info(data.message);
+                    if (data.error && !data.cart){
+                      this.showSnackService.error(this.cartService.rebaseCartError);
+                      throw new Error(data.message);
+                    }
+                    this.showSnackService.info(data.message);
                     request$.unsubscribe();
                   },
-                  error: (data: CartResponseType) => {
-                    console.error(data.message);
+                  error: (errorResponse: HttpErrorResponse) => {
+                    //this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartRebase);//не выводим никаких ошибок
+                    console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
                   },
                 });
               }
-              //this.showSnackService.success(data.message);
+              this.showSnackService.success(data.message);
               this.router.navigate(['/']).then();
             },
             error: (errorResponse: HttpErrorResponse) => {
-              console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected Login error! Code:${errorResponse.status}`);
               this.showSnackService.error(errorResponse.error.message, ReqErrorTypes.authLogin);
+              console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected Login error! Code:${errorResponse.status}`);
             }
           }));
       }

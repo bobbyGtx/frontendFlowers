@@ -47,8 +47,8 @@ export class DetailComponent implements OnInit, OnDestroy {
     this.subscriptions$.add(
       this.cartService.updateCart(this.product!, count).subscribe({
         next: (data: CartResponseType) => {
-          if (data.error) {
-            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+          if (data.error && !data.cart) {
+            this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
           this.cartProducts = [];
@@ -65,9 +65,8 @@ export class DetailComponent implements OnInit, OnDestroy {
           }
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-          else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
+          this.showSnackService.error(this.cartService.updateCartError);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
     );
@@ -98,7 +97,7 @@ export class DetailComponent implements OnInit, OnDestroy {
             this.subscriptions$.add(combinedRequests$.subscribe({
               next: (data: [CartResponseType, RecommendedProductsResponseType]) => {
                 if (data[0].error) {
-                  this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+                  this.showSnackService.error(this.cartService.getCartError);
                   throw new Error(data[0].message);
                 }//Обработка ошибки корзины пользователя
                 if (data[1].error) {

@@ -32,8 +32,8 @@ export type userErrorsType = {
 })
 
 export class ProductService {
-  http: HttpClient = inject(HttpClient);
-  languageService:LanguageService= inject(LanguageService);
+  private http: HttpClient = inject(HttpClient);
+  private languageService:LanguageService= inject(LanguageService);
 
   private productTemplate: ProductType = {
     id: 0,
@@ -79,16 +79,16 @@ export class ProductService {
   };
 
   get getBestProductsError():string{
-    return this.userErrors.getBestProducts[this.languageService.appLang]
+    return this.userErrors.getBestProducts[this.languageService.appLang];
   };
   get getRecommendedProductsError():string{
-    return this.userErrors.getRecommendedProducts[this.languageService.appLang]
+    return this.userErrors.getRecommendedProducts[this.languageService.appLang];
   };
   get getProductsError():string{
-    return this.userErrors.getProducts[this.languageService.appLang]
+    return this.userErrors.getProducts[this.languageService.appLang];
   }
   get getProductError():string{
-    return this.userErrors.getProduct[this.languageService.appLang]
+    return this.userErrors.getProduct[this.languageService.appLang];
   }
 
   getBestProducts(): Observable<BestProductsResponseType> {

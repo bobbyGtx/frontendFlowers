@@ -9,6 +9,7 @@ import {CartProductType} from '../../../assets/types/cart-product.type';
 import {CartType} from '../../../assets/types/cart.type';
 import {AuthService} from '../../core/auth/auth.service';
 import {ShowSnackService} from '../../core/show-snack.service';
+import {LanguageService} from '../../core/language.service';
 
 export type userErrorsType = {
   getCart: { [key in AppLanguages]: string; },
@@ -23,21 +24,42 @@ export class CartService {
   private http: HttpClient = inject(HttpClient);
   private authService: AuthService = inject(AuthService);
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService= inject(LanguageService);
+
+  readonly cartLsKey: string = 'userCart';
+  private cartRequest$?: Observable<CartResponseType>;//для предотвращения дублирования запроса
 
   private cartCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  private cartCache: CartResponseType | null = null;
-  private cartRequest$?: Observable<CartResponseType>;//для предотвращения дублирования запроса
+  private cartCache: CartResponseType | null = null;//Кэш ответа корзины. Пополняется по результатам 2х запросов
   readonly cartCacheLifetime: number = 30000;
   clearCartCacheTimeout: ReturnType<typeof setTimeout> | null = null;//таймер для чистки кэша корзины
 
-  readonly cartLsKey: string = 'userCart';
+  userErrors: userErrorsType = {
+    getCart: {
+      [AppLanguages.ru]: 'Ошибка при запросе корзины. Обновите страницу.',
+      [AppLanguages.en]: 'Error requesting cart. Please refresh the page.',
+      [AppLanguages.de]: 'Fehler beim Anfordern des Warenkorbs. Bitte aktualisieren Sie die Seite.',
+    },
+    updateCart: {
+      [AppLanguages.ru]: 'Ошибка изменения корзины. Повторите попытку.',
+      [AppLanguages.en]: 'Error editing cart. Please try again.',
+      [AppLanguages.de]: 'Fehler beim Ändern des Warenkorbs. Bitte versuchen Sie es erneut.',
+    },
+    rebaseCart: {
+      [AppLanguages.ru]:'Ошибка переноса локальной корзины.',
+      [AppLanguages.en]:'Error transferring local recycle bin.',
+      [AppLanguages.de]:'Fehler beim Übertragen des lokalen Papierkorbs.',
+    },
+  };
 
-  resetCacheTimer() {
-    if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
-    this.clearCartCacheTimeout = setTimeout(() => {
-      this.cartCache = null;
-      if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
-    }, this.cartCacheLifetime);
+  get getCartError():string {
+    return this.userErrors.getCart[this.languageService.appLang];
+  }
+  get updateCartError():string {
+    return this.userErrors.updateCart[this.languageService.appLang];
+  }
+  get rebaseCartError():string {
+    return this.userErrors.rebaseCart[this.languageService.appLang];
   }
 
   getCartCount$(): Observable<number> {
@@ -52,36 +74,10 @@ export class CartService {
     this.cartCount$.next(0);
   }//сброс после создания заказа например
 
-  userErrorMessages = {
-    getCart: 'Ошибка при запросе корзины. Обновите страницу.',
-    updateCart: 'Ошибка при добавления товара в корзину.',
-  }
-
-  userErrors: userErrorsType = {
-    getCart: {
-      [AppLanguages.ru]: 'Ошибка при запросе корзины. Обновите страницу.',
-      [AppLanguages.en]: 'Error requesting cart. Please refresh the page.',
-      [AppLanguages.de]: 'Fehler beim Anfordern des Warenkorbs. Bitte aktualisieren Sie die Seite.',
-    },
-    updateCart: {
-      [AppLanguages.ru]: 'Ошибка изменения корзины. Повторите попытку.',
-      [AppLanguages.en]: 'Error editing cart. Please try again.',
-      [AppLanguages.de]: 'Fehler beim Ändern des Warenkorbs. Bitte versuchen Sie es erneut.',
-    },
-    rebaseCart: {
-      [AppLanguages.ru]: 'Ошибка при запросе категорий. Обновите страницу.',
-      [AppLanguages.en]: 'Error retrieving categories. Please refresh the page.',
-      [AppLanguages.de]: 'Fehler beim Abrufen der Kategorien. Bitte aktualisieren Sie die Seite.',
-    },
-  };
-
   getCart(forceUpdate: boolean = false): Observable<CartResponseType> {
-    console.log(this.cartCache);
     if (!this.authService.isLogged$.getValue()) return of(this.getLSCart());
     if (!forceUpdate && this.cartCache) return of(this.cartCache);
-    if (this.cartRequest$) {
-      return this.cartRequest$;
-    }
+    if (this.cartRequest$) {return this.cartRequest$;}
     const accessToken: string | null = this.authService.getTokens().accessToken;
     const headers = new HttpHeaders().set("x-access-token", accessToken ? accessToken : '');
     this.cartRequest$ = this.http.get<CartResponseType>(environment.api + 'cart.php', {headers})
@@ -279,5 +275,12 @@ export class CartService {
     return !!(userLSCart && userLSCart.items.length > 0);
   }
 
+  resetCacheTimer() {
+    if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
+    this.clearCartCacheTimeout = setTimeout(() => {
+      this.cartCache = null;
+      if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
+    }, this.cartCacheLifetime);
+  }
 }
 

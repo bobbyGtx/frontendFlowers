@@ -6,6 +6,7 @@ import {Subscription} from 'rxjs';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'product-card',
@@ -30,10 +31,11 @@ class ProductCardComponent implements OnInit, OnDestroy{
     this.subscriptions$.add(
       this.cartService.updateCart(this.product,count).subscribe({
         next: (data: CartResponseType) => {
-          if (data.error) {
-            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+          if (data.error && !data.cart) {
+            this.showSnackService.error(this.cartService.updateCartError,ReqErrorTypes.cartUpdate);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
+          if (data.error && data.cart) this.showSnackService.info(data.message);
           this.product.countInCart=0;
           this.count=1;
           if (data.cart){
@@ -44,9 +46,8 @@ class ProductCardComponent implements OnInit, OnDestroy{
           }
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-          else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
+          this.showSnackService.error(this.cartService.updateCartError);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
     );

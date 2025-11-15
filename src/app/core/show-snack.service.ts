@@ -101,7 +101,7 @@ export class ShowSnackService {
       },
       {
         error: 'User with this email is already registered!',
-        [AppLanguages.ru]:'Пользователь с таким E-mail уде зарегистрирован!',
+        [AppLanguages.ru]:'Пользователь с таким E-mail уже зарегистрирован!',
         [AppLanguages.en]:'User with this email is already registered!',
         [AppLanguages.de]:'Dieser Benutzer ist bereits registriert!',
       },
@@ -111,8 +111,64 @@ export class ShowSnackService {
         [AppLanguages.en]:'Registration error. Please try again.',
         [AppLanguages.de]:'Registrierungsfehler. Bitte versuchen Sie es erneut.',
       }
-    ]
+    ],
+    [ReqErrorTypes.cartGetCart]:[
+      {
+        error: 'default',
+        [AppLanguages.ru]:'Ошибка при запросе корзины. Обновите страницу.',
+        [AppLanguages.en]:'Error requesting cart. Please refresh the page.',
+        [AppLanguages.de]:'Fehler beim Anfordern des Warenkorbs. Bitte aktualisieren Sie die Seite.',
+      }
+    ],
+    [ReqErrorTypes.cartUpdate]:[
+      {
+        error: 'User with this email is already registered!',
+        [AppLanguages.ru]:'Пользователь с таким E-mail уде зарегистрирован!',
+        [AppLanguages.en]:'User with this email is already registered!',
+        [AppLanguages.de]:'Dieser Benutzer ist bereits registriert!',
+      },
+      {
+        error: 'default',
+        [AppLanguages.ru]: 'Ошибка изменения корзины. Повторите попытку.',
+        [AppLanguages.en]: 'Error editing cart. Please try again.',
+        [AppLanguages.de]: 'Fehler beim Ändern des Warenkorbs. Bitte versuchen Sie es erneut.',
+      }
+    ],
+    [ReqErrorTypes.cartRebase]:[
+      {
+        error: 'Request parameters not recognized!',
+        [AppLanguages.ru]:'Ошибка! Перенос локальной корзины не выполнен.',
+        [AppLanguages.en]:'Error! Local Cart Bin migration failed.',
+        [AppLanguages.de]:'Fehler! Migration des lokalen Warenkorb fehlgeschlagen.',
+      },
+      {
+        error: 'Cart rebase impossible. User have a cart!',
+        [AppLanguages.ru]:'Перебазирование корзины невозможно. У пользователя есть корзина!',
+        [AppLanguages.en]:'Cart rebase impossible. User have a cart!',
+        [AppLanguages.de]:'Warenkorb-Rebase nicht möglich. Der Nutzer hat einen Warenkorb!',
+      },
+      {
+        error: 'Products not found!',
+        [AppLanguages.ru]:'Продукты из локальной корзины не корректны!',
+        [AppLanguages.en]:'Products from local cart are incorrect!',
+        [AppLanguages.de]:'Die Produkte im lokalen Warenkorb sind falsch!',
+      },
+      {
+        error: 'Unrecognized products were removed.',
+        [AppLanguages.ru]:'Найдены и удалены не корректные родукты из корзины!',
+        [AppLanguages.en]:'Incorrect products found and removed from cart!',
+        [AppLanguages.de]:'Falsche Produkte gefunden und aus dem Warenkorb entfernt!',
+      },
+      {
+        error: 'default',
+        [AppLanguages.ru]:'Ошибка переноса корзины на сервер!',
+        [AppLanguages.en]:"Error transferring user's cart to the server!",
+        [AppLanguages.de]:'Fehler beim Übertragen des Warenkorbs an den Server!',
+      }
+    ],//Вывод ошибок снакбаром отключен в логине
+
   };//ошибки сгруппированные по запросам
+
   private userMessages:Array<UserInfoMsgType> = [
     {
       info:'E-Mail is incorrect',
@@ -172,16 +228,11 @@ export class ShowSnackService {
       [AppLanguages.en]:'You have successfully logged out.',
       [AppLanguages.de]:'Sie haben sich erfolgreich abgemeldet.',
     },{
-      info:'User cart was rebased.',
-      [AppLanguages.ru]:'Ваша корзина перенесена на сервер.',
-      [AppLanguages.en]:'Your cart has been transferred to the server.',
-      [AppLanguages.de]:'Ihr Warenkorb wurde an den Server übertragen.',
-    },{
       info:'Cart has been rebased!',
       [AppLanguages.ru]:'Ваша корзина перемещена на сервер!',
       [AppLanguages.en]:'Your cart has been moved to the server!',
       [AppLanguages.de]:'Ihr Warenkorb wurde auf den Server übertragen!',
-    },    {
+    },{
       info:'Unrecognized products were removed.',
       [AppLanguages.ru]:'Нераспознанные продукты были удалены из корзины.',
       [AppLanguages.en]:'Unrecognized products have been removed from cart.',

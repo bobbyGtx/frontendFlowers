@@ -10,6 +10,7 @@ import {CartResponseType} from '../../../../assets/types/responses/cart-response
 import {environment} from '../../../../environments/environment.development';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
 import {CartProductType} from '../../../../assets/types/cart-product.type';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-cart',
@@ -33,11 +34,11 @@ export class CartComponent implements OnInit , OnDestroy {
         next: (data: CartResponseType) => {
           //Может быть error с нормальным ответом при проблемах с товарами
           if (data.error && !data.cart) {
-            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+            this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
+          //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
           if (data.cart){
-            //Инфо выводится только в cartService компоненте, для предотвращения дублирования и снятия ошибки с кеша
             this.cartItems = data.cart.items;
             if (this.cartItems.length > 0){
               this.calculateTotal();
@@ -61,7 +62,7 @@ export class CartComponent implements OnInit , OnDestroy {
         },
         error: (errorResponse: HttpErrorResponse) => {
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
-          this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
         }
       }));
   }
@@ -71,7 +72,7 @@ export class CartComponent implements OnInit , OnDestroy {
       this.cartService.updateCart(cartProduct,count).subscribe({
         next: (data: CartResponseType) => {
           if (data.error) {
-            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+            this.showSnackService.error(this.cartService.updateCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
           if (data.cart){
@@ -80,7 +81,7 @@ export class CartComponent implements OnInit , OnDestroy {
           }
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.userErrorMessages.updateCart);
+          this.showSnackService.error(this.cartService.updateCartError);
           if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
           else console.log(`Unexpected error (update Cart)!` + ` Code:${errorResponse.status}`);
         }

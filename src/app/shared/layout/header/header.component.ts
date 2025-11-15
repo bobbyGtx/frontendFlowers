@@ -7,6 +7,7 @@ import {CategoryWithTypesType} from '../../../../assets/types/category-with-type
 import {CartService} from '../../services/cart.service';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-header',
@@ -28,21 +29,25 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscriptions$.add(
       this.authService.isLogged$.subscribe(isLoggedIn => {
+        if (!this.isLogged && isLoggedIn){
+          this.subscriptions$.add(
+            this.cartService.getCart().subscribe({
+              next: (data: CartResponseType) => {
+                //Может быть error с нормальным ответом при проблемах с товарами
+                if (data.error && !data.cart) {
+                  this.showSnackService.error(this.cartService.getCartError);
+                  throw new Error(data.message);
+                }//Если ошибка есть и нет корзины в ответе - выводим её и завершаем функцию
+                //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
+              },
+              error: (errorResponse: HttpErrorResponse) => {
+                this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+                console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
+              }
+            })
+          );
+        }//Если мы сменили статус на залогинен, то ищем корзину
         this.isLogged = isLoggedIn;
-        this.subscriptions$.add(
-          this.cartService.getCart(true).subscribe({
-            next: (data: CartResponseType) => {
-              //Может быть error с нормальным ответом при проблемах с товарами
-              if (data.error && !data.cart) {
-                this.showSnackService.error(this.cartService.userErrorMessages.getCart);
-                throw new Error(data.message);
-              }//Если ошибка есть и нет корзины в ответе - выводим её и завершаем функцию
-            },
-            error: (errorResponse: HttpErrorResponse) => {
-              this.showSnackService.error(this.cartService.userErrorMessages.getCart);
-              console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
-            }
-          }));
       }),
     );
     this.subscriptions$.add(
@@ -50,7 +55,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.count = cartCount;
       }),
     );
-
   }
 
   logout(): void {

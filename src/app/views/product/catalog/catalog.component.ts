@@ -19,6 +19,7 @@ import {CategoryFilters} from '../../../../assets/enums/category-filters.enum';
 import {CartService} from '../../../shared/services/cart.service';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-catalog',
@@ -59,18 +60,16 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
     this.subscriptions$.add(this.cartService.getCart().subscribe({
         next: (data: CartResponseType) => {
-          if (data.error) {
-            this.showSnackService.error(this.cartService.userErrorMessages.getCart);
+          if (data.error && !data.cart) {
+            this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.cart){
-            this.cartItems = data.cart.items;
-          }
+          //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
+          if (data.cart){this.cartItems = data.cart.items;}
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.cartService.userErrorMessages.getCart);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-          else console.log(`Unexpected error (get Cart)!` + ` Code:${errorResponse.status}`);
+          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getCart)! Code:${errorResponse.status}`);
         }
       }));
 

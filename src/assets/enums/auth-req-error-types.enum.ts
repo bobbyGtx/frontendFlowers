@@ -1,4 +1,7 @@
 export enum ReqErrorTypes {
   authLogin='authLogin',
-  authSignUp='authSignUp'
+  authSignUp='authSignUp',
+  cartGetCart='cartGetCart',
+  cartUpdate='cartUpdate',
+  cartRebase='cartRebase',
 }
