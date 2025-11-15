@@ -129,9 +129,6 @@ export class CartService {
       .pipe(
         tap((data: CartResponseType) => {
           if (data.cart && data.cart.count >= 0) {
-            if (data.cart.count === 0) {
-              this.updateCartCount(data.cart.count);
-            } else {
               //коррекция кол-ва товаров в корзине с вычетом недоступных
               let totalCount = 0;
               data.cart.items.forEach((cartItem: CartItemType) => {
@@ -144,7 +141,6 @@ export class CartService {
               this.updateCartCount(totalCount);
               this.cartCache = data;
               this.resetCacheTimer();
-            }
           }
         })
       );

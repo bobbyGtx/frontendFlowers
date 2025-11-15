@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {environment} from '../../../../environments/environment.development';
-import {combineLatest, Observable, Subscription} from 'rxjs';
+import {catchError, combineLatest, Observable, of, Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProductService} from '../../../shared/services/product.service';
 import {ShowSnackService} from '../../../core/show-snack.service';
@@ -11,6 +11,7 @@ import {RecommendedProductsResponseType} from '../../../../assets/types/response
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 import {CartService} from '../../../shared/services/cart.service';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-detail',
@@ -66,7 +67,7 @@ export class DetailComponent implements OnInit, OnDestroy {
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(this.cartService.updateCartError);
-          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
+          console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
     );
@@ -82,55 +83,70 @@ export class DetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscriptions$.add(
       this.activatedRoute.params.subscribe(params => {
-        this.productService.getProduct(params['url']).subscribe({
-          next: (productData: ProductResponseType) => {
-            if (productData.error) {
-              this.showSnackService.error(this.productService.getProductError);
-              throw new Error(productData.message);
-            }
-            if (!productData.product) throw new Error(productData.message);
+        const getProduct$: Observable<ProductResponseType> = this.productService.getProduct(params['url'])
+          .pipe(catchError((err: HttpErrorResponse): Observable<ProductResponseType> => of({__error: true, err} as any)));
+        const getUserCart$: Observable<CartResponseType> = this.cartService.getCart()
+          .pipe(catchError((err: HttpErrorResponse): Observable<CartResponseType> => of({__error: true, err} as any)));
 
-            const combinedRequests$: Observable<[CartResponseType, RecommendedProductsResponseType]> = combineLatest([
-              this.cartService.getCart(),
-              this.productService.getRecommendedProducts(productData.product.category_id, productData.product.id)
-            ]);
-            this.subscriptions$.add(combinedRequests$.subscribe({
-              next: (data: [CartResponseType, RecommendedProductsResponseType]) => {
-                if (data[0].error) {
-                  this.showSnackService.error(this.cartService.getCartError);
-                  throw new Error(data[0].message);
-                }//Обработка ошибки корзины пользователя
-                if (data[1].error) {
-                  this.showSnackService.error(this.productService.getRecommendedProductsError);
-                  throw new Error(data[1].message);
-                }//Обработка ошибки рекомендуемых товаров
-                this.cartProducts = data[0].cart ? data[0].cart.items : [];
-                this.recommendedProducts = data[1].products ? data[1].products : [];
-                if (!productData.product) throw new Error(productData.message);
-                if (this.cartProducts.length > 0) {
-                  const productIndexInCart: number = this.cartProducts.findIndex((cartItem: CartItemType) => cartItem.product.id === productData.product?.id);
-                  if (productIndexInCart !== -1) {
-                    productData.product.countInCart = this.cartProducts[productIndexInCart].quantity;
-                    this.count = productData.product.countInCart;
-                  }
-                  this.checkRecommendedProducts();//заполнение countInCart полей у рекомендованных продуктов
-                }
-                this.product = productData.product!;
-              },
-              error: (errorResponse: HttpErrorResponse) => {
-                this.showSnackService.error('Request Error!');
-                if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-                else console.log(`Unexpected error (get Cart + getRecommendedProducts)!` + ` Code:${errorResponse.status}`);
+        const combinedRequests$: Observable<[ ProductResponseType | any,CartResponseType | any]> = combineLatest([getProduct$,getUserCart$]);
+        this.subscriptions$.add(combinedRequests$.subscribe({
+          next:([getProductResp, getUserCartResp]:[ProductResponseType|any,CartResponseType | any])=>{
+            // ---------- Ошибка GetProduct ----------
+            if (getProductResp.__error) {
+              const errorResponse: HttpErrorResponse = getProductResp.err;
+              this.showSnackService.error(this.productService.getProductError);
+              console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getProduct)! Code:${errorResponse.status}`);
+            }
+            const productResponse:ProductResponseType = getProductResp as ProductResponseType;
+            if (productResponse.error || !productResponse.product) {
+              this.showSnackService.error(this.productService.getProductError);
+              throw new Error(productResponse.message);
+            }
+            this.product=productResponse.product;
+            // ---------- Ошибка корзина ----------
+            if (getUserCartResp.__error) {
+              const httpErr: HttpErrorResponse = getUserCartResp.err;
+              this.showSnackService.error(httpErr.error.message, ReqErrorTypes.cartGetCart);
+              console.error(httpErr.error.message ? httpErr.error.message : `Unexpected (get Cart) error! Code:${httpErr.status}`);
+            }
+            const cartData = getUserCartResp as CartResponseType;
+            if ((cartData.error && !cartData.cart) || !cartData.cart) {
+              this.showSnackService.error(this.cartService.getCartError);
+              throw new Error(cartData.message);
+            }//Если ошибка есть и нет корзины в ответе - выводим её и завершаем функцию
+            //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
+            this.cartProducts = cartData.cart.items;
+            //Применение корзины
+            if (this.cartProducts.length > 0) {
+              const productIndexInCart: number = this.cartProducts.findIndex((cartItem: CartItemType) => cartItem.product.id === this.product!.id);
+              if (productIndexInCart !== -1) {
+                this.product.countInCart = this.cartProducts[productIndexInCart].quantity;
+                this.count = this.product.countInCart;
               }
-            }));
-          },
-          error: (errorResponse: HttpErrorResponse) => {
-            this.showSnackService.error(this.productService.getProductError);
-            console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getProduct)! Code:${errorResponse.status}`);
+            }
+
+            this.subscriptions$.add(
+              this.productService.getRecommendedProducts(this.product.category_id, this.product.id).subscribe({
+                next: (data: RecommendedProductsResponseType) => {
+                  if (data.error){
+                    this.showSnackService.error(this.productService.getProductError);
+                    throw new Error(data.message);
+                  }
+                  if (data.products && data.products.length > 0) {
+                    this.recommendedProducts = data.products;
+                    this.checkRecommendedProducts();//заполнение countInCart полей у рекомендованных продуктов
+                  }
+                },
+                error: (errorResponse: HttpErrorResponse) => {
+                  this.showSnackService.error(this.productService.getRecommendedProductsError);
+                  console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getRecommendedProducts)! Code:${errorResponse.status}`);
+                },
+              })
+            );
           }
-        });
+        }));
       })
-    );
+    );//3 запроса. 2 спаренных (продукт и корзина), после чего рекомендованные продукты
   }
 
   checkRecommendedProducts() {

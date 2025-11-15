@@ -58,21 +58,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
     const clicks = fromEvent(document, 'click');
     this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
 
-    this.subscriptions$.add(this.cartService.getCart().subscribe({
-        next: (data: CartResponseType) => {
-          if (data.error && !data.cart) {
-            this.showSnackService.error(this.cartService.getCartError);
-            throw new Error(data.message);
-          }//Если ошибка есть - выводим её и завершаем функцию
-          //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
-          if (data.cart){this.cartItems = data.cart.items;}
-        },
-        error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
-          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getCart)! Code:${errorResponse.status}`);
-        }
-      }));
-
     this.subscriptions$.add(this.categoryService.getCategoriesWithTypes().subscribe({
         next: (data: CategoriesWithTypesResponseType) => {
           if (data.error) {
@@ -133,6 +118,22 @@ export class CatalogComponent implements OnInit, OnDestroy {
         }
       }));
 
+    this.subscriptions$.add(this.cartService.getCart().subscribe({
+      next: (data: CartResponseType) => {
+        if (data.error && !data.cart) {
+          this.showSnackService.error(this.cartService.getCartError);
+          throw new Error(data.message);
+        }//Если ошибка есть - выводим её и завершаем функцию
+        //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
+        if (data.cart){
+          this.cartItems = data.cart.items;
+        }
+      },
+      error: (errorResponse: HttpErrorResponse) => {
+        this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+        console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getCart)! Code:${errorResponse.status}`);
+      }
+    }));
   }
 
   toggleSorting(event: MouseEvent) {
