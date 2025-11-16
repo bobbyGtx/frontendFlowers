@@ -12,6 +12,7 @@ import {AppLanguages} from '../../assets/enums/app-languages.enum';
 import {DefaultResponseType} from '../../assets/types/responses/default-response.type';
 import {BehaviorSubject, timer} from 'rxjs';
 import {ReqErrorTypes} from '../../assets/enums/auth-req-error-types.enum';
+import {Config} from '../shared/config';
 
 type SnackSettingsType = {
   data?: {
@@ -53,7 +54,7 @@ export class ShowSnackService {
       dlgType: 'snackbar-error',
       messages: [],
     },
-    duration: 100000,
+    duration: 10000,
     panelClass: 'snackbar-error',
   };
   private multiInfoSettings: SnackSettingsType = {
@@ -241,7 +242,7 @@ export class ShowSnackService {
   ];//Подтверждения
   private userInfos:Array<UserInfoMsgType> = [
     {
-      info:'Attention',
+      info:Config.confirmMsgFromServer,
       [AppLanguages.ru]:'Уведомление:',
       [AppLanguages.en]:'Notification:',
       [AppLanguages.de]:'Benachrichtigung:',
@@ -381,14 +382,12 @@ export class ShowSnackService {
   }
 
   error(message: string, reqType: ReqErrorTypes | null = null, code: number | null = null): void {
-    console.log(message, reqType);
     if (message.length<2) return;
     if (reqType) message = this.getUserGroupError(reqType, message);
-
     code ? message = `${message}  Code: ${code}` : null;
     this.addMessage(message,DlgTypes.error);
     //this._snackbar.open(message, 'ok', this.errorSettings);
-  }//Simple error with string
+  }
 
   errorObj(error: DefaultResponseType,reqType: ReqErrorTypes | null = null, code: number | null = null): void {
     if (reqType) error.message = this.getUserGroupError(reqType,error.message);
@@ -400,30 +399,35 @@ export class ShowSnackService {
     }
   }//Simple error msg & messages[]?
 
-  infoObj(info: DefaultResponseType|string, code: number | null = null): void {
+  /**
+   * Детальное описание:
+   * - выводт информационное сообщение. Простое если входит строка, расширенное - если есть массив строк
+   * - Проверяет @param info на тип, если строка - выводит простое переведенное сообщение
+   * если это не строка, обрабатывает данные в объекте.
+   * Если в массиве сообщений 1 элемент и info.message = 'Request success!'(Config.confirmMsgFromServer), то выводим простое сообщение,
+   * в противном случае заменяем 'Request success!' на "Информация" и выводим сложное сообщение с переведенными элементами
+   *
+   * @param {DefaultResponseType|string} info Ответ от сервера или строка.;
+   * выводит info - если строка, или обрабатывает info.message и info.messages[]
+   */
+  infoObj(info: DefaultResponseType | string): void {
     if (typeof info === 'string') {
       this.addMessage(this.getUserInfoMsg(info),DlgTypes.info);
       return;
     }
-    if (info.message == "Request success!"){
-      info.message = this.getUserInfoMsg(info.infoMessage?info.infoMessage:'Attention');
-    }else{
-      info.message = this.getUserInfoMsg(info.infoMessage?info.infoMessage:info.message);
+    if (info.message===Config.confirmMsgFromServer && info.messages && info.messages.length === 1){
+      this.addMessage(this.getUserInfoMsg(info.messages[0]),DlgTypes.info);
+      return;
     }
-    const infMessage = code ? `${info.message}  Code: ${code}` : info.message;
-    if (info.messages && Array.isArray(info.messages) && info.messages.length > 0) {
-      this.addMessage(info.message,DlgTypes.info,this.getUserinfoMessages(info.messages));
+    let userMsg:string=this.getUserInfoMsg(info.message);
+    if (userMsg && Array.isArray(info.messages) && info.messages.length > 0) {
+      this.addMessage(userMsg,DlgTypes.info,this.getUserinfoMessages(info.messages));
     } else {
-      this.addMessage(infMessage,DlgTypes.info);
+      this.addMessage(userMsg,DlgTypes.info);
     }
   }//Simple error msg & messages[]?
 
   success(message: string): void {
     this.addMessage(this.getUserSuccessMsg(message),DlgTypes.success);
   }
-
-  info(message: string): void {
-    //this._snackbar.open(this.getUserInfoMsg(message), 'ok', this.infoSettings);
-    this.addMessage(this.getUserInfoMsg(message),DlgTypes.info);
-  }//Функция сначала ищет перевод в userInfos
 }

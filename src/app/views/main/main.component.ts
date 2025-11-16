@@ -130,7 +130,7 @@ export class MainComponent implements OnInit, OnDestroy {
             throw new Error(userCart.message);
           }//обработка ошибки с кодом 200 без корзины
           if (userCart.error && userCart.cart)this.showSnackService.error(userCart.message,ReqErrorTypes.cartGetCart);//инфо
-          if (userCart.infoMessage || userCart.messages) this.showSnackService.infoObj(userCart);
+          if (userCart.messages) this.showSnackService.infoObj(userCart);
           if (userCart.cart && userCart.cart.items.length > 0){
             userCart.cart.items.forEach((cartItem:CartItemType)=>{
               const bestProductIndex:number = bestProducts.findIndex((bestProductItem:ProductType)=> bestProductItem.id==cartItem.product.id);

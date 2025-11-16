@@ -52,7 +52,7 @@ export class DetailComponent implements OnInit, OnDestroy {
             this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.infoMessage) this.showSnackService.info(data.infoMessage);
+          if (data.messages) this.showSnackService.infoObj(data);
           this.cartProducts = [];
           this.product!.countInCart = 0;
             this.cartProducts = data.cart.items;

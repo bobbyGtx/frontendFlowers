@@ -39,8 +39,7 @@ export class CartComponent implements OnInit , OnDestroy {
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
           //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
-          if (data.infoMessage) this.showSnackService.infoObj(data.infoMessage);
-          if (data.messages) this.showSnackService.errorObj(data);
+          if (data.messages) this.showSnackService.infoObj(data);
           if (data.cart){
             this.cartItems = data.cart.items;
             if (this.cartItems.length > 0){
@@ -78,7 +77,7 @@ export class CartComponent implements OnInit , OnDestroy {
             this.showSnackService.error(this.cartService.updateCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.infoMessage) this.showSnackService.info(data.infoMessage);
+          if (data.messages) this.showSnackService.infoObj(data);
           this.cartItems = data.cart.items;
           this.calculateTotal();
         },
