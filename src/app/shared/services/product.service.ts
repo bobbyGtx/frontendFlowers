@@ -57,9 +57,9 @@ export class ProductService {
   };
   userErrors:userErrorsType = {
     getBestProducts: {
-      [AppLanguages.ru]:'Лучшие продукты не найдены, обновите страницу.',
-      [AppLanguages.en]:'Best products not found, try refresh the page.',
-      [AppLanguages.de]:'Die besten Produkte wurden nicht gefunden, bitte aktualisieren Sie die Seite.',
+      [AppLanguages.ru]:'Ошибка получения списка лучших продуктов.',
+      [AppLanguages.en]:'Error retrieving list of top products.',
+      [AppLanguages.de]:'Fehler beim Abrufen der Liste der Top-Produkte.',
     },
     getRecommendedProducts: {
       [AppLanguages.ru]:'Рекомендуемые продукты не найдены, обновите страницу.',

@@ -9,6 +9,7 @@ import {BestProductsResponseType} from '../../../assets/types/responses/best-pro
 import {CartResponseType} from '../../../assets/types/responses/cart-response.type';
 import {CartService} from '../../shared/services/cart.service';
 import {CartItemType} from '../../../assets/types/cart-item.type';
+import {ReqErrorTypes} from '../../../assets/enums/auth-req-error-types.enum';
 
 type ReviewType={
   name: string,
@@ -118,7 +119,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
           if (cartResponse.__error) {
             const httpErr: HttpErrorResponse = cartResponse.err;
-            this.showSnackService.error(this.cartService.getCartError);
+            this.showSnackService.error(this.cartService.getCartError,ReqErrorTypes.cartGetCart);
             console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetCart)! Code:${httpErr.status}`);
             this.bestProducts = bestProducts;
             return;

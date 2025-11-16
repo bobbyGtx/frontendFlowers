@@ -69,6 +69,7 @@ response={
  - Выводим сообщение об ошибке с передачей в функцию всего ответа и типа запроса!
    - Если есть только message, её перевод ищется в "userGroupErrors", где ошибки сгруппированы по типу запроса. Если перевод не найден, выводится последний свойство Default с заглушкой ошибки.
    - Если есть "messages" - то выводится расширенное сообщение, а переводы строк из массива берутся из переменной "userMessages"
+   - Некоторые запросы, которые не зависят от пользователя, при получении ошибок выводят сообщение из сервиса этого запроса! "this.showSnackService.error(this.productService.getBestProductsError);"
 ```ts
    error: (errorResponse:HttpErrorResponse)=> {
     console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected Sign Up error! Code:${errorResponse.status}`);

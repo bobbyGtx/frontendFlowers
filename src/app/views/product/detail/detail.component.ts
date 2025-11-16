@@ -63,7 +63,6 @@ export class DetailComponent implements OnInit, OnDestroy {
               }
               this.checkRecommendedProducts();
             }
-
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
@@ -91,7 +90,7 @@ export class DetailComponent implements OnInit, OnDestroy {
         const combinedRequests$: Observable<[ ProductResponseType | any,CartResponseType | any]> = combineLatest([getProduct$,getUserCart$]);
         this.subscriptions$.add(combinedRequests$.subscribe({
           next:([getProductResp, getUserCartResp]:[ProductResponseType|any,CartResponseType | any])=>{
-            // ---------- Ошибка GetProduct ----------
+            // ---------- Error code GetProduct ----------
             if (getProductResp.__error) {
               const errorResponse: HttpErrorResponse = getProductResp.err;
               this.showSnackService.error(this.productService.getProductError);
@@ -103,7 +102,7 @@ export class DetailComponent implements OnInit, OnDestroy {
               throw new Error(productResponse.message);
             }
             this.product=productResponse.product;
-            // ---------- Ошибка корзина ----------
+            // ---------- Error code GetCart ----------
             if (getUserCartResp.__error) {
               const httpErr: HttpErrorResponse = getUserCartResp.err;
               this.showSnackService.error(httpErr.error.message, ReqErrorTypes.cartGetCart);

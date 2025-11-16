@@ -69,7 +69,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
             this.activatedRoute.queryParams
               .pipe(
                 debounce(() => {
-                  if (this.debounce) return timer(600);
+                  if (this.debounce) return timer(500);
                   this.debounce = true;
                   return timer(0);
                 })
@@ -124,7 +124,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
           this.showSnackService.error(this.cartService.getCartError);
           throw new Error(data.message);
         }//Если ошибка есть - выводим её и завершаем функцию
-        //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
         //Все остальные предупреждения по корзине, только в Cart компоненте
         if (data.cart) this.cartItems = data.cart.items;
       },
