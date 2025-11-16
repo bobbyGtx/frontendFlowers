@@ -5,9 +5,6 @@ import {Router} from '@angular/router';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
 import {CartService} from '../../services/cart.service';
-import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
-import {HttpErrorResponse} from '@angular/common/http';
-import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-header',

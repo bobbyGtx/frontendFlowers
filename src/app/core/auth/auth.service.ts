@@ -28,7 +28,7 @@ export class AuthService {
   }
 
   get userId(): number | null {
-    let userId: number | null = null;
+    let userId: number | null;
     if (localStorage.getItem(this.userIdKey)) {
       userId = Number(localStorage.getItem(this.userIdKey)) > 0 ? Number(localStorage.getItem(this.userIdKey)) : null;
     } else {
