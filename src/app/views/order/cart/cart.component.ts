@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../../shared/services/product.service';
-import {Subscription} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 import {BestProductsResponseType} from '../../../../assets/types/responses/best-products-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
@@ -27,6 +27,7 @@ export class CartComponent implements OnInit , OnDestroy {
   cartItems:CartItemType[]=[];
   totalAmount:number=0;
   totalCount:number=0;
+  showedMessages:Array<string>=[];
 
 
   ngOnInit() {
@@ -38,8 +39,9 @@ export class CartComponent implements OnInit , OnDestroy {
             this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
-          if (data.messages) this.showSnackService.infoObj(data);
+          //if (data.error && data.cart) this.showSnackService.error(data.message,ReqErrorTypes.cartGetCart);Инфо сообщение выводим только в сервисе
+          if (data.messages) this.showMessages(data);
+          //if (data.messages) this.showSnackService.infoObj(data);
           if (data.cart){
             this.cartItems = data.cart.items;
             if (this.cartItems.length > 0){
@@ -77,7 +79,8 @@ export class CartComponent implements OnInit , OnDestroy {
             this.showSnackService.error(this.cartService.updateCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.messages) this.showSnackService.infoObj(data);
+          //if (data.messages) this.showSnackService.infoObj(data);
+          if (data.messages) this.showMessages(data);
           this.cartItems = data.cart.items;
           this.calculateTotal();
         },
@@ -87,6 +90,37 @@ export class CartComponent implements OnInit , OnDestroy {
         }
       })
     );
+  }
+  //функция для фильтрации повторных сообщений из messages[]
+  showMessages(cartResponse:CartResponseType):void{
+    if (!cartResponse.messages || cartResponse.messages.length === 0) return;
+    if (this.showedMessages.length === 0){
+      this.showedMessages=cartResponse.messages;
+    }else{
+      let newMessages:string[]=[];
+      for (let i = 0; i < cartResponse.messages.length; i++) {
+        const ind = this.showedMessages.findIndex(item=>item===cartResponse.messages![i]);
+        if (ind ===-1) newMessages.push(cartResponse.messages[i]);
+      }
+      if (newMessages.length === 0){
+        cartResponse.messages=[];
+      }else{
+        this.showedMessages=[...this.showedMessages, ...cartResponse.messages];
+      }
+
+    }
+
+    if (cartResponse.messages.length > 0){
+      const tmrSubscription$ = timer(30000).subscribe(()=>{
+        cartResponse.messages?.forEach((message:string)=>{
+          const ind = this.showedMessages.findIndex(item=>item===message);
+          if (ind!==-1) this.showedMessages.splice(ind,1);
+        })
+        tmrSubscription$.unsubscribe();
+      });
+      this.showSnackService.infoObj(cartResponse);
+    }
+
   }
 
   updateCount(cartProduct:CartProductType,value:number) {

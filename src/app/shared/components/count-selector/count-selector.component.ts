@@ -46,6 +46,7 @@ export class CountSelectorComponent implements OnInit {
   decreaseCount(){
     if (!this.disabled && this.count>1) {
       this.count--;
+      if (this.count > this.maxCount) this.count = this.maxCount;
       this.filter.next(this.count);
     }
   }

@@ -9,7 +9,6 @@ import {BestProductsResponseType} from '../../../assets/types/responses/best-pro
 import {CartResponseType} from '../../../assets/types/responses/cart-response.type';
 import {CartService} from '../../shared/services/cart.service';
 import {CartItemType} from '../../../assets/types/cart-item.type';
-import {ReqErrorTypes} from '../../../assets/enums/auth-req-error-types.enum';
 
 type ReviewType={
   name: string,
@@ -129,8 +128,7 @@ export class MainComponent implements OnInit, OnDestroy {
             this.showSnackService.error(this.cartService.getCartError);
             throw new Error(userCart.message);
           }//обработка ошибки с кодом 200 без корзины
-          if (userCart.error && userCart.cart)this.showSnackService.error(userCart.message,ReqErrorTypes.cartGetCart);//инфо
-          if (userCart.messages) this.showSnackService.infoObj(userCart);
+          //Ошибки корзины выводим только на странице корзины
           if (userCart.cart && userCart.cart.items.length > 0){
             userCart.cart.items.forEach((cartItem:CartItemType)=>{
               const bestProductIndex:number = bestProducts.findIndex((bestProductItem:ProductType)=> bestProductItem.id==cartItem.product.id);

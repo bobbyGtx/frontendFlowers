@@ -57,7 +57,7 @@ export class LoginComponent implements OnDestroy {
                       this.showSnackService.error(this.cartService.rebaseCartError);
                       throw new Error(data.message);
                     }
-                    if (data.messages) data.error?this.showSnackService.errorObj(data): this.showSnackService.infoObj(data);
+                    if (data.messages) this.showSnackService.infoObj(data);
                     request$.unsubscribe();
                   },
                   error: (errorResponse: HttpErrorResponse) => {
@@ -65,23 +65,6 @@ export class LoginComponent implements OnDestroy {
                     console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
                   },
                 });
-              }else{
-                this.subscriptions$.add(
-                  this.cartService.getCart().subscribe({
-                      next: (data: CartResponseType) => {
-                        //Может быть error с нормальным ответом при проблемах с товарами
-                        if (data.error && !data.cart) {
-                          this.showSnackService.error(this.cartService.getCartError);
-                          throw new Error(data.message);
-                        }//Если ошибка есть и нет корзины в ответе - выводим её и завершаем функцию
-                        //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
-                      },
-                      error: (errorResponse: HttpErrorResponse) => {
-                        this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
-                        console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
-                      }
-                    })
-                );
               }
               this.router.navigate(['/']).then();
             },

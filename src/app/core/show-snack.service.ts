@@ -274,7 +274,7 @@ export class ShowSnackService {
       [AppLanguages.de]:'Nicht genügend Ware auf Lager.',
     },{
       info: 'Requested product is currently unavailable!',
-      [AppLanguages.ru]:'Один или несколько товаров в корзины не доступен!',
+      [AppLanguages.ru]:'Один или несколько товаров в корзине не доступен!',
       [AppLanguages.en]:'One or more items in your cart are not available!',
       [AppLanguages.de]:'Mindestens ein Artikel in Ihrem Warenkorb ist nicht verfügbar!',
     }

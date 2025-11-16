@@ -35,7 +35,7 @@ class ProductCardComponent implements OnInit, OnDestroy{
             this.showSnackService.error(this.cartService.updateCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.messages) this.showSnackService.infoObj(data);
+          //Инфо сообщения выводим только в cart компоненте
           this.product.countInCart=0;
           this.count=1;
           const itemIndexInResp:number = data.cart.items.findIndex((item)=>item.product.id === this.product.id);

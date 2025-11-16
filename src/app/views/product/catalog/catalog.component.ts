@@ -125,9 +125,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
           throw new Error(data.message);
         }//Если ошибка есть - выводим её и завершаем функцию
         //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
-        if (data.cart){
-          this.cartItems = data.cart.items;
-        }
+        //Все остальные предупреждения по корзине, только в Cart компоненте
+        if (data.cart) this.cartItems = data.cart.items;
       },
       error: (errorResponse: HttpErrorResponse) => {
         this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
