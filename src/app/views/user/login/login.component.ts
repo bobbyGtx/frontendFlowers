@@ -48,7 +48,7 @@ export class LoginComponent implements OnDestroy {
 
               this.authService.setTokens(data.user.accessToken, data.user.refreshToken);
               this.authService.userId = data.user.userId;
-
+              this.showSnackService.success(data.message);
               if (this.cartService.checkLSCart()){
                 //При этом запросе чистится локальная корзина
                 const request$ = this.cartService.rebaseCart(data.user.accessToken).subscribe({
@@ -69,8 +69,24 @@ export class LoginComponent implements OnDestroy {
                     console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
                   },
                 });
+              }else{
+                this.subscriptions$.add(
+                  this.cartService.getCart().subscribe({
+                      next: (data: CartResponseType) => {
+                        //Может быть error с нормальным ответом при проблемах с товарами
+                        if (data.error && !data.cart) {
+                          this.showSnackService.error(this.cartService.getCartError);
+                          throw new Error(data.message);
+                        }//Если ошибка есть и нет корзины в ответе - выводим её и завершаем функцию
+                        //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
+                      },
+                      error: (errorResponse: HttpErrorResponse) => {
+                        this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+                        console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
+                      }
+                    })
+                );
               }
-              this.showSnackService.success(data.message);
               this.router.navigate(['/']).then();
             },
             error: (errorResponse: HttpErrorResponse) => {

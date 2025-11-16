@@ -67,6 +67,7 @@ export class AuthService {
   }
 
   logout(): Observable<DefaultResponseType> {
+
     const tokens = this.getTokens();
     if (tokens.refreshToken) {
       return this.http.post<DefaultResponseType>(environment.api + 'logout.php', {refreshToken: tokens.refreshToken});

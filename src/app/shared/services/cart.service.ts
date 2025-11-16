@@ -10,6 +10,7 @@ import {CartType} from '../../../assets/types/cart.type';
 import {AuthService} from '../../core/auth/auth.service';
 import {ShowSnackService} from '../../core/show-snack.service';
 import {LanguageService} from '../../core/language.service';
+import {ReqErrorTypes} from '../../../assets/enums/auth-req-error-types.enum';
 
 export type userErrorsType = {
   getCart: { [key in AppLanguages]: string; },
@@ -85,7 +86,7 @@ export class CartService {
         tap((data: CartResponseType) => {
           if (data.cart && data.cart.count >= 0) {
             //Инфо сообщение при наличии ошибки и корзины выводится только тут
-            if (data.error) this.showSnackService.error(data.message);
+            if (data.error) this.showSnackService.error(data.message,ReqErrorTypes.cartGetCart);
             this.cartCache = data;
             //Если была ошибка и есть корзина, значит это информационное сообщение, которое удаляем из кеша
             this.cartCache.error = false;
@@ -160,28 +161,30 @@ export class CartService {
       }
     });
     const headers = new HttpHeaders().set("x-access-token", accessToken);
-    return this.http.post<CartResponseType>(environment.api + 'cart.php', {products}, {headers}).pipe(
+    this.cartRequest$ = this.http.post<CartResponseType>(environment.api + 'cart.php', {products}, {headers}).pipe(
       tap((data: CartResponseType) => {
         if (!data.error && data.cart && data.cart.count >= 0) {
-          if (data.cart.count === 0) {
-            this.updateCartCount(data.cart.count);
-          } else {
-            //коррекция кол-ва товаров в корзине с вычетом недоступных
-            let totalCount = 0;
-            data.cart.items.forEach((cartItem: CartItemType) => {
-              if (cartItem.product.disabled) {
-                cartItem.quantity = 0;
-              } else {
-                totalCount += cartItem.quantity;
-              }
-            });
-            this.updateCartCount(totalCount);
-            this.cartCache = data;
-            this.resetCacheTimer();
-          }
+          //коррекция кол-ва товаров в корзине с вычетом недоступных
+          let totalCount = 0;
+          data.cart.items.forEach((cartItem: CartItemType) => {
+            if (cartItem.product.disabled) {
+              cartItem.quantity = 0;
+            } else {
+              totalCount += cartItem.quantity;
+            }
+          });
+          this.updateCartCount(totalCount);
+          this.cartCache = data;
+          this.resetCacheTimer();
         }
+      }),
+      shareReplay(1),
+      finalize(() => {
+        //После выполнения запроса очищаем живой observable, чтоб в след раз создался новый
+        this.cartRequest$ = undefined;
       })
     );
+    return this.cartRequest$;
   }
 
   getLSCart(): CartResponseType {

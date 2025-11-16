@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../../shared/services/product.service';
-import { Subscription} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {BestProductsResponseType} from '../../../../assets/types/responses/best-products-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
@@ -38,9 +38,9 @@ export class CartComponent implements OnInit , OnDestroy {
             this.showSnackService.error(this.cartService.getCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
-          if (data.infoMessage) this.showSnackService.info(data.infoMessage);
-          if (data.messages) data.error?this.showSnackService.errorObj(data):this.showSnackService.infoObj(data);
           //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
+          if (data.infoMessage) this.showSnackService.infoObj(data.infoMessage);
+          if (data.messages) this.showSnackService.errorObj(data);
           if (data.cart){
             this.cartItems = data.cart.items;
             if (this.cartItems.length > 0){
