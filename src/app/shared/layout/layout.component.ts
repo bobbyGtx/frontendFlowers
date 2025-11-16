@@ -28,8 +28,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(this.categoryService.userErrorMessages.catWithTypes);
-          if (errorResponse.error && errorResponse.error.message) console.log(errorResponse.error.message)
-          else console.log(`Unexpected error (get Categories)!` + ` Code:${errorResponse.status}`);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
     );

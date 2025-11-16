@@ -41,7 +41,7 @@
     </div>
   </div>
 </section>
-<section class="best-products">
+<section class="best-products" *ngIf="bestProducts.length">
   <div class="container">
     <products-carousel [products]="bestProducts" [title]="'Лучшие предложения месяца'"></products-carousel>
   </div>

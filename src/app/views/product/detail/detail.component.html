@@ -91,7 +91,7 @@
         </div>
       </div>
     </div>
-    <div class="recommended-products">
+    <div class="recommended-products" *ngIf="recommendedProducts.length">
       <products-carousel [products]="recommendedProducts" [title]="'Рекомендуемые товары'"></products-carousel>
     </div>
   </div>
