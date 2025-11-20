@@ -10,11 +10,11 @@ import {LoginResponseType} from '../../../assets/types/responses/login-response.
 @Injectable({providedIn: 'root'})
 
 export class AuthService {
-  http: HttpClient = inject(HttpClient);
+  private http: HttpClient = inject(HttpClient);
   rememberMe: boolean = false;
-  public accessTokenKey: string = 'accessToken';
-  public refreshTokenKey: string = 'refreshToken';
-  public userIdKey: string = 'userId';
+  private accessTokenKey: string = 'accessToken';
+  private refreshTokenKey: string = 'refreshToken';
+  private userIdKey: string = 'userId';
   public isLogged$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   userTemplate: UserType = {
@@ -46,6 +46,10 @@ export class AuthService {
     }
   }
 
+  getIsLoggedIn(){
+    return this.isLogged$.value;
+  }
+
   signUp(email: string, password: string, passwordRepeat: string): Observable<DefaultResponseType> {
     return this.http.post<DefaultResponseType>(environment.api + 'register.php', {email, password, passwordRepeat});
   }
@@ -67,12 +71,28 @@ export class AuthService {
   }
 
   logout(): Observable<DefaultResponseType> {
-
     const tokens = this.getTokens();
     if (tokens.refreshToken) {
       return this.http.post<DefaultResponseType>(environment.api + 'logout.php', {refreshToken: tokens.refreshToken});
     }
     throw throwError(() => 'Can not find token.');
+  }
+
+  refresh():Observable<LoginResponseType> {
+    const tokens = this.getTokens();
+    if (!tokens || !tokens.refreshToken) throw throwError(() => 'Can not find token.');
+    return this.http.post<LoginResponseType>(environment.api + 'refresh.php', {refreshToken: tokens.refreshToken})
+      .pipe(
+        map((response: LoginResponseType): LoginResponseType => {
+          if (response.error) return response
+          //Если от сервера пришел нормальный ответ, но данные потеряны
+          if (!response.user || !ResponseDataValidator.validateRequiredFields(this.userTemplate, response.user)) {
+            response.error = true;
+            response.message = 'Login error. User data not found in response or have invalid structure.';
+          }
+          return response;
+        })
+      );
   }
 
   public setTokens(accessToken: string, refreshToken: string) {

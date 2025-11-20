@@ -116,16 +116,12 @@
             width: 290px;
             &.button-transparent{
               width:307px;
-
             }
             &.button-icon{
               svg{
                 width:16px;
                 height:15px;
                 fill:green;
-                &:hover{
-                  //fill:#6CAC72;
-                }
               }
             }
           }

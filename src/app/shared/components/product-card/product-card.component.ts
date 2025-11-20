@@ -7,6 +7,11 @@ import {CartResponseType} from '../../../../assets/types/responses/cart-response
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {Config} from '../../config';
+import {FavoritesResponseType} from '../../../../assets/types/responses/favorites-response.type';
+import {AddToFavoritesResponseType} from '../../../../assets/types/responses/add-to-favorites-response.type';
+import {AuthService} from '../../../core/auth/auth.service';
+import {FavoriteService} from '../../services/favorite.service';
 
 @Component({
   selector: 'product-card',
@@ -19,6 +24,8 @@ class ProductCardComponent implements OnInit, OnDestroy{
   //countInCart:number = 0;
   cartService:CartService=inject(CartService);
   showSnackService:ShowSnackService=inject(ShowSnackService);
+  authService:AuthService=inject(AuthService);
+  favoriteService:FavoriteService=inject(FavoriteService);
   subscriptions$:Subscription=new Subscription();
   images:string = environment.images;
   count:number=1;
@@ -62,6 +69,46 @@ class ProductCardComponent implements OnInit, OnDestroy{
   updateCount(count:number){
     this.count=count;
     if (this.product.countInCart)this.updateCart(count);
+  }
+
+  protected toggleFavorite():void {
+    if (!this.product) return;
+    if (!this.authService.getIsLoggedIn()){
+      this.showSnackService.infoObj(Config.authorisationRequired);
+      return;
+    }
+    if (this.product.isInFavorite){
+      this.subscriptions$.add(
+        this.favoriteService.removeFavorite(this.product.id).subscribe({
+          next: (data:FavoritesResponseType) => {
+            if (data.error) {
+              this.showSnackService.error(this.favoriteService.removeFavoriteError);
+              throw new Error(data.message);
+            }
+            if (this.product)this.product.isInFavorite=false;
+          },
+          error: (errorResponse: HttpErrorResponse) => {
+            console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (remove Favorite) error! Code:${errorResponse.status}`);
+            this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+          }
+        })
+      );
+    }else{
+      this.subscriptions$.add(
+        this.favoriteService.addToFavorite(this.product.id).subscribe({
+          next: (data: AddToFavoritesResponseType) => {
+            if (data.error || !data.product) {
+              this.showSnackService.error(this.favoriteService.addToFavoritesError);
+              throw new Error(data.message);
+            }
+            if (this.product && this.product.id === data.product.id) this.product.isInFavorite = true;
+          },
+          error: (errorResponse: HttpErrorResponse) => {
+            console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (remove Favorite) error! Code:${errorResponse.status}`);
+            this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+          }
+        }));
+    }
   }
 
   ngOnDestroy() {

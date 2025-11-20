@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ProductService} from '../../../shared/services/product.service';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {debounce, fromEvent, Subscription, timer} from 'rxjs';
+import {catchError, combineLatest, debounce, fromEvent, Observable, of, Subscription, timer} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {CategoryService} from '../../../shared/services/category.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -19,7 +19,10 @@ import {CategoryFilters} from '../../../../assets/enums/category-filters.enum';
 import {CartService} from '../../../shared/services/cart.service';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
-import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {FavoriteService} from '../../../shared/services/favorite.service';
+import {FavoriteProductType} from '../../../../assets/types/favorite-product.type';
+import {FavoritesResponseType} from '../../../../assets/types/responses/favorites-response.type';
+import {AuthService} from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-catalog',
@@ -27,27 +30,30 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
   styleUrl: './catalog.component.scss'
 })
 export class CatalogComponent implements OnInit, OnDestroy {
-  productService: ProductService = inject(ProductService);
-  categoryService: CategoryService = inject(CategoryService);
-  showSnackService: ShowSnackService = inject(ShowSnackService);
-  activatedRoute: ActivatedRoute = inject(ActivatedRoute);
-  cartService: CartService = inject(CartService);
-  router: Router = inject(Router);
-  subscriptions$: Subscription = new Subscription();
+  private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private authService: AuthService=inject(AuthService);
+  private productService: ProductService = inject(ProductService);
+  private categoryService: CategoryService = inject(CategoryService);
+  private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  private cartService: CartService = inject(CartService);
+  private favoriteService: FavoriteService = inject(FavoriteService);
+  protected router: Router = inject(Router);
+  private subscriptions$: Subscription = new Subscription();
 
-  activeParams: ActiveParamsType = {types: []};
-  appliedFilters: Array<AppliedFilterType> = [];
+  protected activeParams: ActiveParamsType = {types: []};
+  protected appliedFilters: Array<AppliedFilterType> = [];
 
-  products: Array<ProductType> = [];
-  categoriesWithTypes: Array<CategoryWithTypesType> = [];
-  cartItems:CartItemType[]=[]
+  protected products: Array<ProductType> = [];
+  protected categoriesWithTypes: Array<CategoryWithTypesType> = [];
+  protected cartItems:CartItemType[]=[];
+  protected favoriteProducts:FavoriteProductType[]=[];
 
-  activePage: number = 1;
-  pages: Array<number> = [];
-  totalProducts: number = 0;
-  sortingOpened: boolean = false;
-  debounce: boolean = false;
-  sortingOptions: Array<SortingOptionsType> = [
+  protected activePage: number = 1;
+  protected pages: Array<number> = [];
+  protected totalProducts: number = 0;
+  protected sortingOpened: boolean = false;
+  private debounce: boolean = false;
+  protected sortingOptions: Array<SortingOptionsType> = [
     {name: 'От А до Я', value: 'name-asc'},
     {name: 'От Я до А', value: 'name-desc'},
     {name: 'По возрастанию цены', value: 'price-asc'},
@@ -55,7 +61,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit() {
-    const clicks = fromEvent(document, 'click');
+    const clicks:Observable<Event> = fromEvent(document, 'click');
     this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
 
     this.subscriptions$.add(this.categoryService.getCategoriesWithTypes().subscribe({
@@ -65,73 +71,43 @@ export class CatalogComponent implements OnInit, OnDestroy {
             throw new Error(data.message);
           }
           if (data.categories) this.categoriesWithTypes = data.categories;
-          this.subscriptions$.add(
-            this.activatedRoute.queryParams
-              .pipe(
-                debounce(() => {
-                  if (this.debounce) return timer(500);
-                  this.debounce = true;
-                  return timer(0);
-                })
-              )
-              .subscribe(params => {
-                this.activeParams = ActiveParamsUtil.processParams(params);
-                this.fillAppliedFilters();
-                this.debounce = true;
-                this.subscriptions$.add(
-                  this.productService.getProducts(this.activeParams).subscribe({
-                    next: (data: ProductsResponseType) => {
-                      if (data.error) {
-                        this.showSnackService.error(this.productService.getProductsError);
-                        throw new Error(data.message);
-                      }
-                      if (data.response) {
-                        if (this.cartItems && this.cartItems.length > 0){
-                          this.products=data.response.products.map((productItem:ProductType)=>{
-                            const productIndexInCart:number = this.cartItems.findIndex((cartItem:CartItemType)=>cartItem.product.id===productItem.id);
-                            if (productIndexInCart!==-1){
-                              productItem.countInCart = this.cartItems[productIndexInCart].quantity;
-                            }
-                            return productItem;
-                          });
-                        }else{
-                          this.products = data.response.products;
-                        }
-                        this.products = data.response.products;
-                        this.activePage = data.response.page;
-                        this.pages = [];
-                        for (let i: number = 1; i <= data.response.totalPages; i++) this.pages.push(i);
-                        this.totalProducts = data.response.totalProducts;
-                      }
-                    },
-                    error: (errorResponse: HttpErrorResponse) => {
-                      this.showSnackService.error(this.productService.getProductsError);
-                      console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getProducts)! Code:${errorResponse.status}`);
-                    }
-                  }));
-              })
-          );
+          //Запрос корзины и избранного
+          const cart$:Observable<CartResponseType|any> = this.cartService.getCart().pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any)));
+          const favorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites().pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
+          //Favorites of(null) если пользователь не залогинен
+          const combinedRequest$: Observable<[CartResponseType | any, FavoritesResponseType | any]> = combineLatest([cart$,favorites$]);
+          this.subscriptions$.add(combinedRequest$.subscribe({
+            next:([cartResponse,favoritesResponse]:[CartResponseType | any, FavoritesResponseType | any])=>{
+              if (cartResponse.__error) {
+                const httpErr: HttpErrorResponse = cartResponse.err;
+                console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetCart)! Code:${httpErr.status}`);
+              }else{
+                const userCart: CartResponseType = (cartResponse as CartResponseType);
+                if (userCart.cart) this.cartItems = userCart.cart.items;
+              }
+              if (favoritesResponse){
+                if (favoritesResponse.__error) {
+                  const httpErr: HttpErrorResponse = favoritesResponse.err;
+                  console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetFavorites)! Code:${httpErr.status}`);
+                }else{
+                  const favoriteList:FavoritesResponseType = (favoritesResponse as FavoritesResponseType);
+                  if (favoriteList.favorites)this.favoriteProducts = favoriteList.favorites;
+                }
+              }//Если пользователь залогинен, то favoritesResponse != null
+              this.processCatalog();
+            },
+            error:(error: HttpErrorResponse) => {
+              this.showSnackService.error("Unexpected Request Error!");
+              console.error(error.message);
+              this.processCatalog();
+            }
+          }));
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (get Categories)! Code:${errorResponse.status}`);
         }
       }));
-
-    this.subscriptions$.add(this.cartService.getCart().subscribe({
-      next: (data: CartResponseType) => {
-        if (data.error && !data.cart) {
-          this.showSnackService.error(this.cartService.getCartError);
-          throw new Error(data.message);
-        }//Если ошибка есть - выводим её и завершаем функцию
-        //Все остальные предупреждения по корзине, только в Cart компоненте
-        if (data.cart) this.cartItems = data.cart.items;
-      },
-      error: (errorResponse: HttpErrorResponse) => {
-        this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
-        console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getCart)! Code:${errorResponse.status}`);
-      }
-    }));
   }
 
   toggleSorting(event: MouseEvent) {
@@ -248,6 +224,60 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.router.navigate(['/catalog'], {
       queryParams: clearParams
     });
+  }
+
+  processCatalog(){
+    this.subscriptions$.add(
+      this.activatedRoute.queryParams
+        .pipe(
+          debounce(() => {
+            if (this.debounce) return timer(500);
+            this.debounce = true;
+            return timer(0);
+          })
+        )
+        .subscribe(params => {
+          this.activeParams = ActiveParamsUtil.processParams(params);
+          this.fillAppliedFilters();
+          this.debounce = true;
+          this.subscriptions$.add(
+            this.productService.getProducts(this.activeParams).subscribe({
+              next: (data: ProductsResponseType) => {
+                if (data.error) {
+                  this.showSnackService.error(this.productService.getProductsError);
+                  throw new Error(data.message);
+                }
+                if (!data.response) return;
+                if ((this.cartItems && this.cartItems.length > 0) || (this.favoriteProducts && this.favoriteProducts.length > 0)) {
+                  this.products=data.response.products.map((productItem:ProductType)=>{
+                    if (this.cartItems && this.cartItems.length > 0){
+                      const productIndexInCart:number = this.cartItems.findIndex((cartItem:CartItemType)=>cartItem.product.id===productItem.id);
+                      if (productIndexInCart!==-1){
+                        productItem.countInCart = this.cartItems[productIndexInCart].quantity;
+                      }
+                    }//Обработка корзины
+                    if (this.favoriteProducts && this.favoriteProducts.length > 0){
+                      const productIndexInFav:number = this.favoriteProducts.findIndex((favItem:FavoriteProductType)=>favItem.id===productItem.id);
+                      if (productIndexInFav!==-1) productItem.isInFavorite = true;
+                    }//Обработка избранного
+                    return productItem;
+                  });
+                }else{
+                  this.products = data.response.products;
+                }
+                this.products = data.response.products;
+                this.activePage = data.response.page;
+                this.pages = [];
+                for (let i: number = 1; i <= data.response.totalPages; i++) this.pages.push(i);
+                this.totalProducts = data.response.totalProducts;
+              },
+              error: (errorResponse: HttpErrorResponse) => {
+                this.showSnackService.error(this.productService.getProductsError);
+                console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getProducts)! Code:${errorResponse.status}`);
+              }
+            }));
+        })
+    );
   }
 
   ngOnDestroy() {

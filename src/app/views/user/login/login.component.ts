@@ -51,7 +51,7 @@ export class LoginComponent implements OnDestroy {
               this.showSnackService.success(data.message);
               if (this.cartService.checkLSCart()){
                 //При этом запросе чистится локальная корзина
-                const request$ = this.cartService.rebaseCart(data.user.accessToken).subscribe({
+                const request$ = this.cartService.rebaseCart().subscribe({
                   next: (data: CartResponseType) => {
                     if (data.error && !data.cart){
                       this.showSnackService.error(this.cartService.rebaseCartError);

@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, finalize, Observable, of, shareReplay, tap} from 'rxjs';
 import {CartResponseType} from '../../../assets/types/responses/cart-response.type';
 import {environment} from '../../../environments/environment';
@@ -26,16 +26,14 @@ export class CartService {
   private authService: AuthService = inject(AuthService);
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private languageService:LanguageService= inject(LanguageService);
-
   readonly cartLsKey: string = 'userCart';
   private cartRequest$?: Observable<CartResponseType>;//для предотвращения дублирования запроса
-
   private cartCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   private cartCache: CartResponseType | null = null;//Кэш ответа корзины. Пополняется по результатам 2х запросов
   readonly cartCacheLifetime: number = 30000;
   clearCartCacheTimeout: ReturnType<typeof setTimeout> | null = null;//таймер для чистки кэша корзины
 
-  userErrors: userErrorsType = {
+  private userErrors: userErrorsType = {
     getCart: {
       [AppLanguages.ru]: 'Ошибка при запросе корзины. Обновите страницу.',
       [AppLanguages.en]: 'Error requesting cart. Please refresh the page.',
@@ -53,6 +51,15 @@ export class CartService {
     },
   };
 
+  private isLoggedIn:boolean = false;
+
+  constructor() {
+    this.authService.isLogged$.subscribe(isLogged => {
+      this.isLoggedIn = isLogged;
+      this.cartCache=null;
+    });
+  }
+
   get getCartError():string {
     return this.userErrors.getCart[this.languageService.appLang];
   }
@@ -67,7 +74,7 @@ export class CartService {
     return this.cartCount$;
   }
 
-  updateCartCount(newCount: number): void {
+  private updateCartCount(newCount: number): void {
     this.cartCount$.next(newCount);
   }
 
@@ -76,12 +83,10 @@ export class CartService {
   }//сброс после создания заказа например
 
   getCart(forceUpdate: boolean = false): Observable<CartResponseType> {
-    if (!this.authService.isLogged$.getValue()) return of(this.getLSCart());
+    if (!this.isLoggedIn) return of(this.getLSCart());
     if (!forceUpdate && this.cartCache) return of(this.cartCache);
     if (this.cartRequest$) {return this.cartRequest$;}
-    const accessToken: string | null = this.authService.getTokens().accessToken;
-    const headers = new HttpHeaders().set("x-access-token", accessToken ? accessToken : '');
-    this.cartRequest$ = this.http.get<CartResponseType>(environment.api + 'cart.php', {headers})
+    this.cartRequest$ = this.http.get<CartResponseType>(environment.api + 'cart.php')
       .pipe(
         tap((data: CartResponseType) => {
           if (data.cart && data.cart.count >= 0) {
@@ -107,7 +112,6 @@ export class CartService {
               this.cartCache = data;
               this.resetCacheTimer();
             }
-
             this.resetCacheTimer();
           }
         }),
@@ -122,11 +126,9 @@ export class CartService {
   }
 
   updateCart(cartProduct: CartProductType, quantity: number): Observable<CartResponseType> {
-    if (!this.authService.isLogged$.getValue()) return of(this.updateLSCart(cartProduct, quantity));
+    if (!this.isLoggedIn) return of(this.updateLSCart(cartProduct, quantity));
     const id: number = cartProduct.id;
-    const accessToken: string | null = this.authService.getTokens().accessToken;
-    const headers = new HttpHeaders().set("x-access-token", accessToken ? accessToken : '');
-    return this.http.patch<CartResponseType>(environment.api + 'cart.php', {id, quantity}, {headers})
+    return this.http.patch<CartResponseType>(environment.api + 'cart.php', {id, quantity})
       .pipe(
         tap((data: CartResponseType) => {
           if (data.cart && data.cart.count >= 0) {
@@ -147,7 +149,7 @@ export class CartService {
       );
   }
 
-  rebaseCart(accessToken: string): Observable<CartResponseType> {
+  rebaseCart(): Observable<CartResponseType> {
     let userLSCart: CartResponseType = this.getLSCart();
     localStorage.removeItem(this.cartLsKey);
     if (userLSCart.cart && userLSCart.cart?.items.length === 0) {
@@ -160,8 +162,7 @@ export class CartService {
         products.push({id: cartItem.product.id, quantity: cartItem.quantity});
       }
     });
-    const headers = new HttpHeaders().set("x-access-token", accessToken);
-    this.cartRequest$ = this.http.post<CartResponseType>(environment.api + 'cart.php', {products}, {headers}).pipe(
+    this.cartRequest$ = this.http.post<CartResponseType>(environment.api + 'cart.php', {products}).pipe(
       tap((data: CartResponseType) => {
         if (!data.error && data.cart && data.cart.count >= 0) {
           //коррекция кол-ва товаров в корзине с вычетом недоступных
@@ -187,7 +188,7 @@ export class CartService {
     return this.cartRequest$;
   }
 
-  getLSCart(): CartResponseType {
+  private getLSCart(): CartResponseType {
     let cart: CartType = {
       count: 0,
       createdAt: 0,
@@ -274,7 +275,7 @@ export class CartService {
     return !!(userLSCart && userLSCart.items.length > 0);
   }
 
-  resetCacheTimer() {
+  private resetCacheTimer() {
     if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
     this.clearCartCacheTimeout = setTimeout(() => {
       this.cartCache = null;

@@ -6,7 +6,7 @@ import {LayoutComponent} from './shared/layout/layout.component';
 import {HeaderComponent} from './shared/layout/header/header.component';
 import {FooterComponent} from './shared/layout/footer/footer.component';
 import {MainComponent} from './views/main/main.component';
-import {provideHttpClient} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatMenuModule} from '@angular/material/menu';
@@ -14,6 +14,8 @@ import {MatIcon} from '@angular/material/icon';
 import {SharedModule} from './shared/shared.module';
 import {CarouselModule} from 'ngx-owl-carousel-o';
 import {NgOptimizedImage} from "@angular/common";
+import {AuthInterceptor} from './core/auth/auth.interceptor';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -29,11 +31,17 @@ import {NgOptimizedImage} from "@angular/common";
     SharedModule,
     MatMenuModule,
     MatIcon,
+    MatTooltipModule,
     CarouselModule,
     NgOptimizedImage,
     AppRoutingModule
   ],
-  providers: [provideHttpClient(), provideAnimationsAsync()],
+  providers: [provideHttpClient(), provideAnimationsAsync(),provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide:HTTP_INTERCEPTORS,
+      useClass:AuthInterceptor,
+      multi:true
+    }],
   bootstrap: [AppComponent]
 })
 export class AppModule {

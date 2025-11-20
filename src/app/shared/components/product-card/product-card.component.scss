@@ -33,11 +33,23 @@
     right: 12px;
     cursor: pointer;
     z-index: 2;
-
     svg {
       width: 24px;
       height: 24px;
       fill: none;
+      path:first-child{
+        fill: black;
+      }
+    }
+    .in-favorites {
+      svg{
+        path{
+          fill: #B6D5B9;
+          &:first-child{
+            fill: #6dd478;
+          }
+        }
+      }
     }
   }
 

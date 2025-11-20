@@ -82,30 +82,36 @@ export class ShowSnackService {
         [AppLanguages.ru]:'Введен некорректный E-Mail!',
         [AppLanguages.en]:'Entered email is incorrect!',
         [AppLanguages.de]:'Falsche E-Mail-Adresse eingegeben!',
-      },
-      {
+      },{
         error: 'Password wrong!',
         [AppLanguages.ru]:'Пароль не верный!',
         [AppLanguages.en]:'Password wrong!',
         [AppLanguages.de]:'Falsches Passwort!',
-      },
-      {
+      },{
         error: 'E-mail not found in DB!',
         [AppLanguages.ru]:'Пользователь с такой почтой не зарегистрирован!',
         [AppLanguages.en]:'User with this email is not registered!',
         [AppLanguages.de]:'Der Benutzer mit dieser E-Mail-Adresse ist nicht registriert!',
-      },
-      {
+      },{
         error: 'User blocked!',
         [AppLanguages.ru]:'Пользователь заблокирован.',
         [AppLanguages.en]:'User blocked!',
         [AppLanguages.de]:'Das Konto wurde gesperrt.',
-      },
-      {
+      },{
+        error: 'Refresh token invalid!',
+        [AppLanguages.ru]:'Требуется повторная авторизация.',
+        [AppLanguages.en]:'Reauthorization required.',
+        [AppLanguages.de]:'Erneute Autorisierung erforderlich.',
+      },{
+        error: Config.authorisationRequired,
+        [AppLanguages.ru]:'Необходимо авторизоваться!',
+        [AppLanguages.en]:'Authorization required!',
+        [AppLanguages.de]:'Autorisierung erforderlich!',
+      },{
         error: 'default',
-        [AppLanguages.ru]:'Ошибка авторизации. Обратитесь в поддержку.',
-        [AppLanguages.en]:'Authorization error. Please contact support.',
-        [AppLanguages.de]:'Autorisierungsfehler. Bitte wenden Sie sich an den Support.',
+        [AppLanguages.ru]:'Ошибка авторизации. Попробуйте войти ещё раз.',
+        [AppLanguages.en]:'Authorization error. Please try again.',
+        [AppLanguages.de]:'Autorisierungsfehler. Bitte versuchen Sie, sich erneut anzumelden.',
       },
     ],
     [ReqErrorTypes.authSignUp]: [
@@ -277,6 +283,11 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Один или несколько товаров в корзине не доступен!',
       [AppLanguages.en]:'One or more items in your cart are not available!',
       [AppLanguages.de]:'Mindestens ein Artikel in Ihrem Warenkorb ist nicht verfügbar!',
+    },{
+      info: Config.authorisationRequired,
+      [AppLanguages.ru]:'Необходимо авторизоваться!',
+      [AppLanguages.en]:'Authorization required!',
+      [AppLanguages.de]:'Autorisierung erforderlich!',
     }
 
   ];//Информационные сообщения

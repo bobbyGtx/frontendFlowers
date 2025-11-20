@@ -7,7 +7,6 @@ import {OrderComponent} from './order/order.component';
 const routes: Routes = [
   {path: 'cart', component: CartComponent},
   {path: 'order', component: OrderComponent},
-
 ];
 
 @NgModule({

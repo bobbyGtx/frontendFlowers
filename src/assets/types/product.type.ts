@@ -17,5 +17,6 @@ export type ProductType = {
     name: string,
     url: string
   },
-  countInCart?: number,
+  countInCart?: number,//флаг корзины
+  isInFavorite?: boolean,//флаг избранного
 }

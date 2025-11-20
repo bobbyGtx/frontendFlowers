@@ -12,6 +12,12 @@ import {CartResponseType} from '../../../../assets/types/responses/cart-response
 import {CartService} from '../../../shared/services/cart.service';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {FavoriteService} from '../../../shared/services/favorite.service';
+import {AddToFavoritesResponseType} from '../../../../assets/types/responses/add-to-favorites-response.type';
+import {FavoritesResponseType} from '../../../../assets/types/responses/favorites-response.type';
+import {FavoriteProductType} from '../../../../assets/types/favorite-product.type';
+import {AuthService} from '../../../core/auth/auth.service';
+import {Config} from '../../../shared/config';
 
 @Component({
   selector: 'app-detail',
@@ -19,10 +25,12 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
   styleUrl: './detail.component.scss'
 })
 export class DetailComponent implements OnInit, OnDestroy {
-  productService: ProductService = inject(ProductService);
-  showSnackService: ShowSnackService = inject(ShowSnackService);
-  activatedRoute: ActivatedRoute = inject(ActivatedRoute);
-  cartService: CartService = inject(CartService);
+  private productService: ProductService = inject(ProductService);
+  private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  private cartService: CartService = inject(CartService);
+  private authService: AuthService = inject(AuthService);
+  private favoriteService: FavoriteService = inject(FavoriteService);
 
   serverImagesPath: string = environment.images;
   recommendedProducts: ProductType[] = [];
@@ -31,20 +39,20 @@ export class DetailComponent implements OnInit, OnDestroy {
   subscriptions$: Subscription = new Subscription();
   count: number = 1;
 
-  updateCount(value: number) {
+  protected updateCount(value: number) {
     this.count = value;
     if (this.product?.countInCart) {
       this.updateCart(value);
     }
   }
 
-  addToCart() {
+  protected addToCart() {
     if (!this.product?.disabled) {
       this.updateCart(this.count);
     }
   }
 
-  updateCart(count: number) {
+  private updateCart(count: number) {
     this.subscriptions$.add(
       this.cartService.updateCart(this.product!, count).subscribe({
         next: (data: CartResponseType) => {
@@ -72,11 +80,60 @@ export class DetailComponent implements OnInit, OnDestroy {
     );
   }
 
-  removeFromCart() {
+  protected removeFromCart() {
     if (this.product?.countInCart) {
       this.count = 1;
       this.updateCart(0);
     }
+  }
+
+  protected toggleFavorite():void {
+    if (!this.product) return;
+    if (!this.authService.getIsLoggedIn()){
+      this.showSnackService.infoObj(Config.authorisationRequired);
+      return;
+    }
+    if (this.product.isInFavorite){
+      this.subscriptions$.add(
+        this.favoriteService.removeFavorite(this.product.id).subscribe({
+          next: (data:FavoritesResponseType) => {
+            if (data.error) {
+              this.showSnackService.error(this.favoriteService.removeFavoriteError);
+              throw new Error(data.message);
+            }
+            if (this.product)this.product.isInFavorite=false;
+          },
+          error: (errorResponse: HttpErrorResponse) => {
+            console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (remove Favorite) error! Code:${errorResponse.status}`);
+            this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+          }
+        })
+      );
+    }else{
+      this.subscriptions$.add(
+        this.favoriteService.addToFavorite(this.product.id).subscribe({
+          next: (data: AddToFavoritesResponseType) => {
+            if (data.error || !data.product) {
+              this.showSnackService.error(this.favoriteService.addToFavoritesError);
+              throw new Error(data.message);
+            }
+            if (this.product && this.product.id === data.product.id) this.product.isInFavorite = true;
+          },
+          error: (errorResponse: HttpErrorResponse) => {
+            console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (remove Favorite) error! Code:${errorResponse.status}`);
+            this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+          }
+        }));
+    }
+  }
+
+  private checkRecommendedProducts() {
+    this.recommendedProducts.forEach((productItem: ProductType) => {
+      const productIndexInCart: number = this.cartProducts.findIndex((cartItem: CartItemType) => cartItem.product.id == productItem.id);
+      if (productIndexInCart !== -1) {
+        productItem.countInCart = this.cartProducts[productIndexInCart].quantity;
+      }
+    })
   }
 
   ngOnInit(): void {
@@ -124,6 +181,23 @@ export class DetailComponent implements OnInit, OnDestroy {
               }
             }
 
+            if (this.authService.getIsLoggedIn()){
+            this.subscriptions$.add(
+              this.favoriteService.getFavorites().subscribe({
+                next: (data:FavoritesResponseType) => {
+                  if (data.error || !data.favorites || !Array.isArray(data.favorites)) {
+                    this.showSnackService.error(this.favoriteService.getFavoritesError);
+                    throw new Error(data.message);
+                  }//Если ошибка есть - выводим её и завершаем функцию
+                  const indexInFav:number = data.favorites.findIndex((favItem:FavoriteProductType)=>favItem.id===this.product!.id);
+                  if (indexInFav !== -1) this.product!.isInFavorite=true;
+                },
+                error: (errorResponse: HttpErrorResponse) => {
+                  console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Favorites) error! Code:${errorResponse.status}`);
+                  this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+                }
+              }));
+            }
             this.subscriptions$.add(
               this.productService.getRecommendedProducts(this.product.category_id, this.product.id).subscribe({
                 next: (data: RecommendedProductsResponseType) => {
@@ -146,15 +220,6 @@ export class DetailComponent implements OnInit, OnDestroy {
         }));
       })
     );//3 запроса. 2 спаренных (продукт и корзина), после чего рекомендованные продукты
-  }
-
-  checkRecommendedProducts() {
-    this.recommendedProducts.forEach((productItem: ProductType) => {
-      const productIndexInCart: number = this.cartProducts.findIndex((cartItem: CartItemType) => cartItem.product.id == productItem.id);
-      if (productIndexInCart !== -1) {
-        productItem.countInCart = this.cartProducts[productIndexInCart].quantity;
-      }
-    })
   }
 
   ngOnDestroy(): void {

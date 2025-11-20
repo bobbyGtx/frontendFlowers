@@ -5,6 +5,7 @@ import { ProductRoutingModule } from './product-routing.module';
 import { CatalogComponent } from './catalog/catalog.component';
 import { DetailComponent } from './detail/detail.component';
 import {SharedModule} from '../../shared/shared.module';
+import {MatTooltip} from "@angular/material/tooltip";
 
 
 @NgModule({
@@ -12,10 +13,11 @@ import {SharedModule} from '../../shared/shared.module';
     CatalogComponent,
     DetailComponent
   ],
-  imports: [
-    CommonModule,
-    SharedModule,
-    ProductRoutingModule
-  ]
+    imports: [
+        CommonModule,
+        SharedModule,
+        ProductRoutingModule,
+        MatTooltip
+    ]
 })
 export class ProductModule { }
