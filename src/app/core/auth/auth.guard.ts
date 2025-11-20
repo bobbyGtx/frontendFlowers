@@ -4,7 +4,7 @@ import {AuthService} from './auth.service';
 import {ShowSnackService} from '../show-snack.service';
 
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const authService:AuthService = inject(AuthService);
   const showSnackService:ShowSnackService = inject(ShowSnackService);
   if (authService.getIsLoggedIn()){

@@ -7,7 +7,6 @@ import {AppLanguages} from '../../../assets/enums/app-languages.enum';
 import {LanguageService} from '../../core/language.service';
 import {DefaultResponseType} from '../../../assets/types/responses/default-response.type';
 import {AddToFavoritesResponseType} from '../../../assets/types/responses/add-to-favorites-response.type';
-import {ProductType} from '../../../assets/types/product.type';
 import {FavoriteProductType} from '../../../assets/types/favorite-product.type';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
 
