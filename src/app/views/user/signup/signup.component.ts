@@ -27,6 +27,7 @@ export class SignupComponent {
     agree: [false, Validators.requiredTrue],
   });
 
+
   get email() {
     return this.signUpForm.get('email');
   }
@@ -43,7 +44,7 @@ export class SignupComponent {
   signUp(){
     if (this.signUpForm.valid && this.signUpForm.value.email && this.signUpForm.value.password && this.signUpForm.value.passwordRepeat && this.signUpForm.value.agree) {
       this.subscriptions$.add(
-        this.authService.signUp(this.signUpForm.value.email,this.signUpForm.value.password,this.signUpForm.value.passwordRepeat)
+        this.authService.signUp(this.signUpForm.value.email,this.signUpForm.value.password,this.signUpForm.value.passwordRepeat,this.signUpForm.value.agree)
           .subscribe({
             next: (data:DefaultResponseType)=> {
               if (data.error){

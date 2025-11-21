@@ -23,6 +23,7 @@ import {FavoriteService} from '../../../shared/services/favorite.service';
 import {FavoriteProductType} from '../../../../assets/types/favorite-product.type';
 import {FavoritesResponseType} from '../../../../assets/types/responses/favorites-response.type';
 import {AuthService} from '../../../core/auth/auth.service';
+import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 
 @Component({
   selector: 'app-catalog',
@@ -243,6 +244,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
       next:([cartResponse,favoritesResponse]:[CartResponseType | any, FavoritesResponseType | any])=>{
         if (cartResponse.__error) {
           const httpErr: HttpErrorResponse = cartResponse.err;
+          if (httpErr.status !==401 && httpErr.status !== 403)this.showSnackService.error(httpErr.error.message, ReqErrorTypes.cartGetCart);
           console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetCart)! Code:${httpErr.status}`);
         }else{
           const userCart: CartResponseType = (cartResponse as CartResponseType);
@@ -250,10 +252,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
         }
         if (favoritesResponse){
           if (favoritesResponse.__error) {
-            if (favoritesResponse.__error.status !== 401 && favoritesResponse.__error.status !== 403) {
-              this.showSnackService.error(this.favoriteService.getFavoritesError);
-            }
-            console.error(favoritesResponse.__error.error.message ? favoritesResponse.__error.error.message : `Unexpected (get Favorites) error! Code:${favoritesResponse.__error.status}`);
+            const httpFavErr: HttpErrorResponse = favoritesResponse.err;
+            console.error(httpFavErr.error.message ? httpFavErr.error.message : `Unexpected (get Favorites) error! Code:${httpFavErr.status}`);
           }else{
             const favoriteList:FavoritesResponseType = (favoritesResponse as FavoritesResponseType);
             if (favoriteList.favorites)this.favoriteProducts = favoriteList.favorites;

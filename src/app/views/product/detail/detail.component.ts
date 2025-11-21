@@ -36,6 +36,7 @@ export class DetailComponent implements OnInit, OnDestroy {
   recommendedProducts: ProductType[] = [];
   product: ProductType | null = null;
   cartProducts: CartItemType[] = [];
+  favoriteProducts: FavoriteProductType[] = [];
   subscriptions$: Subscription = new Subscription();
   count: number = 1;
 
@@ -57,7 +58,7 @@ export class DetailComponent implements OnInit, OnDestroy {
       this.cartService.updateCart(this.product!, count).subscribe({
         next: (data: CartResponseType) => {
           if (data.error || !data.cart) {
-            this.showSnackService.error(this.cartService.getCartError);
+            this.showSnackService.error(this.cartService.updateCartError);
             throw new Error(data.message);
           }//Если ошибка есть - выводим её и завершаем функцию
           //Инф сообщения только в Cart компоненте
@@ -69,11 +70,11 @@ export class DetailComponent implements OnInit, OnDestroy {
               if (itemIndexInResp > -1) {
                 this.product!.countInCart = data.cart.items[itemIndexInResp].quantity;
               }
-              this.checkRecommendedProducts();
+              this.applyFavAndCart();
             }
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
+          if (errorResponse.status !==401 && errorResponse.status !== 403)this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
           console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
@@ -104,9 +105,7 @@ export class DetailComponent implements OnInit, OnDestroy {
             if (this.product)this.product.isInFavorite=false;
           },
           error: (errorResponse: HttpErrorResponse) => {
-            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) {
-              this.showSnackService.error(this.favoriteService.removeFavoriteError);
-            }
+            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) this.showSnackService.error(this.favoriteService.removeFavoriteError);
             console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (remove Favorite) error! Code:${errorResponse.status}`);
           }
         })
@@ -122,25 +121,24 @@ export class DetailComponent implements OnInit, OnDestroy {
             if (this.product && this.product.id === data.product.id) this.product.isInFavorite = true;
           },
           error: (errorResponse: HttpErrorResponse) => {
-            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) {
-              this.showSnackService.error(this.favoriteService.addToFavoritesError);
-            }
+            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) this.showSnackService.error(this.favoriteService.addToFavoritesError);
             console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (add Favorite) error! Code:${errorResponse.status}`);
-
           }
         }));
     }
   }
 
-  private checkRecommendedProducts() {
+  private applyFavAndCart() {
     this.recommendedProducts.forEach((productItem: ProductType) => {
-      const productIndexInCart: number = this.cartProducts.findIndex((cartItem: CartItemType) => cartItem.product.id == productItem.id);
-      if (productIndexInCart !== -1) {
-        productItem.countInCart = this.cartProducts[productIndexInCart].quantity;
+      if (this.favoriteProducts.length>0){
+        const favIndex:number = this.favoriteProducts.findIndex((favItem:FavoriteProductType)=>favItem.id === productItem.id);
+        if (favIndex !==-1) productItem.isInFavorite=true;
       }
+      const productIndexInCart: number = this.cartProducts.findIndex((cartItem: CartItemType) => cartItem.product.id == productItem.id);
+      if (productIndexInCart !== -1) productItem.countInCart = this.cartProducts[productIndexInCart].quantity;
     })
   }
-
+//Объединить все 3 запроса
   ngOnInit(): void {
     this.subscriptions$.add(
       this.activatedRoute.params.subscribe(params => {
@@ -148,15 +146,17 @@ export class DetailComponent implements OnInit, OnDestroy {
           .pipe(catchError((err: HttpErrorResponse): Observable<ProductResponseType> => of({__error: true, err} as any)));
         const getUserCart$: Observable<CartResponseType> = this.cartService.getCart()
           .pipe(catchError((err: HttpErrorResponse): Observable<CartResponseType> => of({__error: true, err} as any)));
+        const getFavorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites()
+          .pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
 
-        const combinedRequests$: Observable<[ ProductResponseType | any,CartResponseType | any]> = combineLatest([getProduct$,getUserCart$]);
+        const combinedRequests$: Observable<[ ProductResponseType | any,CartResponseType | any, FavoritesResponseType|any]> = combineLatest([getProduct$,getUserCart$,getFavorites$]);
         this.subscriptions$.add(combinedRequests$.subscribe({
-          next:([getProductResp, getUserCartResp]:[ProductResponseType|any,CartResponseType | any])=>{
+          next:([getProductResp, getUserCartResp, getFavoritesResp]:[ProductResponseType|any,CartResponseType | any, FavoritesResponseType|any])=>{
             // ---------- Error code GetProduct ----------
             if (getProductResp.__error) {
               const errorResponse: HttpErrorResponse = getProductResp.err;
               this.showSnackService.error(this.productService.getProductError);
-              console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getProduct)! Code:${errorResponse.status}`);
+              console.error(errorResponse.message ? errorResponse.message : `Unexpected error (getProduct)! Code:${errorResponse.status}`);
             }
             const productResponse:ProductResponseType = getProductResp as ProductResponseType;
             if (productResponse.error || !productResponse.product) {
@@ -167,7 +167,7 @@ export class DetailComponent implements OnInit, OnDestroy {
             // ---------- Error code GetCart ----------
             if (getUserCartResp.__error) {
               const httpErr: HttpErrorResponse = getUserCartResp.err;
-              this.showSnackService.error(httpErr.error.message, ReqErrorTypes.cartGetCart);
+              if (httpErr.status !==401 && httpErr.status !== 403)this.showSnackService.error(httpErr.error.message, ReqErrorTypes.cartGetCart);
               console.error(httpErr.error.message ? httpErr.error.message : `Unexpected (get Cart) error! Code:${httpErr.status}`);
             }
             const cartData = getUserCartResp as CartResponseType;
@@ -177,6 +177,7 @@ export class DetailComponent implements OnInit, OnDestroy {
             }//Если ошибка есть и нет корзины в ответе - выводим её и завершаем функцию
             //if (data.error && data.cart) this.showSnackService.info(data.message);Инфо сообщение выводим только в сервисе
             this.cartProducts = cartData.cart.items;
+
             //Применение корзины
             if (this.cartProducts.length > 0) {
               const productIndexInCart: number = this.cartProducts.findIndex((cartItem: CartItemType) => cartItem.product.id === this.product!.id);
@@ -186,25 +187,22 @@ export class DetailComponent implements OnInit, OnDestroy {
               }
             }
 
-            if (this.authService.getIsLoggedIn()){
-            this.subscriptions$.add(
-              this.favoriteService.getFavorites().subscribe({
-                next: (data:FavoritesResponseType) => {
-                  if (data.error || !data.favorites || !Array.isArray(data.favorites)) {
-                    this.showSnackService.error(this.favoriteService.getFavoritesError);
-                    throw new Error(data.message);
-                  }//Если ошибка есть - выводим её и завершаем функцию
-                  const indexInFav:number = data.favorites.findIndex((favItem:FavoriteProductType)=>favItem.id===this.product!.id);
+            //Применение избранного
+            if (getFavoritesResp){
+              if (getFavoritesResp.__error) {
+                const httpFavErr: HttpErrorResponse = getFavoritesResp.err;
+                if (httpFavErr.status !==401 && httpFavErr.status !== 403)this.showSnackService.error(this.favoriteService.getFavoritesError);
+                console.error(httpFavErr.error.message ? httpFavErr.error.message : `Unexpected (get Favorites) error! Code:${httpFavErr.status}`);
+              }else{
+                const favoriteList:FavoritesResponseType = (getFavoritesResp as FavoritesResponseType);
+                if (favoriteList.favorites && favoriteList.favorites.length > 0) {
+                  this.favoriteProducts = favoriteList.favorites;
+                  const indexInFav:number = favoriteList.favorites.findIndex((favItem:FavoriteProductType)=>favItem.id===this.product!.id);
                   if (indexInFav !== -1) this.product!.isInFavorite=true;
-                },
-                error: (errorResponse: HttpErrorResponse) => {
-                  if (errorResponse.status !== 401 && errorResponse.status !== 403) {
-                    this.showSnackService.error(this.favoriteService.getFavoritesError);
-                  }
-                  console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected (get Favorites) error! Code:${errorResponse.status}`);
                 }
-              }));
+              }
             }
+
             this.subscriptions$.add(
               this.productService.getRecommendedProducts(this.product.category_id, this.product.id).subscribe({
                 next: (data: RecommendedProductsResponseType) => {
@@ -214,7 +212,7 @@ export class DetailComponent implements OnInit, OnDestroy {
                   }
                   if (data.products && data.products.length > 0) {
                     this.recommendedProducts = data.products;
-                    this.checkRecommendedProducts();//заполнение countInCart полей у рекомендованных продуктов
+                    this.applyFavAndCart();//заполнение countInCart полей у рекомендованных продуктов
                   }
                 },
                 error: (errorResponse: HttpErrorResponse) => {

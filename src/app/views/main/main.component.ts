@@ -9,7 +9,6 @@ import {BestProductsResponseType} from '../../../assets/types/responses/best-pro
 import {CartResponseType} from '../../../assets/types/responses/cart-response.type';
 import {CartService} from '../../shared/services/cart.service';
 import {CartItemType} from '../../../assets/types/cart-item.type';
-import {ReqErrorTypes} from '../../../assets/enums/auth-req-error-types.enum';
 import {FavoritesResponseType} from '../../../assets/types/responses/favorites-response.type';
 import {AuthService} from '../../core/auth/auth.service';
 import {FavoriteService} from '../../shared/services/favorite.service';
@@ -101,12 +100,10 @@ export class MainComponent implements OnInit, OnDestroy {
         of({ __error: true, err } as any)
       )
     );
-    const cart$ = this.cartService.getCart().pipe(
-      catchError((err: HttpErrorResponse) =>
-        of({ __error: true, err } as any)
-      )
-    );
-    const favorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites().pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
+    const cart$ = this.cartService.getCart()
+      .pipe(catchError((err: HttpErrorResponse) => of({ __error: true, err } as any)));
+    const favorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites()
+      .pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
     //Favorites of(null) если пользователь не залогинен
     const combinedRequest$: Observable<[BestProductsResponseType | any, CartResponseType | any, FavoritesResponseType|any]> =
       combineLatest([bestProducts$, cart$, favorites$]);
@@ -116,18 +113,15 @@ export class MainComponent implements OnInit, OnDestroy {
           //Обработка ошибок bestProducts
           if (bestProductsResponse.__error) {
             const httpErr: HttpErrorResponse = bestProductsResponse.err;
-            this.showSnackService.error(this.productService.getBestProductsError);
             console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (getBestProducts)! Code:${httpErr.status}`);
             return;
           }//Ошибочный код bestProducts. Завершаем функцию
           if ((bestProductsResponse as BestProductsResponseType).error){
-            this.showSnackService.error(this.productService.getBestProductsError);
             throw new Error((bestProductsResponse as BestProductsResponseType).message);
           }//Обработка ошибки с кодом 200
           let bestProducts:Array<ProductType> = (bestProductsResponse as BestProductsResponseType).products!;
           if (cartResponse.__error) {
             const httpErr: HttpErrorResponse = cartResponse.err;
-            this.showSnackService.error(this.cartService.getCartError,ReqErrorTypes.cartGetCart);
             console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetCart)! Code:${httpErr.status}`);
             this.bestProducts = bestProducts;
             return;

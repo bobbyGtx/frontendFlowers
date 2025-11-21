@@ -65,8 +65,8 @@ export class CartComponent implements OnInit , OnDestroy {
           }
         },
         error: (errorResponse: HttpErrorResponse) => {
+          if (errorResponse.status !==401 && errorResponse.status !== 403) this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
-          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
         }
       }));
   }
@@ -85,7 +85,7 @@ export class CartComponent implements OnInit , OnDestroy {
           this.calculateTotal();
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
+          if (errorResponse.status !==401 && errorResponse.status !== 403)this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })

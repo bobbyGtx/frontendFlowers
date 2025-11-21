@@ -51,7 +51,7 @@ class ProductCardComponent implements OnInit, OnDestroy{
           }
         },
         error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
+          if (errorResponse.status !==401 && errorResponse.status !== 403) this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);
         }
       })
@@ -88,9 +88,7 @@ class ProductCardComponent implements OnInit, OnDestroy{
             if (this.product)this.product.isInFavorite=false;
           },
           error: (errorResponse: HttpErrorResponse) => {
-            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) {
-              this.showSnackService.error(this.favoriteService.removeFavoriteError);
-            }
+            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) this.showSnackService.error(this.favoriteService.removeFavoriteError);
             console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (remove Favorite) error! Code:${errorResponse.status}`);
           }
         })
@@ -106,9 +104,7 @@ class ProductCardComponent implements OnInit, OnDestroy{
             if (this.product && this.product.id === data.product.id) this.product.isInFavorite = true;
           },
           error: (errorResponse: HttpErrorResponse) => {
-            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) {
-              this.showSnackService.error(this.favoriteService.addToFavoritesError);
-            }
+            if (errorResponse.error.status !== 401 && errorResponse.status !== 403) this.showSnackService.error(this.favoriteService.addToFavoritesError);
             console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (add Favorite) error! Code:${errorResponse.status}`);
           }
         }));

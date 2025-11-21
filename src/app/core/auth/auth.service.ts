@@ -50,8 +50,8 @@ export class AuthService {
     return this.isLogged$.value;
   }
 
-  signUp(email: string, password: string, passwordRepeat: string): Observable<DefaultResponseType> {
-    return this.http.post<DefaultResponseType>(environment.api + 'register.php', {email, password, passwordRepeat});
+  signUp(email: string, password: string, passwordRepeat: string, agree:boolean): Observable<DefaultResponseType> {
+    return this.http.post<DefaultResponseType>(environment.api + 'register.php', {email, password, passwordRepeat,agree});
   }
 
   login(email: string, password: string, rememberMe: boolean): Observable<LoginResponseType> {

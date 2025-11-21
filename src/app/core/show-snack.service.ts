@@ -45,7 +45,7 @@ export class ShowSnackService {
   private lastMsgId:number = 0;
 
   private errorSettings: SnackSettingsType = {
-    duration: 8500,
+    duration: 4000,
     panelClass: 'snackbar-error',
   };
   private multiErrorSettings: SnackSettingsType = {
@@ -54,7 +54,7 @@ export class ShowSnackService {
       dlgType: 'snackbar-error',
       messages: [],
     },
-    duration: 10000,
+    duration: 5000,
     panelClass: 'snackbar-error',
   };
   private multiInfoSettings: SnackSettingsType = {
@@ -63,7 +63,7 @@ export class ShowSnackService {
       dlgType: 'snackbar-info',
       messages: [],
     },
-    duration: 7000,
+    duration: 4500,
     panelClass: 'snackbar-info',
   };
   private successSettings: SnackSettingsType = {
@@ -335,7 +335,7 @@ export class ShowSnackService {
   }
 
   constructor() {
-    this.msgStack$.subscribe(msgStack=>{
+    this.msgStack$.subscribe((msgStack:MessageType[])=>{
       if (msgStack.length===0) {
         this.lastMsgId=0;
         return;
@@ -359,7 +359,7 @@ export class ShowSnackService {
         this.deleteMessage(actualMessage.id);
       })
     });
-  }
+  }//Подписка на поток уведомлений
 
   addMessage(message:string,type:DlgTypes,messages:string[]|null=null):void {
     let newMessage:MessageType={
@@ -369,22 +369,22 @@ export class ShowSnackService {
       settings:null
     }
     if (type===DlgTypes.success){
-      newMessage.settings = this.successSettings;
+      newMessage.settings = {...this.successSettings};
     }else if(type===DlgTypes.info){
       if (messages && messages.length>0){
-        newMessage.settings = this.multiInfoSettings;
+        newMessage.settings = structuredClone(this.multiInfoSettings);
         newMessage.settings['data']!['message'] = message;
         newMessage.settings['data']!['messages'] = messages;
       }else{
-        newMessage.settings = this.infoSettings;
+        newMessage.settings = {...this.infoSettings};
       }
     }else if(type===DlgTypes.error){
       if (messages && messages.length>0){
-        newMessage.settings = this.multiErrorSettings;
+        newMessage.settings =structuredClone(this.multiErrorSettings);
         newMessage.settings['data']!['message'] = message;
         newMessage.settings['data']!['messages'] = messages;
       }else{
-        newMessage.settings = this.errorSettings;
+        newMessage.settings = {...this.errorSettings};
       }
     }else{
      console.error('Unexpected DlgType');
@@ -393,7 +393,17 @@ export class ShowSnackService {
 
     if (newMessage.settings){
       this.lastMsgId = newMessage.id;
-      this.msgStack$.next([...this.msgStack$.getValue(),newMessage]);
+      const equalMsgIndex:number = this.msgStack$.getValue().findIndex(messageItem=>{
+        if (messageItem.message === message){
+          if (messageItem.settings?.data?.messages && newMessage.settings?.data?.messages && messageItem.settings?.data?.messages.length === newMessage.settings?.data?.messages.length) {
+            return messageItem.settings.data.messages.every(strItem=> newMessage.settings!.data!.messages!.includes(strItem));
+          }else{
+            return false
+          }
+        }
+        return false
+      });//Проверяем наличие такого-же сообщения в массиве
+      if (equalMsgIndex ===-1) this.msgStack$.next([...this.msgStack$.getValue(),newMessage]);
     }
   }
   deleteMessage(id:number):void {

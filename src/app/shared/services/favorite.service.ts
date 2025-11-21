@@ -125,6 +125,22 @@ export class FavoriteService {
       );
   }
 
+  addToFavorite(productId:number): Observable<AddToFavoritesResponseType> {
+    return this.http.post<AddToFavoritesResponseType>(environment.api + 'favorites.php',{productId})
+      .pipe(
+        map((response:AddToFavoritesResponseType)=>{
+          if (response.error) return response;
+          if (!response.product || !ResponseDataValidator.validateRequiredFields(this.favoriteProductTemplate, response.product)) {
+            response.error = true;
+            response.message = 'addToFavorite error. Product not found in response or have invalid structure.';
+          }else{
+            this.cacheOperation(CacheOperations.add, response.product);
+          }
+          return response;
+        })
+      );
+  }
+
   removeFavorite(productId:number): Observable<DefaultResponseType> {
     return this.http.delete<DefaultResponseType>(environment.api + 'favorites.php',{body:{productId}})
       .pipe(
@@ -139,22 +155,6 @@ export class FavoriteService {
             disabled: false,
             ends: false,
           });
-        })
-      );
-  }
-
-  addToFavorite(productId:number): Observable<AddToFavoritesResponseType> {
-    return this.http.post<AddToFavoritesResponseType>(environment.api + 'favorites.php',{productId})
-      .pipe(
-        map((response:AddToFavoritesResponseType)=>{
-          if (response.error) return response;
-          if (!response.product || !ResponseDataValidator.validateRequiredFields(this.favoriteProductTemplate, response.product)) {
-            response.error = true;
-            response.message = 'addToFavorite error. Product not found in response or have invalid structure.';
-          }else{
-            this.cacheOperation(CacheOperations.add, response.product);
-          }
-          return response;
         })
       );
   }

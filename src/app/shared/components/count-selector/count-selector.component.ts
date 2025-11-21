@@ -37,6 +37,7 @@ export class CountSelectorComponent implements OnInit {
     let newValue:number=Number((event.target as HTMLInputElement).value);
     if (newValue > this.maxCount){
       this.count = this.maxCount;
+      console.log(this.count);
       this.showSnackService.error(`Доступно ${this.maxCount} единиц товара!`);
     }
     if (!newValue || newValue < 1) this.count = 1;

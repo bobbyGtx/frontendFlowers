@@ -31,9 +31,7 @@ export class FavoriteComponent implements OnInit, OnDestroy {
           this.favoriteProducts = data.favorites;
         },
         error: (errorResponse: HttpErrorResponse) => {
-          if (errorResponse.status !== 401 && errorResponse.status !== 403) {
-            this.showSnackService.error(this.favoriteService.getFavoritesError);
-          }
+          if (errorResponse.status !== 401 && errorResponse.status !== 403) this.showSnackService.error(this.favoriteService.getFavoritesError);
           console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected (get Favorites) error! Code:${errorResponse.status}`);
         }
       }));
@@ -50,9 +48,7 @@ export class FavoriteComponent implements OnInit, OnDestroy {
           this.favoriteProducts = this.favoriteProducts.filter(product => product.id !== productId);
         },
         error: (errorResponse: HttpErrorResponse) => {
-          if (errorResponse.error.status !== 401 && errorResponse.status !== 403) {
-            this.showSnackService.error(this.favoriteService.removeFavoriteError);
-          }
+          if (errorResponse.error.status !== 401 && errorResponse.status !== 403) this.showSnackService.error(this.favoriteService.removeFavoriteError);
           console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected (remove Favorite) error! Code:${errorResponse.status}`);
         }
       })
