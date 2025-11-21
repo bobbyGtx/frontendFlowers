@@ -277,6 +277,7 @@ export class CartService {
 
   private resetCacheTimer() {
     if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
+
     this.clearCartCacheTimeout = setTimeout(() => {
       this.cartCache = null;
       if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);

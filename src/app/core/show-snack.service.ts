@@ -116,7 +116,7 @@ export class ShowSnackService {
     ],
     [ReqErrorTypes.authSignUp]: [
       {
-        error: 'Data not Acceptable!',
+        error: 'Data not acceptable!',
         [AppLanguages.ru]:'Данные не соответствуют требованиям!',
         [AppLanguages.en]:'Data does not meet the requirements!',
         [AppLanguages.de]:'Die Daten erfüllen die Anforderungen nicht!',

@@ -71,37 +71,22 @@ export class CatalogComponent implements OnInit, OnDestroy {
             throw new Error(data.message);
           }
           if (data.categories) this.categoriesWithTypes = data.categories;
-          //Запрос корзины и избранного
-          const cart$:Observable<CartResponseType|any> = this.cartService.getCart().pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any)));
-          const favorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites().pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
-          //Favorites of(null) если пользователь не залогинен
-          const combinedRequest$: Observable<[CartResponseType | any, FavoritesResponseType | any]> = combineLatest([cart$,favorites$]);
-          this.subscriptions$.add(combinedRequest$.subscribe({
-            next:([cartResponse,favoritesResponse]:[CartResponseType | any, FavoritesResponseType | any])=>{
-              if (cartResponse.__error) {
-                const httpErr: HttpErrorResponse = cartResponse.err;
-                console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetCart)! Code:${httpErr.status}`);
-              }else{
-                const userCart: CartResponseType = (cartResponse as CartResponseType);
-                if (userCart.cart) this.cartItems = userCart.cart.items;
-              }
-              if (favoritesResponse){
-                if (favoritesResponse.__error) {
-                  const httpErr: HttpErrorResponse = favoritesResponse.err;
-                  console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetFavorites)! Code:${httpErr.status}`);
-                }else{
-                  const favoriteList:FavoritesResponseType = (favoritesResponse as FavoritesResponseType);
-                  if (favoriteList.favorites)this.favoriteProducts = favoriteList.favorites;
-                }
-              }//Если пользователь залогинен, то favoritesResponse != null
-              this.processCatalog();
-            },
-            error:(error: HttpErrorResponse) => {
-              this.showSnackService.error("Unexpected Request Error!");
-              console.error(error.message);
-              this.processCatalog();
-            }
-          }));
+          this.subscriptions$.add(
+            this.activatedRoute.queryParams
+              .pipe(
+                debounce(() => {
+                  if (this.debounce) return timer(500);
+                  this.debounce = true;
+                  return timer(0);
+                })
+              )
+              .subscribe(params => {
+                this.activeParams = ActiveParamsUtil.processParams(params);
+                this.fillAppliedFilters();
+                this.debounce = true;
+                this.requestProducts();
+              })
+          );
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
@@ -226,58 +211,78 @@ export class CatalogComponent implements OnInit, OnDestroy {
     });
   }
 
-  processCatalog(){
-    this.subscriptions$.add(
-      this.activatedRoute.queryParams
-        .pipe(
-          debounce(() => {
-            if (this.debounce) return timer(500);
-            this.debounce = true;
-            return timer(0);
-          })
-        )
-        .subscribe(params => {
-          this.activeParams = ActiveParamsUtil.processParams(params);
-          this.fillAppliedFilters();
-          this.debounce = true;
-          this.subscriptions$.add(
-            this.productService.getProducts(this.activeParams).subscribe({
-              next: (data: ProductsResponseType) => {
-                if (data.error) {
-                  this.showSnackService.error(this.productService.getProductsError);
-                  throw new Error(data.message);
-                }
-                if (!data.response) return;
-                if ((this.cartItems && this.cartItems.length > 0) || (this.favoriteProducts && this.favoriteProducts.length > 0)) {
-                  this.products=data.response.products.map((productItem:ProductType)=>{
-                    if (this.cartItems && this.cartItems.length > 0){
-                      const productIndexInCart:number = this.cartItems.findIndex((cartItem:CartItemType)=>cartItem.product.id===productItem.id);
-                      if (productIndexInCart!==-1){
-                        productItem.countInCart = this.cartItems[productIndexInCart].quantity;
-                      }
-                    }//Обработка корзины
-                    if (this.favoriteProducts && this.favoriteProducts.length > 0){
-                      const productIndexInFav:number = this.favoriteProducts.findIndex((favItem:FavoriteProductType)=>favItem.id===productItem.id);
-                      if (productIndexInFav!==-1) productItem.isInFavorite = true;
-                    }//Обработка избранного
-                    return productItem;
-                  });
-                }else{
-                  this.products = data.response.products;
-                }
-                this.products = data.response.products;
-                this.activePage = data.response.page;
-                this.pages = [];
-                for (let i: number = 1; i <= data.response.totalPages; i++) this.pages.push(i);
-                this.totalProducts = data.response.totalProducts;
-              },
-              error: (errorResponse: HttpErrorResponse) => {
-                this.showSnackService.error(this.productService.getProductsError);
-                console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getProducts)! Code:${errorResponse.status}`);
-              }
-            }));
-        })
-    );
+  requestProducts(){
+    this.subscriptions$.add(this.productService.getProducts(this.activeParams).subscribe({
+      next: (data: ProductsResponseType) => {
+        if (data.error) {
+          this.showSnackService.error(this.productService.getProductsError);
+          throw new Error(data.message);
+        }
+        if (!data.response) return;
+        this.products = data.response.products;
+        this.activePage = data.response.page;
+        this.pages = [];
+        for (let i: number = 1; i <= data.response.totalPages; i++) this.pages.push(i);
+        this.totalProducts = data.response.totalProducts;
+        this.requestCartAndFavorites();
+      },
+      error: (errorResponse: HttpErrorResponse) => {
+        this.showSnackService.error(this.productService.getProductsError);
+        console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getProducts)! Code:${errorResponse.status}`);
+      }
+    }));
+  }
+
+  requestCartAndFavorites(){
+    //Запрос корзины и избранного
+    const cart$:Observable<CartResponseType|any> = this.cartService.getCart().pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any)));
+    const favorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites().pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
+    //Favorites of(null) если пользователь не залогинен
+    const combinedRequest$: Observable<[CartResponseType | any, FavoritesResponseType | any]> = combineLatest([cart$,favorites$]);
+    this.subscriptions$.add(combinedRequest$.subscribe({
+      next:([cartResponse,favoritesResponse]:[CartResponseType | any, FavoritesResponseType | any])=>{
+        if (cartResponse.__error) {
+          const httpErr: HttpErrorResponse = cartResponse.err;
+          console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetCart)! Code:${httpErr.status}`);
+        }else{
+          const userCart: CartResponseType = (cartResponse as CartResponseType);
+          if (userCart.cart) this.cartItems = userCart.cart.items;
+        }
+        if (favoritesResponse){
+          if (favoritesResponse.__error) {
+            const httpErr: HttpErrorResponse = favoritesResponse.err;
+            console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetFavorites)! Code:${httpErr.status}`);
+          }else{
+            const favoriteList:FavoritesResponseType = (favoritesResponse as FavoritesResponseType);
+            if (favoriteList.favorites)this.favoriteProducts = favoriteList.favorites;
+          }
+        }//Если пользователь залогинен, то favoritesResponse != null
+        this.showCartAndFavorites();
+      },
+      error:(error: HttpErrorResponse) => {
+        this.showSnackService.error("Unexpected Request Error!");
+        console.error(error.message);
+      }
+    }));
+  }
+
+  showCartAndFavorites(){
+    if (!this.products.length) return;
+    if ((this.cartItems && this.cartItems.length > 0) || (this.favoriteProducts && this.favoriteProducts.length > 0)) {
+      this.products=this.products.map((productItem:ProductType)=>{
+        if (this.cartItems && this.cartItems.length > 0){
+          const productIndexInCart:number = this.cartItems.findIndex((cartItem:CartItemType)=>cartItem.product.id===productItem.id);
+          if (productIndexInCart!==-1){
+            productItem.countInCart = this.cartItems[productIndexInCart].quantity;
+          }
+        }//Обработка корзины
+        if (this.favoriteProducts && this.favoriteProducts.length > 0){
+          const productIndexInFav:number = this.favoriteProducts.findIndex((favItem:FavoriteProductType)=>favItem.id===productItem.id);
+          if (productIndexInFav!==-1) productItem.isInFavorite = true;
+        }//Обработка избранного
+        return productItem;
+      });
+    }
   }
 
   ngOnDestroy() {

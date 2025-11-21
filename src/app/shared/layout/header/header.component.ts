@@ -34,6 +34,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.count = cartCount;
       }),
     );
+    this.subscriptions$.add(this.cartService.getCart().subscribe());//запрос корзины для рассчёта кол-ва.
   }
 
   logout(): void {
