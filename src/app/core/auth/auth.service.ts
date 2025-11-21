@@ -124,8 +124,10 @@ export class AuthService {
   public removeTokens() {
     localStorage.removeItem(this.accessTokenKey);
     localStorage.removeItem(this.refreshTokenKey);
+    localStorage.removeItem(this.userIdKey);
     sessionStorage.removeItem(this.accessTokenKey);
     sessionStorage.removeItem(this.refreshTokenKey);
+    sessionStorage.removeItem(this.userIdKey);
     this.isLogged$.next(false);
     this.rememberMe = false;
   }

@@ -4,8 +4,10 @@
     > Email не валиден (не верный формат)
   - EMail is busy!
     > Пользователь с таким Email уже зарегистрирован
+  - Request parameters not recognized! (paramName)
+    >Передаваемый в запрос параметр не найден или имеет не верный формат
 
-- 401 
+- 401 (ReqErrorTypes.authLogin)
   - Access token not found or has not valid format!
     >Токен не найден в заголовке, либо имеет не корректный формат по RegEx=/^[a-zA-Z0-9]{100}$/
   - Refresh token not found or has not valid format!
@@ -34,4 +36,8 @@
   - Nothing to change!
     > Данные для добавления в базу данных не обнаружены. (updateUserData,prepareNewData) запрос patch->user
 
-//$errors['userIdNotFound'] добавить везде код 500
+## Code 200 (Ok)
+- Request success!
+- Record changed!
+- Record deleted!
+- Cart has been rebased!

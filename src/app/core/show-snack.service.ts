@@ -78,7 +78,7 @@ export class ShowSnackService {
   private userGroupErrors: UserErrorsGroupType = {
     [ReqErrorTypes.authLogin]: [
       {
-        error: 'Email not correct!',
+        error: 'Email not valid!',
         [AppLanguages.ru]:'Введен некорректный E-Mail!',
         [AppLanguages.en]:'Entered email is incorrect!',
         [AppLanguages.de]:'Falsche E-Mail-Adresse eingegeben!',
@@ -232,18 +232,26 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Успешная авторизация!',
       [AppLanguages.en]:'Authorization success!',
       [AppLanguages.de]:'Autorisierung erfolgreich!',
-    },
-    {
+    },{
       success:'You have successfully logged out.',
       [AppLanguages.ru]:'Вы успешно вышли из системы.',
       [AppLanguages.en]:'You have successfully logged out.',
       [AppLanguages.de]:'Sie haben sich erfolgreich abgemeldet.',
-    },
-    {
+    },{
       success:'User registered!',
       [AppLanguages.ru]:'Регистрация прошла успешно. Войдите в систему.',
       [AppLanguages.en]:'You have successfully logged out.',
       [AppLanguages.de]:'Sie haben sich erfolgreich abgemeldet.',
+    },{
+      success:'Record changed!',
+      [AppLanguages.ru]:'Запись изменена.',
+      [AppLanguages.en]:'Record has been changed.',
+      [AppLanguages.de]:'Der Eintrag wurde geändert.',
+    },{
+      success:'Record deleted!',
+      [AppLanguages.ru]:'Запись удалена',
+      [AppLanguages.en]:'Record has been deleted.',
+      [AppLanguages.de]:'Der Eintrag wurde gelöscht',
     }
   ];//Подтверждения
   private userInfos:Array<UserInfoMsgType> = [
@@ -393,7 +401,7 @@ export class ShowSnackService {
   }
 
   error(message: string, reqType: ReqErrorTypes | null = null, code: number | null = null): void {
-    if (message.length<2) return;
+    if (!message || message.length<2) return;
     if (reqType) message = this.getUserGroupError(reqType, message);
     code ? message = `${message}  Code: ${code}` : null;
     this.addMessage(message,DlgTypes.error);

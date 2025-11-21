@@ -76,6 +76,13 @@ response={
     this.showSnackService.errorObj(errorResponse.error,ReqErrorTypes.authSignUp);
     }
 ```
+ - Ошибки в запросах требующих авторизации обрабатываются иначе. 
+  >В интерцепторе перехватываются ошибки авторизации с кодами 401 и 403. Во избежание дублирования сообщений, вывод сообщений у этих кодов исключается
+```ts
+  if (errorResponse.error.status !== 401 && errorResponse.status !== 403) {
+  this.showSnackService.error(this.favoriteService.removeFavoriteError);
+  }
+  ```
 ### Пример кода обработки ответа
 ```ts
         this.authService.signUp(this.signUpForm.value.email,this.signUpForm.value.password,this.signUpForm.value.passwordRepeat)

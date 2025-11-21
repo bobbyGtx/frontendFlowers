@@ -250,8 +250,10 @@ export class CatalogComponent implements OnInit, OnDestroy {
         }
         if (favoritesResponse){
           if (favoritesResponse.__error) {
-            const httpErr: HttpErrorResponse = favoritesResponse.err;
-            console.error(httpErr.error.message?httpErr.error.message:`Unexpected error (GetFavorites)! Code:${httpErr.status}`);
+            if (favoritesResponse.__error.status !== 401 && favoritesResponse.__error.status !== 403) {
+              this.showSnackService.error(this.favoriteService.getFavoritesError);
+            }
+            console.error(favoritesResponse.__error.error.message ? favoritesResponse.__error.error.message : `Unexpected (get Favorites) error! Code:${favoritesResponse.__error.status}`);
           }else{
             const favoriteList:FavoritesResponseType = (favoritesResponse as FavoritesResponseType);
             if (favoriteList.favorites)this.favoriteProducts = favoriteList.favorites;

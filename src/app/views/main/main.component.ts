@@ -125,7 +125,6 @@ export class MainComponent implements OnInit, OnDestroy {
             throw new Error((bestProductsResponse as BestProductsResponseType).message);
           }//Обработка ошибки с кодом 200
           let bestProducts:Array<ProductType> = (bestProductsResponse as BestProductsResponseType).products!;
-
           if (cartResponse.__error) {
             const httpErr: HttpErrorResponse = cartResponse.err;
             this.showSnackService.error(this.cartService.getCartError,ReqErrorTypes.cartGetCart);

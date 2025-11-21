@@ -28,6 +28,15 @@ enum CacheOperations{
   clear='clear',
 }
 
+/*
+* Сервис для работы с избранным.
+* Особенности: данные кэшируются в автоматическом режиме во время выполнения запросов.
+* cache - переменная для хранения кэша избранного
+* cacheTimeout - таймаут для чистки кэша
+* cacheLifetime - время жизни кэша. Используется в таймауте
+*  - favoriteProductTemplate - переменная со всеми обязательными полями, для проверки целостности данных
+* */
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,7 +45,7 @@ export class FavoriteService {
   private languageService:LanguageService=inject(LanguageService);
   private cache:FavoritesResponseType|null=null;
   private cacheTimeout: ReturnType<typeof setTimeout> | null = null;//таймер для чистки кэша корзины
-  private cacheLifetime:number = 60000;
+  private cacheLifetime:number = 120000;
 
   private favoriteProductTemplate: FavoriteProductType = {
     id: 0,
@@ -104,8 +113,8 @@ export class FavoriteService {
     }, this.cacheLifetime);
   }
 
-  getFavorites(): Observable<FavoritesResponseType> {
-    if (this.cache) return of(this.cache);
+  getFavorites(forceUpdate:boolean=false): Observable<FavoritesResponseType> {
+    if (!forceUpdate && this.cache) return of(this.cache);
     return this.http.get<FavoritesResponseType>(environment.api + 'favorites.php')
       .pipe(
         tap((response:FavoritesResponseType) => {

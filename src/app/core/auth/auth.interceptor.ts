@@ -33,8 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
     const tokens: { accessToken: string | null, refreshToken: string | null } = this.authService.getTokens();
     const language: AppLanguages = this.languageService.appLang;
     let headers = req.headers.set(Config.reqLanguageHeader, language);
-
-    if (!tokens || !tokens.accessToken) return next.handle(req.clone({headers}));
+    if (!tokens || !tokens.accessToken || req.url.includes('/login')||req.url.includes('/signup')||req.url.includes('/refresh')) return next.handle(req.clone({headers}));
     headers = headers.set(Config.accessTokenHeader, tokens.accessToken);
     const newReq = req.clone({headers});//Клонируем запрос и добавляем хедер языка
     return next.handle(newReq).pipe(
@@ -43,6 +42,12 @@ export class AuthInterceptor implements HttpInterceptor {
         if (error.status === 401 && !newReq.url.includes('/login.php') && !newReq.url.includes('/signup.php') && !newReq.url.includes('/refresh')) {
           return this.handle401Error(newReq, next);
         }
+        if (error.status === 403){
+          this.showSnackService.error(error.message,ReqErrorTypes.authLogin);
+          this.authService.removeTokens();
+          this.router.navigate(['/']);
+          return throwError(() => error);
+        }//Обработка блокировки пользователя
         return throwError(() => error);//Возврат ошибки
       })
     );
@@ -64,6 +69,9 @@ export class AuthInterceptor implements HttpInterceptor {
           return next.handle(newReq);
         }),
         catchError(error=>{
+          if (error.status === 401) {
+            this.showSnackService.error(error.message,ReqErrorTypes.authLogin);
+          }
           this.authService.removeTokens();
           this.router.navigate(['/']);
           return throwError(() => error);
