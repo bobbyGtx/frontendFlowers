@@ -86,10 +86,9 @@
                  [class.not-valid]="lowDeliveryPrice">{{ activeDeliveryType.delivery_price }} EUR
               <svg *ngIf="activeDeliveryType.lPMinPrice>0 && !lowDeliveryPrice"
                    [matTooltip]="'Cкидка на доставку при покупке от '+ activeDeliveryType.lPMinPrice +' EUR'"
-                   matTooltipClass="mat-tooltip-discount"
+                   matTooltipClass="mat-tooltip-compact"
                    matTooltipPosition="below"
-                   matTooltipHideDelay="30000"
-
+                   matTooltipHideDelay="200"
                    class="attention-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2"/>

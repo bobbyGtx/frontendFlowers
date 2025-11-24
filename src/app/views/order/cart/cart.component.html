@@ -10,7 +10,11 @@
           <count-selector (onCountChange)="updateCount(cartProduct.product,$event)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled"></count-selector>
           <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
           <div class="cart-product-remove" (click)="editCount(cartProduct.product,0)">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <svg matTooltip="Удалить из корзины"
+            matTooltipClass="mat-tooltip-compact"
+            matTooltipPosition="above"
+            matTooltipHideDelay="200"
+              viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
               <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
               <line x1="13.9238" y1="2.62996" x2="1.90301" y2="14.6508" stroke-linecap="round"/>
             </svg>

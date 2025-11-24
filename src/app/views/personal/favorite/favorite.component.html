@@ -2,28 +2,38 @@
   <div class="container">
     <div class="favorite-title">Избранное</div>
     <div class="favorite-empty" *ngIf="!favoriteProducts.length">
-        <div class="cart-empty-message">В избранном нет товаров</div>
-        <button class="button" routerLink="/catalog">В каталог</button>
+      <div class="cart-empty-message">В избранном нет товаров</div>
+      <button class="button" routerLink="/catalog">В каталог</button>
     </div>
 
     <div class="favorite-products" *ngIf="favoriteProducts.length">
       <div class="favorite-product" *ngFor="let favProduct of favoriteProducts">
-        <div class="favorite-product-image" [class.disabled]="favProduct.disabled" [style.background-image]="'url('+serverImagesPath + favProduct.image + ')'">
-          <span class="ends-message" *ngIf="favProduct.ends && !favProduct.disabled">Заканчивается!</span>
+        <div class="first-group">
+          <div class="favorite-product-image" [class.disabled]="favProduct.disabled"
+               [style.background-image]="'url('+serverImagesPath + favProduct.image + ')'"></div>
+          <div class="favorite-product-name">{{ favProduct.name }}</div>
         </div>
-        <div class="favorite-product-name">{{favProduct.name}}</div>
-        <div class="favorite-product-price">{{ favProduct.price }} EUR</div>
-        <div class="favorite-product-action">
-          <button [routerLink]="'/product/'+favProduct.url" class="button">Открыть</button>
+        <div class="second-group">
+          <div class="favorite-product-price">{{ favProduct.price }} EUR</div>
+          <div class="favorite-product-end">
+            <span [matTooltip]="'Доступно '+favProduct.count + ' единиц'"
+              matTooltipClass="mat-tooltip-compact"
+              matTooltipPosition="above"
+              matTooltipHideDelay="200"
+              *ngIf="favProduct.ends && !favProduct.disabled">Заканчивается</span></div>
+          <div class="favorite-product-action">
+            <button [routerLink]="'/product/'+favProduct.url" class="button">Открыть</button>
+          </div>
+          <div class="favorite-product-remove">
+            <a title="Удалить из избранного" (click)="removeFromFavorites(favProduct.id)">
+              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
+                <line x1="13.9238" y1="2.62996" x2="1.90301" y2="14.6508" stroke-linecap="round"/>
+              </svg>
+            </a>
+          </div>
         </div>
-        <div class="favorite-product-remove">
-          <a title="Удалить из избранного" (click)="removeFromFavorites(favProduct.id)">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-            <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
-            <line x1="13.9238" y1="2.62996" x2="1.90301" y2="14.6508" stroke-linecap="round"/>
-          </svg>
-          </a>
-        </div>
+
       </div>
     </div>
   </div>

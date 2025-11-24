@@ -10,16 +10,18 @@ import { CategoryFilterComponent } from './components/category-filter/category-f
 import { ProductsCarouselComponent } from './components/products-carousel/products-carousel.component';
 import {CarouselModule} from 'ngx-owl-carousel-o';
 import { CountSelectorComponent } from './components/count-selector/count-selector.component';
+import {MatTooltip} from "@angular/material/tooltip";
 
 @NgModule({
     declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent],
-  imports: [
-    CommonModule,
-    MatButton,
-    RouterLink,
-    FormsModule,
-    CarouselModule
-  ],
+    imports: [
+        CommonModule,
+        MatButton,
+        RouterLink,
+        FormsModule,
+        CarouselModule,
+        MatTooltip
+    ],
     exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent],
 })
 export class SharedModule {
