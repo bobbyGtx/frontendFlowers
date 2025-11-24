@@ -1,1 +1,120 @@
-<p>order works!</p>
+<div class="order">
+  <div class="container">
+    <div class="order-title">Оформление вашего заказа</div>
+    <div class="order-info" *ngIf="cart && deliveryTypes.length && activeDeliveryType">
+      <div class="order-form">
+        <div class="order-form-block">
+          <div class="order-form-label">Выберите способ доставки</div>
+          <div class="order-form-types">
+            <div class="order-form-type-item" *ngFor="let deliveryType of deliveryTypes"
+                 [class.active]="activeDeliveryType.id === deliveryType.id"
+                 (click)="changeDeliveryType(deliveryType)"
+            >{{ deliveryType.deliveryType }}
+            </div>
+          </div>
+        </div>
+
+        <div class="order-form-block">
+          <div class="order-form-label">Заполните личные данные</div>
+          <div class="order-form-inputs personal-data-inputs">
+            <input type="text" class="input" placeholder="Фамилия">
+            <input type="text" class="input" placeholder="Имя">
+            <input type="text" class="input" placeholder="Телефон">
+            <input type="text" class="input" placeholder="E-Mail">
+          </div>
+        </div>
+
+        <div class="order-form-block">
+          <div class="order-form-label">Заполните адрес доставки</div>
+          <div class="order-form-inputs address-data-inputs">
+            <select name="region" class="input region" id="region">
+              <option value="Bayern">Бавария</option>
+              <option value="Saarland">Саарланд</option>
+              <option value="Berlin">Берлин</option>
+              <option value="Brandenburg">Бранденбург</option>
+              <option value="Baden-Württemberg">Баден-Вюрттемберг</option>
+            </select>
+            <input type="text" class="input town" placeholder="Город">
+            <input type="text" class="input zip" placeholder="Индекс">
+            <input type="text" class="input street" placeholder="Улица">
+            <input type="text" class="input house" placeholder="№ дома">
+          </div>
+        </div>
+
+        <div class="order-form-block">
+          <div class="order-form-label">Выберите способ оплаты</div>
+          <div class="order-form-radio">
+            <div class="order-form-radio-block">
+              <input type="radio" id="card">
+              <label for="card">Оплата банковской картой в интернет-магазине</label>
+            </div>
+            <div class="order-form-radio-block">
+              <input type="radio" id="cashless">
+              <label for="cashless">Безналичный расчет при получении</label>
+            </div>
+            <div class="order-form-radio-block">
+              <input type="radio" id="cash">
+              <label for="cash">Наличный расчет при получении</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-form-block">
+          <div class="order-form-label">Комментарий к заказу (необязательно)</div>
+          <div class="order-form-inputs">
+            <textarea cols="30" rows="5" maxlength="500" class="input"
+                      placeholder="Оставьте свой комментарий..."></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="order-details">
+        <div class="order-details-info">
+          <div class="order-details-info-title">Ваш заказ</div>
+          <div class="order-details-info-item">
+            <div class="order-details-info-item-caption">Товаров:</div>
+            <div class="order-details-info-item-data">{{ cart.count }}</div>
+          </div>
+          <div class="order-details-info-item">
+            <div class="order-details-info-item-caption">Общая стоимость:</div>
+            <div class="order-details-info-item-data">{{ cart.amount }} EUR</div>
+          </div>
+          <div class="order-details-info-item">
+            <div class="order-details-info-item-caption">Стоимость доставки:</div>
+            <div class="order-details-info-item-data"
+                 [class.not-valid]="lowDeliveryPrice">{{ activeDeliveryType.delivery_price }} EUR
+              <svg *ngIf="activeDeliveryType.lPMinPrice>0 && !lowDeliveryPrice"
+                   [matTooltip]="'Cкидка на доставку при покупке от '+ activeDeliveryType.lPMinPrice +' EUR'"
+                   matTooltipClass="mat-tooltip-discount"
+                   matTooltipPosition="below"
+                   matTooltipHideDelay="30000"
+
+                   class="attention-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"/>
+                <rect height="0.01" stroke-linejoin="round" stroke-width="3" width="0.01" x="12"
+                      y="16"/>
+                <path d="M12 12L12 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+
+          </div>
+          <div class="order-details-info-item discount" *ngIf="lowDeliveryPrice">
+            <div class="order-details-info-item-caption">Скидка на доставку:</div>
+            <div
+              class="order-details-info-item-data">{{ activeDeliveryType.low_price - activeDeliveryType.delivery_price }}
+              EUR
+            </div>
+
+          </div>
+          <div class="order-details-info-item">
+            <div class="order-details-info-item-caption">Итоговая стоимость:</div>
+            <div class="order-details-info-item-data">{{ finalAmount }} EUR</div>
+          </div>
+        </div>
+        <button class="button">Подтвердить заказ</button>
+      </div>
+    </div>
+  </div>
+</div>

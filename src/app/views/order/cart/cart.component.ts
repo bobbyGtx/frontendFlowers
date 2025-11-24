@@ -29,7 +29,6 @@ export class CartComponent implements OnInit , OnDestroy {
   totalCount:number=0;
   showedMessages:Array<string>=[];
 
-
   ngOnInit() {
     this.subscriptions$.add(
       this.cartService.getCart(true).subscribe({
@@ -44,8 +43,9 @@ export class CartComponent implements OnInit , OnDestroy {
           //if (data.messages) this.showSnackService.infoObj(data);
           if (data.cart){
             this.cartItems = data.cart.items;
+            this.totalCount=data.cart.count;
+            this.totalAmount=data.cart.amount;
             if (this.cartItems.length > 0){
-              this.calculateTotal();
               this.subscriptions$.add(
                 this.productService.getBestProducts().subscribe({
                   next: (data:BestProductsResponseType) => {
@@ -82,7 +82,8 @@ export class CartComponent implements OnInit , OnDestroy {
           //if (data.messages) this.showSnackService.infoObj(data);
           if (data.messages) this.showMessages(data);
           this.cartItems = data.cart.items;
-          this.calculateTotal();
+          this.totalCount=data.cart.count;
+          this.totalAmount=data.cart.amount;
         },
         error: (errorResponse: HttpErrorResponse) => {
           if (errorResponse.status !==401 && errorResponse.status !== 403)this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
@@ -107,7 +108,6 @@ export class CartComponent implements OnInit , OnDestroy {
       }else{
         this.showedMessages=[...this.showedMessages, ...cartResponse.messages];
       }
-
     }
 
     if (cartResponse.messages.length > 0){
@@ -125,19 +125,6 @@ export class CartComponent implements OnInit , OnDestroy {
 
   updateCount(cartProduct:CartProductType,value:number) {
     this.editCount(cartProduct,value);
-  }
-
-  calculateTotal():void{
-    this.totalCount=0;
-    this.totalAmount=0;
-    this.cartItems.forEach((cartItem:CartItemType) => {
-      if(cartItem.product.disabled) {
-        cartItem.quantity=0;
-      }else{
-        this.totalCount+=cartItem.quantity;
-        this.totalAmount+=cartItem.quantity*cartItem.product.price;
-      }
-    });
   }
 
   ngOnDestroy() {

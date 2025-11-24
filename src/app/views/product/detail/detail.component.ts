@@ -156,7 +156,7 @@ export class DetailComponent implements OnInit, OnDestroy {
             if (getProductResp.__error) {
               const errorResponse: HttpErrorResponse = getProductResp.err;
               this.showSnackService.error(this.productService.getProductError);
-              console.error(errorResponse.message ? errorResponse.message : `Unexpected error (getProduct)! Code:${errorResponse.status}`);
+              console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getProduct)! Code:${errorResponse.status}`);
             }
             const productResponse:ProductResponseType = getProductResp as ProductResponseType;
             if (productResponse.error || !productResponse.product) {

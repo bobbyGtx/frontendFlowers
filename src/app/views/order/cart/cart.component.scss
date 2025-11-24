@@ -101,10 +101,10 @@
           padding: 40px;
           border-radius: 5px;
           background: $details-info-bg;
-          margin-bottom: 12px;
+          margin-bottom: 14px;
           .cart-details-info-title{
             @include head-lora(26px);
-            margin-bottom: 20px;
+            margin-bottom: 22px;
           }
           .cart-details-info-item{
             display: flex;

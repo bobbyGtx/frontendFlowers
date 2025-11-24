@@ -2,10 +2,13 @@ $container-width: 1240px;//ширина контейнера
 $green-text-color: #202B21;
 $gray-text-color: #2C2C2C;
 $black-text-color: #000;
+$white-text-color: #fff;
+$white-bg-color: #fff;
 $base-bg-color: #648F64;
 $green-bg-color-sections: #A4CBA3;
 $small-input-border:#6CAC72;
 $transparent-btn-border:$small-input-border;
+$transparent-background:transparent;
 
 $input-border:#2A592E;//reviews-border
 $link-color: #519057;
@@ -41,6 +44,9 @@ $remove-btn-color:$applied-filter-close;
 $remove-btn-color-h:$applied-filter-close-h;
 $details-info-bg:#E7F1E8;
 $transp-button-font-color: #6CAC72;
+
+//Order
+$delivery-type-border-color:$small-input-border;
 
 //count-selector
 $svg-color: #9AA89B;

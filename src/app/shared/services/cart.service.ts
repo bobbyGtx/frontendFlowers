@@ -25,7 +25,7 @@ export class CartService {
   private http: HttpClient = inject(HttpClient);
   private authService: AuthService = inject(AuthService);
   private showSnackService: ShowSnackService = inject(ShowSnackService);
-  private languageService:LanguageService= inject(LanguageService);
+  private languageService: LanguageService = inject(LanguageService);
   readonly cartLsKey: string = 'userCart';
   private cartRequest$?: Observable<CartResponseType>;//для предотвращения дублирования запроса
   private cartCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
@@ -45,28 +45,30 @@ export class CartService {
       [AppLanguages.de]: 'Fehler beim Ändern des Warenkorbs. Bitte versuchen Sie es erneut.',
     },
     rebaseCart: {
-      [AppLanguages.ru]:'Ошибка переноса локальной корзины.',
-      [AppLanguages.en]:'Error transferring local recycle bin.',
-      [AppLanguages.de]:'Fehler beim Übertragen des lokalen Papierkorbs.',
+      [AppLanguages.ru]: 'Ошибка переноса локальной корзины.',
+      [AppLanguages.en]: 'Error transferring local recycle bin.',
+      [AppLanguages.de]: 'Fehler beim Übertragen des lokalen Papierkorbs.',
     },
   };
 
-  private isLoggedIn:boolean = false;
+  private isLoggedIn: boolean = false;
 
   constructor() {
     this.authService.isLogged$.subscribe(isLogged => {
       this.isLoggedIn = isLogged;
-      this.cartCache=null;
+      this.cartCache = null;
     });
   }
 
-  get getCartError():string {
+  get getCartError(): string {
     return this.userErrors.getCart[this.languageService.appLang];
   }
-  get updateCartError():string {
+
+  get updateCartError(): string {
     return this.userErrors.updateCart[this.languageService.appLang];
   }
-  get rebaseCartError():string {
+
+  get rebaseCartError(): string {
     return this.userErrors.rebaseCart[this.languageService.appLang];
   }
 
@@ -85,33 +87,20 @@ export class CartService {
   getCart(forceUpdate: boolean = false): Observable<CartResponseType> {
     if (!this.isLoggedIn) return of(this.getLSCart());
     if (!forceUpdate && this.cartCache) return of(this.cartCache);
-    if (this.cartRequest$) {return this.cartRequest$;}
+    if (this.cartRequest$) return this.cartRequest$;
     this.cartRequest$ = this.http.get<CartResponseType>(environment.api + 'cart.php')
       .pipe(
         tap((data: CartResponseType) => {
           if (data.cart && data.cart.count >= 0) {
-            //Инфо сообщение при наличии ошибки и корзины выводится только тут
-            if (data.error) this.showSnackService.error(data.message,ReqErrorTypes.cartGetCart);
-            this.cartCache = data;
-            //Если была ошибка и есть корзина, значит это информационное сообщение, которое удаляем из кеша
-            this.cartCache.error = false;
-            this.cartCache.message = 'Request success!';
-            if (data.cart.count === 0) {
-              this.updateCartCount(data.cart.count);
-            } else {
-              //коррекция кол-ва товаров в корзине с вычетом недоступных
-              let totalCount = 0;
-              data.cart.items.forEach((cartItem: CartItemType) => {
-                if (cartItem.product.disabled) {
-                  cartItem.quantity = 0;
-                } else {
-                  totalCount += cartItem.quantity;
-                }
-              });
-              this.updateCartCount(totalCount);
-              this.cartCache = data;
-              this.resetCacheTimer();
-            }
+            //Инфо сообщение при наличии ошибки и корзины выводится только тут. Это ошибка о том, что корзина очищена.
+            if (data.error) this.showSnackService.error(data.message, ReqErrorTypes.cartGetCart);
+            //Если была ошибка и есть корзина, значит это информационное сообщение, которое не заносим в кэш
+            this.updateCartCount(data.cart.count);
+            this.cartCache = {
+              error: false,
+              message: 'Request success!',
+              cart: data.cart,
+            };
             this.resetCacheTimer();
           }
         }),
@@ -132,18 +121,13 @@ export class CartService {
       .pipe(
         tap((data: CartResponseType) => {
           if (data.cart && data.cart.count >= 0) {
-              //коррекция кол-ва товаров в корзине с вычетом недоступных
-              let totalCount = 0;
-              data.cart.items.forEach((cartItem: CartItemType) => {
-                if (cartItem.product.disabled) {
-                  cartItem.quantity = 0;
-                } else {
-                  totalCount += cartItem.quantity;
-                }
-              });
-              this.updateCartCount(totalCount);
-              this.cartCache = data;
-              this.resetCacheTimer();
+            this.updateCartCount(data.cart.count);
+            this.cartCache = {
+              error: false,
+              message: 'Request success!',
+              cart: data.cart,
+            };
+            this.resetCacheTimer();
           }
         })
       );
@@ -191,6 +175,7 @@ export class CartService {
   private getLSCart(): CartResponseType {
     let cart: CartType = {
       count: 0,
+      amount:0,
       createdAt: 0,
       updatedAt: 0,
       items: []
@@ -241,10 +226,15 @@ export class CartService {
       if (findIndex === -1) {
         userLSCart.cart.items.push(newCartItem);
         userLSCart.cart.count += quantity;
+        userLSCart.cart.amount += quantity*newCartItem.product.price;
       } else {
         if (userLSCart.cart.items[findIndex].product.disabled) {
-          userLSCart.cart.items[findIndex].quantity = quantity;
+          if (userLSCart.cart.items[findIndex].quantity>0){
+            userLSCart.cart.amount-=userLSCart.cart.items[findIndex].quantity*userLSCart.cart.items[findIndex].product.price;
+          }
+          userLSCart.cart.items[findIndex].quantity = 0;
         } else {
+          userLSCart.cart.amount = userLSCart.cart.amount - (userLSCart.cart.items[findIndex].quantity*userLSCart.cart.items[findIndex].product.price)+(quantity*userLSCart.cart.items[findIndex].product.price);
           userLSCart.cart.count = userLSCart.cart.count - userLSCart.cart.items[findIndex].quantity + quantity;
           userLSCart.cart.items[findIndex].quantity = quantity;
         }
@@ -256,6 +246,7 @@ export class CartService {
       //Создаем новую карзину.
       let userCart: CartType = {
         count: newCartItem.product.disabled ? 0 : newCartItem.quantity,
+        amount:newCartItem.product.disabled ? 0 : newCartItem.quantity*newCartItem.product.price,
         createdAt: Date.now(),
         updatedAt: 0,
         items: [newCartItem]
@@ -284,6 +275,7 @@ export class CartService {
     }, this.cartCacheLifetime);
   }
 }
+
 //if (data.infoMessage) this.showSnackService.info(data.infoMessage);
 //this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
 //console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);

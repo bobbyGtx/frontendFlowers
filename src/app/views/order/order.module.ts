@@ -5,6 +5,7 @@ import { OrderRoutingModule } from './order-routing.module';
 import { CartComponent } from './cart/cart.component';
 import { OrderComponent } from './order/order.component';
 import {SharedModule} from '../../shared/shared.module';
+import {MatTooltip} from "@angular/material/tooltip";
 
 
 @NgModule({
@@ -12,10 +13,11 @@ import {SharedModule} from '../../shared/shared.module';
     CartComponent,
     OrderComponent
   ],
-  imports: [
-    CommonModule,
-    SharedModule,
-    OrderRoutingModule
-  ]
+    imports: [
+        CommonModule,
+        SharedModule,
+        OrderRoutingModule,
+        MatTooltip
+    ]
 })
 export class OrderModule { }

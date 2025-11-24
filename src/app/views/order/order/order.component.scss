@@ -1,0 +1,205 @@
+@import "variables";
+@import "mixins";
+
+.order {
+  padding-top: 86px;
+  padding-bottom: 107px;
+
+  .container {
+    .order-title {
+      @include head-lora(32px);
+    }
+
+    .order-info {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+
+      .order-form {
+        max-width: 646px;
+
+        .order-form-block {
+          margin-bottom: 30px;
+
+          .order-form-label {
+            margin-bottom: 20px;
+            font-family: "Montserrat", sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: $green-text-color;
+          }
+
+          .order-form-types {
+            display: flex;
+            align-items: center;
+            max-width: 340px;
+            box-sizing: border-box;
+            border: 1px solid $delivery-type-border-color;
+            border-radius: 3px;
+            color: $gray-text-color;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 400;
+
+            .order-form-type-item {
+              padding: 13px 35px;
+              cursor: pointer;
+              background: $transparent-background;
+              min-width: 164px;
+              box-sizing: border-box;
+
+              &.active {
+                background-color: $delivery-type-border-color;
+                color: #ffffff;
+
+              }
+            }
+          }
+
+          .order-form-inputs {
+            display: grid;
+            gap: 8px;
+
+            input[type=text] {
+              height: 53px;
+            }
+
+            select {
+              height: 53px;
+            }
+
+            &.personal-data-inputs {
+              grid-template-columns: repeat(2, 210px);
+            }
+
+            &.address-data-inputs {
+              //grid-template-columns: 428px;
+              grid-template-columns: 316px 104px;
+              grid-template-areas:
+              "region region"
+              "town zip"
+              "street house";
+
+              .region {
+                grid-area: region;
+              }
+
+              .town {
+                grid-area: town;
+              }
+
+              .zip {
+                grid-area: zip;
+              }
+
+              .street {
+                grid-area: street;
+              }
+
+              .house {
+                grid-area: house;
+              }
+            }
+
+            textarea {
+              width: 646px;
+              max-width: 646px;
+              height: 130px;
+              max-height: 170px;
+              min-height: 130px;
+            }
+          }
+
+          .order-form-radio {
+            .order-form-radio-block {
+              margin-bottom: 12px;
+
+              &:last-child {
+                margin-bottom: unset;
+              }
+
+              label {
+                font-size: 16px;
+                color: $gray-text-color;
+                line-height: 20px;
+              }
+
+              input:checked {
+                + label {
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .order-details {
+        width: 422px;
+
+        .order-details-info {
+          padding: 40px;
+          border-radius: 5px;
+          background: $details-info-bg;
+          margin-bottom: 14px;
+
+          .order-details-info-title {
+            @include head-lora(26px);
+            margin-bottom: 22px;
+          }
+
+          .order-details-info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+
+
+            .order-details-info-item-caption {
+              font-size: 16px;
+              margin-right: 12px;
+            }
+
+            .order-details-info-item-data {
+              font-size: 20px;
+              font-weight: 500;
+              position: relative;
+              .attention-icon {
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                fill: none;
+                stroke: #f2b954;
+                right: -24px;
+                top: calc(50% - 9px);
+                cursor: help;
+              }
+
+              &.not-valid {
+                color: red;
+                text-decoration: line-through;
+              }
+            }
+
+
+            &.discount {
+              color: $link-color;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+
+              .order-details-info-item-caption,
+              .order-details-info-item-data {
+                font-weight: 600;
+              }
+            }
+          }
+        }
+
+        .button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
