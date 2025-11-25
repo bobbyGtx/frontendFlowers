@@ -30,9 +30,10 @@
           }
 
           .order-form-types {
-            display: flex;
+            //display: flex;
+            display: inline-flex;
             align-items: center;
-            max-width: 340px;
+            max-width: 512px;
             box-sizing: border-box;
             border: 1px solid $delivery-type-border-color;
             border-radius: 3px;
@@ -45,13 +46,17 @@
               padding: 13px 35px;
               cursor: pointer;
               background: $transparent-background;
-              min-width: 164px;
+              width: 170px;
               box-sizing: border-box;
 
               &.active {
                 background-color: $delivery-type-border-color;
                 color: #ffffff;
 
+              }
+              &.disabled {
+                background-color:$disabled-delivery-type-color;
+                cursor: not-allowed;
               }
             }
           }

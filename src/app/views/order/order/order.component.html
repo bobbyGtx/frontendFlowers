@@ -8,8 +8,12 @@
           <div class="order-form-types">
             <div class="order-form-type-item" *ngFor="let deliveryType of deliveryTypes"
                  [class.active]="activeDeliveryType.id === deliveryType.id"
-                 (click)="changeDeliveryType(deliveryType)"
-            >{{ deliveryType.deliveryType }}
+                 [class.disabled]="deliveryType.disabled"
+                 [matTooltip]="deliveryType.disabled?'Метод доставки не доступен':''"
+                 matTooltipClass="mat-tooltip-compact"
+                 matTooltipPosition="below"
+                 matTooltipHideDelay="200"
+                 (click)="changeDeliveryType(deliveryType)">{{ deliveryType.deliveryType }}
             </div>
           </div>
         </div>

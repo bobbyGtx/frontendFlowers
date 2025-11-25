@@ -16,6 +16,7 @@ export type userErrorsType = {
   getCart: { [key in AppLanguages]: string; },
   updateCart: { [key in AppLanguages]: string; },
   rebaseCart: { [key in AppLanguages]: string; },
+  cartEmpty: { [key in AppLanguages]: string; },
 }
 
 @Injectable({
@@ -49,6 +50,11 @@ export class CartService {
       [AppLanguages.en]: 'Error transferring local recycle bin.',
       [AppLanguages.de]: 'Fehler beim Übertragen des lokalen Papierkorbs.',
     },
+    cartEmpty: {
+      [AppLanguages.ru]: 'В корзине нет товаров!',
+      [AppLanguages.en]: 'There are no products in the cart!',
+      [AppLanguages.de]: 'Der Warenkorb ist leer!',
+    },
   };
 
   private isLoggedIn: boolean = false;
@@ -70,6 +76,9 @@ export class CartService {
 
   get rebaseCartError(): string {
     return this.userErrors.rebaseCart[this.languageService.appLang];
+  }
+  get cartEmptyError(): string {
+    return this.userErrors.cartEmpty[this.languageService.appLang];
   }
 
   getCartCount$(): Observable<number> {
