@@ -32,6 +32,45 @@
 - 406 Data not acceptable!
   >Некоторые данные не соответствуют требованиям! + messages['string'];
 
+### orders.php (post)
+- 400
+  - Delivery identifier not found!
+    > Выбран не существующий метод доставки!
+  - Selected Delivery Type not possible now!
+    > Выбранный метод доставки не доступен в данный момент. Disabled флаг у метода доставки
+  - Payment method identifier not found!
+    > Выбранный несуществующий метод доставки!
+  - Selected Payment method not possible now!
+    > Выбранный метод оплаты не доступен в данный момент. Disabled флаг у метода оплаты
+  - Unrecognized products were removed.
+    > Один или несколько продуктов не были найден в БД и были удален из корзины пользователя
+- 406 ошибки валидации
+  - Data not acceptable!
+    > Ошибка валидации.  
+     Для данной ошибки доступна переменная messages со следующими сообщениями:
+    - Invalid delivery type! - Метод доставки не корректен (0 спосле конвертации)
+    - Invalid payment type! - Метод оплаты не корректен (0 спосле конвертации)
+    - Invalid first name! - Имя не корректно или отсутствует.
+    - Invalid last name! - Фамилия не корректно или отсутствует.
+    - Invalid phone! - Номер телефона не корректно или отсутствует.
+    - E-Mail is incorrect - E-Mail не корректен или отсутствует.
+    - Invalid ZIP code! - Почтовый индекс не корректен или отсутствует.
+    - Invalid region! - Регион не корректен или отсутствует.
+    - Invalid city! - Город не корректен или отсутствует.
+    - Invalid street! - Улица не корректен или отсутствует.
+    - Invalid house! - Номер дома не корректен или отсутствует.
+
+- 409 указывает на редирект на корзину
+  - User cart empty!
+    > Корзина пользователя пустая. Не возможно создать заказ.
+  - All products from cart were not found in the database and were removed from the cart.
+    > Все продукты из корзины не найдены в БД. Корзина была очищена.
+  - Create order error.
+    > Ошибка при создании заказа связанная с продуктами в корзине.  
+     Для данной ошибки доступна переменная messages со следующими сообщениями:
+    - Not enough product in stock. (Имя продукта) - Продукта не хватает на складе для заказа
+    - Product from cart is not available. (Name) - Продукт не доступен для продажи.
+  
 ## Code 200 (Ok) with Errors
   - Nothing to change!
     > Данные для добавления в базу данных не обнаружены. (updateUserData,prepareNewData) запрос patch->user

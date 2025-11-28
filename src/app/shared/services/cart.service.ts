@@ -69,11 +69,9 @@ export class CartService {
   get getCartError(): string {
     return this.userErrors.getCart[this.languageService.appLang];
   }
-
   get updateCartError(): string {
     return this.userErrors.updateCart[this.languageService.appLang];
   }
-
   get rebaseCartError(): string {
     return this.userErrors.rebaseCart[this.languageService.appLang];
   }
@@ -91,7 +89,12 @@ export class CartService {
 
   resetCartCount(): void {
     this.cartCount$.next(0);
-  }//сброс после создания заказа например
+  }//сброс кол-ва товаров в корзине
+  resetCartCache(): void {
+    this.clearCartCacheTimeout=null;
+    this.cartCache=null;
+    this.resetCartCount();
+  }//сброс кэша корзины, после создания заказа например
 
   getCart(forceUpdate: boolean = false): Observable<CartResponseType> {
     if (!this.isLoggedIn) return of(this.getLSCart());
@@ -277,7 +280,6 @@ export class CartService {
 
   private resetCacheTimer() {
     if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
-
     this.clearCartCacheTimeout = setTimeout(() => {
       this.cartCache = null;
       if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);

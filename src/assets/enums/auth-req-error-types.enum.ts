@@ -4,4 +4,5 @@ export enum ReqErrorTypes {
   cartGetCart='cartGetCart',
   cartUpdate='cartUpdate',
   cartRebase='cartRebase',
+  createOrder='createOrder',
 }

@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSnackBar, MatSnackBarRef, TextOnlySnackBar} from '@angular/material/snack-bar';
 import {SnackbarMessageComponent} from '../shared/components/snackbar-message/snackbar-message.component';
 import {LanguageService} from './language.service';
 import {
@@ -10,7 +10,7 @@ import {
 } from '../../assets/types/user-errors.type';
 import {AppLanguages} from '../../assets/enums/app-languages.enum';
 import {DefaultResponseType} from '../../assets/types/responses/default-response.type';
-import {BehaviorSubject, timer} from 'rxjs';
+import {BehaviorSubject, Subscription, timer} from 'rxjs';
 import {ReqErrorTypes} from '../../assets/enums/auth-req-error-types.enum';
 import {Config} from '../shared/config';
 
@@ -192,6 +192,59 @@ export class ShowSnackService {
         [AppLanguages.de]:'Fehler beim Übertragen des Warenkorbs an den Server!',
       }
     ],//Вывод ошибок снакбаром отключен в логине
+    [ReqErrorTypes.createOrder]:[
+      {
+        error:'User cart empty!',
+        [AppLanguages.ru]:'Корзина пользователя пустая. Не возможно создать заказ.',
+        [AppLanguages.en]:"The user's cart is empty. Unable to create an order.",
+        [AppLanguages.de]:'Der Warenkorb des Nutzers ist leer. Eine Bestellung konnte nicht erstellt werden.',
+      },{
+        error:'Create order error.',
+        [AppLanguages.ru]:'Ошибка создания заказа.',
+        [AppLanguages.en]:"Error creating order.",
+        [AppLanguages.de]:'Fehler beim Erstellen der Bestellung.',
+      },{
+        error:'Delivery identifier not found!',
+        [AppLanguages.ru]:'Выбран неизвестный способ доставки. Выберите доступный.',
+        [AppLanguages.en]:'An unknown delivery method has been selected. Please select an available one.',
+        [AppLanguages.de]:'Es wurde eine unbekannte Versandart ausgewählt. Bitte wählen Sie eine verfügbare Versandart.',
+      },{
+        error:'Selected Delivery Type not possible now!',
+        [AppLanguages.ru]:'Выбранный метод доставки недоступен. Выберите другой.',
+        [AppLanguages.en]:'The selected delivery method is unavailable. Please choose another one.',
+        [AppLanguages.de]:'Die gewählte Versandart ist nicht verfügbar. Bitte wählen Sie eine andere.',
+      },{
+        error:'Payment method identifier not found!',
+        [AppLanguages.ru]:'Выбран несуществующий метод оплаты.',
+        [AppLanguages.en]:'An inexistent payment method has been selected.',
+        [AppLanguages.de]:'Es wurde eine nicht existierende Zahlungsmethode ausgewählt.',
+      },{
+        error:'Selected Payment method not possible now!',
+        [AppLanguages.ru]:'Выбранный метод оплаты заказа не доступен. Используйте другой.',
+        [AppLanguages.en]:'The selected payment method is not available. Please use another one.',
+        [AppLanguages.de]:'Die gewählte Zahlungsmethode ist nicht verfügbar. Bitte wählen Sie eine andere.',
+      },{
+        error:'Unrecognized products were removed.',
+        [AppLanguages.ru]:'Нераспознанные продукты были удалены из корзины.',
+        [AppLanguages.en]:'Unrecognized products have been removed from cart.',
+        [AppLanguages.de]:'Nicht erkannte Produkte wurden aus Ihrem Warenkorb entfernt.',
+      },{
+        error:'All products from cart were not found in the database and were removed from the cart.',
+        [AppLanguages.ru]:'Не найден ни один товар из корзины в базу данных. Корзина очищена.',
+        [AppLanguages.en]:'None of the items in your cart were found in the database. Your cart has been cleared.',
+        [AppLanguages.de]:'Keiner der Artikel in Ihrem Warenkorb wurde in der Datenbank gefunden. Ihr Warenkorb wurde geleert.',
+      },{
+        error:'Data not acceptable!',
+        [AppLanguages.ru]:'Введенные данные не корректны.',
+        [AppLanguages.en]:'The entered data is incorrect.',
+        [AppLanguages.de]:'Die eingegebenen Daten sind falsch.',
+      },{
+        error: 'default',
+        [AppLanguages.ru]: 'Ошибка при создании заказа. Повторите попытку.',
+        [AppLanguages.en]: 'Error creating order. Please try again.',
+        [AppLanguages.de]: 'Fehler beim Erstellen der Bestellung. Bitte versuchen Sie es erneut.',
+      }
+    ],
   };//ошибки сгруппированные по запросам
 
   private userMessages:Array<UserInfoMsgType> = [
@@ -200,26 +253,82 @@ export class ShowSnackService {
       [AppLanguages.ru]:'E-Mail не корректен',
       [AppLanguages.en]:'E-Mail is incorrect',
       [AppLanguages.de]:'Die E-Mail-Adresse ist falsch',
-    },
-    {
+    },{
       info:'Password is too short',
       [AppLanguages.ru]:'Пароль слишком короткий',
       [AppLanguages.en]:'Password is too short',
       [AppLanguages.de]:'Das Passwort ist zu kurz',
-    },
-    {
+    },{
       info:"Passwords don't match",
       [AppLanguages.ru]:'Пароли не совпадают',
       [AppLanguages.en]:"Passwords don't match",
       [AppLanguages.de]:'Die Passwörter stimmen nicht überein',
-    },
-    {
+    },{
       info:'Agreements not accepted',
       [AppLanguages.ru]:'Условия не приняты',
       [AppLanguages.en]:'Agreements not accepted',
       [AppLanguages.de]:'Bedingungen nicht akzeptiert',
-    },
-    {//это сообщение дублируется т.к. в разных запросах и в разных переменных
+    },{
+      info:'Invalid delivery type!',
+      [AppLanguages.ru]:'Выберите действующий способ доставки.',
+      [AppLanguages.en]:'Please select a valid delivery method.',
+      [AppLanguages.de]:'Bitte wählen Sie eine gültige Versandart.',
+    },{
+      info:'Invalid first name!',
+      [AppLanguages.ru]:'Указано некорректное имя.',
+      [AppLanguages.en]:'Incorrect name specified.',
+      [AppLanguages.de]:'Falscher Name angegeben.',
+    },{
+      info:'Invalid last name!',
+      [AppLanguages.ru]:'Указана некорректная фамилия.',
+      [AppLanguages.en]:'The last name specified is incorrect.',
+      [AppLanguages.de]:'Der angegebene Nachname ist falsch.',
+    },{
+      info:'Invalid phone!',
+      [AppLanguages.ru]:'Указан некорректный номер телефона.',
+      [AppLanguages.en]:'The phone number provided is incorrect.',
+      [AppLanguages.de]:'Die angegebene Telefonnummer ist falsch.',
+    },{
+      info:'Invalid payment type!',
+      [AppLanguages.ru]:'Выберите действующий метод оплаты.',
+      [AppLanguages.en]:'Please select a valid payment method.',
+      [AppLanguages.de]:'Bitte wählen Sie eine gültige Zahlungsmethode.',
+    },{
+      info:'Invalid ZIP code!',
+      [AppLanguages.ru]:'Указан некорректный почтовый индекс.',
+      [AppLanguages.en]:'Incorrect postal code specified.',
+      [AppLanguages.de]:'Falsche Postleitzahl angegeben.',
+    },{
+      info:'Invalid region!',
+      [AppLanguages.ru]:'Указан некорректный регион.',
+      [AppLanguages.en]:'Invalid region specified.',
+      [AppLanguages.de]:'Ungültige Region angegeben.',
+    },{
+      info:'Invalid city!',
+      [AppLanguages.ru]:'Указана некорректный город.',
+      [AppLanguages.en]:'Incorrect City specified.',
+      [AppLanguages.de]:'Falsche Stadt angegeben.',
+    },{
+      info:'Invalid street!',
+      [AppLanguages.ru]:'Указана некорректная улица.',
+      [AppLanguages.en]:'Incorrect street specified.',
+      [AppLanguages.de]:'Falsche Straße angegeben.',
+    },{
+      info:'Invalid house!',
+      [AppLanguages.ru]:'Указан некорректный номер дома.',
+      [AppLanguages.en]:'Incorrect house number indicated.',
+      [AppLanguages.de]:'Falsche Hausnummer angegeben.',
+    },{
+      info:'Not enough product in stock.',
+      [AppLanguages.ru]:'Не достаточное количество продукта на складе. Проверьте корзину.',
+      [AppLanguages.en]:'There is not enough product in stock. Please check your cart.',
+      [AppLanguages.de]:'Es ist nicht genügend Produkt auf Lager. Bitte überprüfen Sie Ihren Warenkorb.',
+    },{
+      info:'Product from cart is not available.',
+      [AppLanguages.ru]:'Продукт(ы) в корзине недоступны для продажи. Проверьте корзину.',
+      [AppLanguages.en]:'The products in your cart are not available for sale. Check your cart.',
+      [AppLanguages.de]:'Die Produkte in Ihrem Warenkorb stehen nicht zum Verkauf.Bitte überprüfen Sie Ihren Warenkorb.',
+    },{//это сообщение дублируется т.к. в разных запросах и в разных переменных
       info:'Unrecognized products were removed.',
       [AppLanguages.ru]:'Нераспознанные продукты были удалены из корзины.',
       [AppLanguages.en]:'Unrecognized products have been removed from cart.',
@@ -306,7 +415,11 @@ export class ShowSnackService {
       const defaultMsgIndex:number = this.userGroupErrors[reqType].length - 1;
       return this.userGroupErrors[reqType][defaultMsgIndex][this.languageService.appLang]?this.userGroupErrors[reqType][defaultMsgIndex][this.languageService.appLang]:message;
     } else {
-      return this.userGroupErrors[reqType][errorIndex][this.languageService.appLang];
+      let msg:string = this.userGroupErrors[reqType][errorIndex][this.languageService.appLang];
+      if (message.indexOf('(')>=0 && message.indexOf(')')>0){
+        msg += message.slice(message.indexOf('('),message.indexOf(')'));
+      }
+      return msg;
     }
   }
   private getUserSuccessMsg(message: string): string {
@@ -316,13 +429,27 @@ export class ShowSnackService {
   }
   private getUserInfoMsg(message: string): string {
     const itemIndex:number = this.userInfos.findIndex(item=>message.toLowerCase().includes(item.info.toLowerCase()));
-    if (itemIndex >= 0) message = this.userInfos[itemIndex][this.languageService.appLang];
+    if (itemIndex >= 0) {
+      let msg:string = this.userInfos[itemIndex][this.languageService.appLang];
+      if (message.indexOf('(')>=0 && message.indexOf(')')>0){
+        msg += message.slice(message.indexOf('('),message.indexOf(')'));
+      }
+      return msg;
+    }
     return message;
   }
-  private getUserValidMessages(messages:string[]):string[]{
+  private getUserMessages(messages:string[]):string[]{
     messages = messages.map((message:string)=>{
       const itemIndex:number = this.userMessages.findIndex((errorItem:UserInfoMsgType)=> message.toLowerCase().includes(errorItem.info.toLowerCase()));
-      return itemIndex ===-1 ? message:this.userMessages[itemIndex][this.languageService.appLang];
+      //обработка вывода сообщения в скобках, например названия товара
+      if (itemIndex >= 0){
+        let msg:string = this.userMessages[itemIndex][this.languageService.appLang];
+        if (message.indexOf('(')>=0 && message.indexOf(')')>0){
+          msg += message.slice(message.indexOf('('),message.indexOf(')'));
+        }
+        return msg;
+      }
+      return message;
     });
     return messages;
   }
@@ -348,16 +475,25 @@ export class ShowSnackService {
         return;
       }
 
+      let snackRef:MatSnackBarRef<SnackbarMessageComponent>|MatSnackBarRef<TextOnlySnackBar>|null;
+
       if (actualMessage.settings.data && actualMessage.settings.data.messages){
         this.msgStack$.value[0].showed = true;//Помечаем напрямую сообщение как показываемое
-        this._snackbar.openFromComponent(SnackbarMessageComponent, actualMessage.settings);
+        snackRef = this._snackbar.openFromComponent(SnackbarMessageComponent, actualMessage.settings);
       }else{
         this.msgStack$.value[0].showed = true;//Помечаем напрямую сообщение как показываемое
-        this._snackbar.open(actualMessage.message, 'ok', actualMessage.settings);
+        snackRef = this._snackbar.open(actualMessage.message, 'ok', actualMessage.settings);
       }
-      timer(actualMessage.settings.duration+500).subscribe(() => {
+
+      const tmrDelMsg:Subscription = timer(actualMessage.settings.duration+500).subscribe(() => {
         this.deleteMessage(actualMessage.id);
-      })
+      });
+      const msgDismissSubscription$:Subscription = snackRef.afterDismissed().subscribe(()=>{
+        tmrDelMsg.unsubscribe();
+        msgDismissSubscription$.unsubscribe();
+        this.deleteMessage(actualMessage.id);
+      });
+
     });
   }//Подписка на поток уведомлений
 
@@ -418,11 +554,15 @@ export class ShowSnackService {
     //this._snackbar.open(message, 'ok', this.errorSettings);
   }
 
-  errorObj(error: DefaultResponseType,reqType: ReqErrorTypes | null = null, code: number | null = null): void {
+  errorObj(error: DefaultResponseType|string,reqType: ReqErrorTypes | null = null, code: number | null = null): void {
+    if (typeof error === "string") {
+      this.error(error,reqType);
+      return;
+    }
     if (reqType) error.message = this.getUserGroupError(reqType,error.message);
     const errMessage = code ? `${error.message}  Code: ${code}` : error.message;
     if (error.messages && Array.isArray(error.messages) && error.messages.length > 0) {
-      this.addMessage(errMessage,DlgTypes.error,this.getUserValidMessages(error.messages));
+      this.addMessage(errMessage,DlgTypes.error,this.getUserMessages(error.messages));
     } else {
       this.addMessage(errMessage,DlgTypes.error);
     }

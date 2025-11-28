@@ -33,9 +33,9 @@ export class PaymentService {
       [AppLanguages.de]: 'Fehler beim Empfang von Zahlungsmethoden. Bitte aktualisieren Sie die Seite.',
     },
     paymentNotAvailable:{
-      [AppLanguages.ru]: 'Передача товара невозможна! Попробуйте оформить заказ позже.',
-      [AppLanguages.en]: 'Flowers transfer not possible! Please try placing your order later.',
-      [AppLanguages.de]: 'Blumenlieferung ist nicht möglich! Bitte versuchen Sie es später.',
+      [AppLanguages.ru]: 'В данный момент оплата невозможна! Попробуйте оформить заказ позже.',
+      [AppLanguages.en]: 'Payment is currently unavailable.! Please try placing your order later.',
+      [AppLanguages.de]: 'Die Zahlung ist momentan nicht möglich.! Bitte versuchen Sie es später.',
     }
   };
 

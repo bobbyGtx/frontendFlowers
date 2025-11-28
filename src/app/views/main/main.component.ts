@@ -104,6 +104,7 @@ export class MainComponent implements OnInit, OnDestroy {
       .pipe(catchError((err: HttpErrorResponse) => of({ __error: true, err } as any)));
     const favorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites()
       .pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
+
     //Favorites of(null) если пользователь не залогинен
     const combinedRequest$: Observable<[BestProductsResponseType | any, CartResponseType | any, FavoritesResponseType|any]> =
       combineLatest([bestProducts$, cart$, favorites$]);

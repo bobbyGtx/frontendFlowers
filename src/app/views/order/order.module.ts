@@ -1,11 +1,12 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
-import { OrderRoutingModule } from './order-routing.module';
-import { CartComponent } from './cart/cart.component';
-import { OrderComponent } from './order/order.component';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {OrderRoutingModule} from './order-routing.module';
+import {CartComponent} from './cart/cart.component';
+import {OrderComponent} from './order/order.component';
 import {SharedModule} from '../../shared/shared.module';
 import {MatTooltip} from "@angular/material/tooltip";
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatDialogModule} from '@angular/material/dialog';
 
 
 @NgModule({
@@ -13,11 +14,14 @@ import {MatTooltip} from "@angular/material/tooltip";
     CartComponent,
     OrderComponent
   ],
-    imports: [
-        CommonModule,
-        SharedModule,
-        OrderRoutingModule,
-        MatTooltip
-    ]
+  imports: [
+    CommonModule,
+    SharedModule,
+    ReactiveFormsModule,
+    MatTooltip,
+    MatDialogModule,
+    OrderRoutingModule
+  ]
 })
-export class OrderModule { }
+export class OrderModule {
+}
