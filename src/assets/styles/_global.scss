@@ -19,8 +19,7 @@ a{
 }
 input[type=text],
 input[type=password],
-textarea,
-select{
+textarea{
   box-sizing: border-box;
   padding: 17px 20px;
   border: 2px solid $input-border;
@@ -31,7 +30,76 @@ select{
   line-height: 1;
   color: $gray-text-color;
   outline: none;
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty {
+    border: 2px solid red;
+  }//стилизация ошибок валидации
 }
+//-----material select-input-----
+:root {
+  @include mat.select-overrides((
+    panel-background-color: #E7F1E8,//цвет открывающегося списка
+    placeholder-text-color:$placeholder-color,
+  ));
+}
+
+.select-input {
+  .mdc-text-field--filled {
+    background-color: $white-bg-color!important;
+    color: $gray-text-color!important;
+    border-radius: 3px;
+    border: 2px solid $input-border;
+    .mat-mdc-form-field-focus-overlay{
+      background-color: white;
+    }
+    .mdc-line-ripple {
+      display: none;
+    }
+    &:hover{
+      color:green;
+      .mat-mdc-form-field-infix{
+        color:green!important;
+      }
+    }
+  }
+  .mat-mdc-text-field-wrapper, .select-label{
+    color: $placeholder-color;
+  }
+  .mat-mdc-form-field-required-marker{
+    display: none;
+  }
+  .mat-mdc-select-value-text{
+    color: $gray-text-color;
+    font-weight: 400;
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1;
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty {
+    .mdc-text-field{
+      border: 2px solid red;
+    }
+  }//стилизация ошибок валидации
+
+  .mat-mdc-form-field-subscript-wrapper{
+    display: none;
+  }
+
+  & [aria-expanded="true"] .mat-mdc-select-arrow {
+    transform: rotate(180deg);
+    transition: transform 200ms ease;
+  }//поворот стрелки при открытии
+  .mat-mdc-select-arrow {
+    transition: transform 200ms ease;
+  }//поворот стрелки вниз при закрытии
+}
+
+
+//-----material select-input-----
+
+
 .small-input[type=text],
 .small-input[type=number]{
   box-sizing: border-box;

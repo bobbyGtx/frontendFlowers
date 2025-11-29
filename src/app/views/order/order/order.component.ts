@@ -93,7 +93,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     firstName: ['', [Validators.required, Validators.pattern(/^(?=.{2,50}$)([A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*(?:\s[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*)*)$/u)]],
     lastName: ['', [Validators.required, Validators.pattern(/^(?=.{2,50}$)([A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*(?:\s[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*)*)$/u)]],
     phone: ['', [Validators.required, Validators.pattern(/^\+[1-9]\d{11,14}$/iu)]],//+14155552671, +497116666777
-    email: ['bobbygtx@gmail.com', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
+    email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
     region: [''],//Валидация всех полей адреса зависит от выбранного DeliveryType, flag:addressNeed
     zip: [''],
     city: [''],
@@ -134,6 +134,11 @@ export class OrderComponent implements OnInit, OnDestroy {
       this.city?.setValidators(Validators.required);
       this.street?.setValidators(Validators.required);
       this.house?.setValidators(Validators.required);
+      this.region?.markAsUntouched();this.region?.markAsPristine();
+      this.zip?.markAsUntouched();this.zip?.markAsPristine();
+      this.city?.markAsUntouched();this.city?.markAsPristine();
+      this.street?.markAsUntouched();this.street?.markAsPristine();
+      this.house?.markAsUntouched();this.house?.markAsPristine();
     } else {
       this.region?.removeValidators(Validators.required);
       this.zip?.removeValidators([Validators.required, Validators.pattern(/^[0-9]{5}$/)]);
@@ -173,8 +178,21 @@ export class OrderComponent implements OnInit, OnDestroy {
       if (this.orderForm.value.street) paramsObject.street = this.orderForm.value.street;
       if (this.orderForm.value.house) paramsObject.house = this.orderForm.value.house;
       if (this.orderForm.value.comment) paramsObject.comment = this.orderForm.value.comment;
-
-      this.subscriptions$.add(this.orderService.createOrder(paramsObject).subscribe({
+      let paramsObjectTest:OrderParamsType={
+        deliveryType: 2,
+        paymentType:1,
+        firstName: 'Dsdsdd',
+        lastName: 'Ffdfdfdf',
+        phone: '+491771750803',
+        email: 'bobbygtx@gmail.com',
+        region:'',
+        zip:'123',
+        city:'4d',
+        street:'ds',
+        house:'',
+        comment:'',
+      }
+      this.subscriptions$.add(this.orderService.createOrder(paramsObjectTest).subscribe({
         next: (data: OrderResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.orderService.createOrderError);

@@ -107,11 +107,12 @@
             }
 
             textarea {
-              width: 646px;
-              max-width: 646px;
+              width: 428px;
+              min-width: 428px;
+              max-width: 428px;
               height: 130px;
-              max-height: 170px;
               min-height: 130px;
+              max-height: 270px;
             }
           }
 

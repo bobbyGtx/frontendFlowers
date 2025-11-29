@@ -516,7 +516,8 @@ export class ShowSnackService {
       }
     }else if(type===DlgTypes.error){
       if (messages && messages.length>0){
-        newMessage.settings =structuredClone(this.multiErrorSettings);
+        newMessage.settings = structuredClone(this.multiErrorSettings);
+        if (messages.length>2)newMessage.settings.duration=newMessage.settings.duration+messages.length*1000;
         newMessage.settings['data']!['message'] = message;
         newMessage.settings['data']!['messages'] = messages;
       }else{

@@ -21,23 +21,35 @@
         <div class="order-form-block">
           <div class="order-form-label">Заполните личные данные</div>
           <div class="order-form-inputs personal-data-inputs">
-            <input type="text" class="input" placeholder="Имя" [ngStyle]="{'border-color':firstName?.invalid &&(firstName?.dirty||firstName?.touched)?'red':''}" formControlName="firstName">
-            <input type="text" class="input" placeholder="Фамилия" [ngStyle]="{'border-color':lastName?.invalid &&(lastName?.dirty||lastName?.touched)?'red':''}" formControlName="lastName">
-            <input type="text" class="input" placeholder="Телефон" [ngStyle]="{'border-color':phone?.invalid &&(phone?.dirty||phone?.touched)?'red':''}" formControlName="phone">
-            <input type="text" class="input" placeholder="E-Mail" [ngStyle]="{'border-color':email?.invalid &&(email?.dirty||email?.touched)?'red':''}" formControlName="email">
+            <input type="text" class="input" placeholder="Имя" formControlName="firstName"
+                   matTooltip="Введите имя получателя с заглавной буквы" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" placeholder="Фамилия" formControlName="lastName"
+                   matTooltip="Введите фамилию получателя с заглавной буквы" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" placeholder="Телефон" formControlName="phone"
+                   matTooltip="Введите телефон получателя. +4912345678901" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" placeholder="E-Mail" formControlName="email"
+                   matTooltip="Введите адрес электронной почты" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
           </div>
         </div>
 
         <div class="order-form-block" *ngIf="activeDeliveryType.addressNeed">
           <div class="order-form-label">Заполните адрес доставки</div>
           <div class="order-form-inputs address-data-inputs">
-            <select name="region" class="input region" id="region" [ngStyle]="{'border-color':region?.invalid &&(region?.dirty||region?.touched)?'red':''}" formControlName="region">
-              <option [value]="region" *ngFor="let region of regionList">{{region}}</option>
-            </select >
-            <input type="text" class="input town" placeholder="Город" [ngStyle]="{'border-color':city?.invalid &&(city?.dirty||city?.touched)?'red':''}" formControlName="city">
-            <input type="text" class="input zip" placeholder="Индекс" [ngStyle]="{'border-color':zip?.invalid &&(zip?.dirty||zip?.touched)?'red':''}" formControlName="zip">
-            <input type="text" class="input street" placeholder="Улица" [ngStyle]="{'border-color':street?.invalid &&(street?.dirty||street?.touched)?'red':''}" formControlName="street">
-            <input type="text" class="input house" placeholder="№ дома" [ngStyle]="{'border-color':house?.invalid &&(house?.dirty||house?.touched)?'red':''}" formControlName="house">
+            <mat-form-field class="select-input region"
+                            matTooltip="Выберите регион доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+              <mat-label class="select-label">Выберите регион</mat-label>
+              <mat-select  formControlName="region">
+                <mat-option [value]="region" *ngFor="let region of regionList">{{region}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <input type="text" class="input town" placeholder="Город" formControlName="city"
+                   matTooltip="Укажите город доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input zip" placeholder="Индекс" formControlName="zip"
+                   matTooltip="Введите почтовый индекс" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input street" placeholder="Улица" formControlName="street"
+                   matTooltip="Введите улицу" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input house" placeholder="№ дома" formControlName="house"
+                   matTooltip="Введите номер дома" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
           </div>
         </div>
 
@@ -54,10 +66,10 @@
         <div class="order-form-block">
           <div class="order-form-label">Комментарий к заказу (необязательно)</div>
           <div class="order-form-inputs">
-            <textarea cols="30" rows="5" maxlength="500" [ngStyle]="{'border-color':comment?.invalid &&(comment?.dirty||comment?.touched)?'red':''}" class="input" placeholder="Оставьте свой комментарий..." formControlName="comment"></textarea>
+            <textarea cols="30" rows="5" maxlength="500" class="input" placeholder="Оставьте свой комментарий..." formControlName="comment"
+                      matTooltip="Комментарий к заказу до 500 символов" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200"></textarea>
           </div>
         </div>
-
       </div>
 
       <div class="order-details">
