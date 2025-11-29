@@ -21,10 +21,10 @@
         <div class="order-form-block">
           <div class="order-form-label">Заполните личные данные</div>
           <div class="order-form-inputs personal-data-inputs">
-            <input type="text" class="input" placeholder="Имя" formControlName="firstName"
-                   matTooltip="Введите имя получателя с заглавной буквы" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <input type="text" class="input" placeholder="Фамилия" formControlName="lastName"
-                   matTooltip="Введите фамилию получателя с заглавной буквы" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" placeholder="Имя" formControlName="firstName" (blur)="changeFirstLetter(firstName)"
+                   matTooltip="Введите имя получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" placeholder="Фамилия" formControlName="lastName" (blur)="changeFirstLetter(lastName)"
+                   matTooltip="Введите фамилию получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
             <input type="text" class="input" placeholder="Телефон" formControlName="phone"
                    matTooltip="Введите телефон получателя. +4912345678901" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
             <input type="text" class="input" placeholder="E-Mail" formControlName="email"

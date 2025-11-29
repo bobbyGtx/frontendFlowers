@@ -13,7 +13,7 @@ import {DeliveryTypesResponseType} from '../../../../assets/types/responses/deli
 import {PaymentService} from '../../../shared/services/payment.service';
 import {PaymentTypesResponseType} from '../../../../assets/types/responses/payment-types-response.type';
 import {PaymentTypeType} from '../../../../assets/types/payment-type.type';
-import {FormBuilder, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, Validators} from '@angular/forms';
 import {Config} from '../../../shared/config';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {OrderService} from '../../../shared/services/order.service';
@@ -178,21 +178,7 @@ export class OrderComponent implements OnInit, OnDestroy {
       if (this.orderForm.value.street) paramsObject.street = this.orderForm.value.street;
       if (this.orderForm.value.house) paramsObject.house = this.orderForm.value.house;
       if (this.orderForm.value.comment) paramsObject.comment = this.orderForm.value.comment;
-      let paramsObjectTest:OrderParamsType={
-        deliveryType: 2,
-        paymentType:1,
-        firstName: 'Dsdsdd',
-        lastName: 'Ffdfdfdf',
-        phone: '+491771750803',
-        email: 'bobbygtx@gmail.com',
-        region:'',
-        zip:'123',
-        city:'4d',
-        street:'ds',
-        house:'',
-        comment:'',
-      }
-      this.subscriptions$.add(this.orderService.createOrder(paramsObjectTest).subscribe({
+      this.subscriptions$.add(this.orderService.createOrder(paramsObject).subscribe({
         next: (data: OrderResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.orderService.createOrderError);
@@ -216,10 +202,15 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
       }));
     }else{
-      this.showSnackService.error('Заполните необходимые поля!');
+      this.showSnackService.error('Заполните обязательные поля!');
       this.orderForm.markAllAsTouched();
     }
+  }
 
+  protected changeFirstLetter(control:AbstractControl<string | null, string | null> | null) {
+    if (control && typeof control.value === 'string' ) {
+      control.setValue(control.value.replace(/^\p{L}/u, c => c.toUpperCase()));
+    }
   }
 
   ngOnInit() {
