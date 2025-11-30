@@ -1,1 +1,85 @@
-<p>info works!</p>
+
+<div class="info">
+  <div class="container">
+    <div class="personal-title">Личный кабинет</div>
+    <div class="personal-pages-selector">
+      <div class="personal-page active">Личные данные</div>
+      <div class="personal-page" routerLink="/orders">Ваши заказы</div>
+    </div>
+
+    <div class="data-form" [formGroup]="infoForm">
+      <div class="data-form-block">
+        <div class="data-form-label">Личные данные</div>
+        <div class="data-form-label-additional">Введённые данные автоматически подставятся при оформлении заказа.</div>
+        <div class="data-form-inputs personal-data-inputs">
+          <input type="text" class="input" placeholder="Имя" formControlName="firstName" (blur)="changeFirstLetter(firstName)"
+                 matTooltip="Введите имя получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+          <input type="text" class="input" placeholder="Фамилия" formControlName="lastName" (blur)="changeFirstLetter(lastName)"
+                 matTooltip="Введите фамилию получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+          <input type="text" class="input" placeholder="Телефон" formControlName="phone"
+                 matTooltip="Введите телефон получателя. +4912345678901" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+          <input type="text" class="input" placeholder="E-Mail" formControlName="email"
+                 matTooltip="Введите адрес электронной почты" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+        </div>
+      </div>
+
+      <div class="data-form-block" *ngIf="activeDeliveryType?.addressNeed">
+        <div class="data-form-label">Адрес доставки</div>
+        <div class="data-form-inputs address-data-inputs">
+          <mat-form-field class="select-input region"
+                          matTooltip="Выберите регион доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <mat-label class="select-label">Выберите регион</mat-label>
+            <mat-select  formControlName="region">
+              <mat-option [value]="region" *ngFor="let region of regionList">{{region}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <input type="text" class="input town" placeholder="Город" formControlName="city"
+                 matTooltip="Укажите город доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+          <input type="text" class="input zip" placeholder="Индекс" formControlName="zip"
+                 matTooltip="Введите почтовый индекс" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+          <input type="text" class="input street" placeholder="Улица" formControlName="street"
+                 matTooltip="Введите улицу" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+          <input type="text" class="input house" placeholder="№ дома" formControlName="house"
+                 matTooltip="Введите номер дома" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+        </div>
+      </div>
+
+      <div class="data-form-block" *ngIf="deliveryTypes.length">
+        <div class="data-form-label">Предпочитаемый способ доставки</div>
+        <div class="data-form-types">
+          <div class="data-form-type-item" *ngFor="let deliveryType of deliveryTypes"
+               [class.active]="activeDeliveryType?.id === deliveryType.id"
+               [class.disabled]="deliveryType.disabled"
+               [matTooltip]="deliveryType.disabled?'Метод доставки не доступен':''"
+               matTooltipClass="mat-tooltip-compact"
+               matTooltipPosition="below"
+               matTooltipHideDelay="200"
+               (click)="changeDeliveryType(deliveryType)">{{ deliveryType.deliveryType }}
+          </div>
+        </div>
+      </div> <!--Способ доставки-->
+
+      <div class="data-form-block" *ngIf="paymentTypes.length">
+        <div class="data-form-label">Предпочитаемый способ оплаты</div>
+        <div class="data-form-radio">
+          <div class="data-form-radio-block" *ngFor="let paymentType of paymentTypes">
+            <input type="radio"
+                   [attr.disabled]="paymentType.disabled ? '' : null"
+                   [id]="'radio_'+paymentType.id"
+                   [value]="paymentType.id"
+                   formControlName="paymentType">
+            <label [for]="'radio_'+paymentType.id">{{paymentType.paymentType}}</label>
+          </div>
+        </div>
+      </div> <!--Способ оплаты-->
+
+      <button class="button">Сохранить</button>
+    </div>
+
+    <div class="page-image">
+      <img ngSrc="/images/page/main.png" width="1025" height="587" alt="flower">
+    </div>
+
+
+  </div>
+</div>

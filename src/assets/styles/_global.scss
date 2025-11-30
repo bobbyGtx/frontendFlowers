@@ -95,11 +95,7 @@ textarea{
     transition: transform 200ms ease;
   }//поворот стрелки вниз при закрытии
 }
-
-
 //-----material select-input-----
-
-
 .small-input[type=text],
 .small-input[type=number]{
   box-sizing: border-box;
@@ -177,6 +173,14 @@ input::-webkit-inner-spin-button {
   -webkit-transform: scale(1);
   transform: scale(1);
 }
+
+ input[type="radio"]:disabled + label{
+    cursor: not-allowed!important;
+    color: $input-border-disabled!important;
+   &:before{
+     border-color: $input-border-disabled;
+   }
+  }//disabled стили
 //-----Radio-----
 
 .button{

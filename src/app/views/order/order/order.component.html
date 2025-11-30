@@ -2,11 +2,11 @@
   <div class="container">
     <div class="order-title">Оформление вашего заказа</div>
     <div class="order-info" *ngIf="cart && deliveryTypes.length && activeDeliveryType">
-      <div class="order-form" [formGroup]="orderForm">
-        <div class="order-form-block">
-          <div class="order-form-label">Выберите способ доставки</div>
-          <div class="order-form-types">
-            <div class="order-form-type-item" *ngFor="let deliveryType of deliveryTypes"
+      <div class="data-form" [formGroup]="orderForm">
+        <div class="data-form-block">
+          <div class="data-form-label">Выберите способ доставки</div>
+          <div class="data-form-types">
+            <div class="data-form-type-item" *ngFor="let deliveryType of deliveryTypes"
                  [class.active]="activeDeliveryType.id === deliveryType.id"
                  [class.disabled]="deliveryType.disabled"
                  [matTooltip]="deliveryType.disabled?'Метод доставки не доступен':''"
@@ -18,9 +18,9 @@
           </div>
         </div>
 
-        <div class="order-form-block">
-          <div class="order-form-label">Заполните личные данные</div>
-          <div class="order-form-inputs personal-data-inputs">
+        <div class="data-form-block">
+          <div class="data-form-label">Заполните личные данные</div>
+          <div class="data-form-inputs personal-data-inputs">
             <input type="text" class="input" placeholder="Имя" formControlName="firstName" (blur)="changeFirstLetter(firstName)"
                    matTooltip="Введите имя получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
             <input type="text" class="input" placeholder="Фамилия" formControlName="lastName" (blur)="changeFirstLetter(lastName)"
@@ -32,9 +32,9 @@
           </div>
         </div>
 
-        <div class="order-form-block" *ngIf="activeDeliveryType.addressNeed">
-          <div class="order-form-label">Заполните адрес доставки</div>
-          <div class="order-form-inputs address-data-inputs">
+        <div class="data-form-block" *ngIf="activeDeliveryType.addressNeed">
+          <div class="data-form-label">Заполните адрес доставки</div>
+          <div class="data-form-inputs address-data-inputs">
             <mat-form-field class="select-input region"
                             matTooltip="Выберите регион доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
               <mat-label class="select-label">Выберите регион</mat-label>
@@ -53,19 +53,19 @@
           </div>
         </div>
 
-        <div class="order-form-block">
-          <div class="order-form-label">Выберите способ оплаты</div>
-          <div class="order-form-radio">
-            <div class="order-form-radio-block" *ngFor="let paymentType of paymentTypes">
+        <div class="data-form-block">
+          <div class="data-form-label">Выберите способ оплаты</div>
+          <div class="data-form-radio">
+            <div class="data-form-radio-block" *ngFor="let paymentType of paymentTypes">
               <input type="radio" [id]="'radio_'+paymentType.id" [value]="paymentType.id" formControlName="paymentType">
               <label [for]="'radio_'+paymentType.id">{{paymentType.paymentType}}</label>
             </div>
           </div>
         </div>
 
-        <div class="order-form-block">
-          <div class="order-form-label">Комментарий к заказу (необязательно)</div>
-          <div class="order-form-inputs">
+        <div class="data-form-block">
+          <div class="data-form-label">Комментарий к заказу (необязательно)</div>
+          <div class="data-form-inputs">
             <textarea cols="30" rows="5" maxlength="500" class="input" placeholder="Оставьте свой комментарий..." formControlName="comment"
                       matTooltip="Комментарий к заказу до 500 символов" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200"></textarea>
           </div>
@@ -115,7 +115,7 @@
             <div class="order-details-info-item-data">{{ finalAmount }} EUR</div>
           </div>
         </div>
-        <button class="button" (click)="createOrder()">Подтвердить заказ</button> <!--[disabled]="orderForm.invalid"-->
+        <button class="button" (click)="createOrder()">Подтвердить заказ</button>
       </div>
     </div>
   </div>

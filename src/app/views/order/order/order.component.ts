@@ -236,7 +236,7 @@ export class OrderComponent implements OnInit, OnDestroy {
           }//код не 200
           if (paymentTypesResponse.__error) {
             const httpPaymentErr: HttpErrorResponse = paymentTypesResponse.err;
-            this.showSnackService.error(this.deliveryService.getDeliveryError);
+            this.showSnackService.error(this.paymentService.getPaymentError);
             console.error(httpPaymentErr.error.message ? httpPaymentErr.error.message : `Unexpected error (getPaymentTypes)! Code:${httpPaymentErr.status}`);
             this.router.navigate(['/cart']);
             return;

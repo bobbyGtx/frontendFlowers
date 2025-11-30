@@ -1,0 +1,32 @@
+@import "variables";
+@import "mixins";
+@import "data-form";
+
+.orders{
+  padding-top: 50px;
+  padding-bottom: 128px;
+  .container{
+    .personal-title{
+      @include head-lora(32px);
+      margin-bottom: 30px;
+
+    }
+    .personal-pages-selector{
+      margin-bottom: 50px;
+      font-family: "Lora", "sans-serif";
+      color: $green-text-color;
+      font-size: 26px;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      .personal-page{
+        border-bottom: 2px solid $page-selector-color;
+        padding: 0 15px 12px 0;
+        cursor: pointer;
+        &.active{
+          border-bottom: 3px solid $page-selector-color;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,134 @@
+@import "variables";
+.data-form {
+  max-width: 646px;
+
+  .data-form-block {
+    margin-bottom: 30px;
+
+    .data-form-label {
+      margin-bottom: 20px;
+      font-family: "Montserrat", sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: $gray-text-color;
+    }
+
+    .data-form-label-additional{
+      font-family: "Montserrat", sans-serif;
+      font-size: 16px;
+      line-height: 1.3;
+      color: $gray-text-color;
+      margin-bottom: 20px;
+    }
+
+    .data-form-types {
+      //display: flex;
+      display: inline-flex;
+      align-items: center;
+      max-width: 512px;
+      box-sizing: border-box;
+      border: 1px solid $delivery-type-border-color;
+      border-radius: 3px;
+      color: $gray-text-color;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 400;
+
+      .data-form-type-item {
+        padding: 13px 35px;
+        cursor: pointer;
+        background: $transparent-background;
+        width: 170px;
+        box-sizing: border-box;
+
+        &.active {
+          background-color: $delivery-type-border-color;
+          color: #ffffff;
+
+        }
+        &.disabled {
+          background-color:$disabled-delivery-type-color;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .data-form-inputs {
+      display: grid;
+      gap: 8px;
+
+      input[type=text] {
+        height: 53px;
+      }
+
+      select {
+        height: 53px;
+      }
+
+      &.personal-data-inputs {
+        grid-template-columns: repeat(2, 210px);
+      }
+
+      &.address-data-inputs {
+        //grid-template-columns: 428px;
+        grid-template-columns: 316px 104px;
+        grid-template-areas:
+              "region region"
+              "town zip"
+              "street house";
+
+        .region {
+          grid-area: region;
+        }
+
+        .town {
+          grid-area: town;
+        }
+
+        .zip {
+          grid-area: zip;
+        }
+
+        .street {
+          grid-area: street;
+        }
+
+        .house {
+          grid-area: house;
+        }
+      }
+
+      textarea {
+        width: 428px;
+        min-width: 428px;
+        max-width: 428px;
+        height: 130px;
+        min-height: 130px;
+        max-height: 270px;
+      }
+    }
+
+    .data-form-radio {
+      .data-form-radio-block {
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: unset;
+        }
+
+        label {
+          font-size: 16px;
+          color: $gray-text-color;
+          line-height: 20px;
+        }
+
+        input:checked {
+          + label {
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+  }
+}
