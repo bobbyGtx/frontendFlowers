@@ -27,9 +27,7 @@ export type userErrorsType = {
   },
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 
 export class ProductService {
   private http: HttpClient = inject(HttpClient);

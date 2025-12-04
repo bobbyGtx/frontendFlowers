@@ -19,6 +19,7 @@
       line-height: 1.3;
       color: $gray-text-color;
       margin-bottom: 20px;
+      max-width: 528px;
     }
 
     .data-form-types {
@@ -57,7 +58,7 @@
       display: grid;
       gap: 8px;
 
-      input[type=text] {
+      input[type=text],input[type=password] {
         height: 53px;
       }
 
@@ -67,6 +68,44 @@
 
       &.personal-data-inputs {
         grid-template-columns: repeat(2, 210px);
+      }
+      &.password-data-inputs {
+        grid-template-columns: 300px 120px;
+        grid-template-areas:
+              "old-pass old-pass-check"
+              "new-pass new-pass"
+              "new-pass-repeat new-pass-repeat";
+
+        .small-btn{
+          max-width: 120px;
+          //height: 54px;
+          padding: 4px;
+          svg{
+            width: 32px;
+            height: 32px;
+            fill: $white-text-color;
+          }
+          &.checked{
+            background-color: $checked-btn-color;
+            cursor: not-allowed;
+            svg{
+              fill: $checked-btn-svg-color;
+            }
+          }
+        }
+        .old-pass{
+          grid-area: old-pass;
+
+        }
+        .old-pass-check{
+          grid-area: old-pass-check;
+        }
+        .new-pass{
+          grid-area: new-pass;
+        }
+        .new-pass-repeat{
+          grid-area: new-pass-repeat;
+        }
       }
 
       &.address-data-inputs {

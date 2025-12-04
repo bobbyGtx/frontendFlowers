@@ -133,7 +133,7 @@ export class OrderComponent implements OnInit, OnDestroy {
       this.zip?.setValidators([Validators.required, Validators.pattern(/^[0-9]{5}$/)]);//Validators.pattern(/^[0-9]{5}$/)
       this.city?.setValidators(Validators.required);
       this.street?.setValidators(Validators.required);
-      this.house?.setValidators(Validators.required);
+      this.house?.setValidators([Validators.required,Validators.pattern(/^\d{1,3}[A-Za-z]?$/)]);
       this.region?.markAsUntouched();this.region?.markAsPristine();
       this.zip?.markAsUntouched();this.zip?.markAsPristine();
       this.city?.markAsUntouched();this.city?.markAsPristine();

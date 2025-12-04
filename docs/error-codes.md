@@ -59,7 +59,6 @@
     - Invalid city! - Город не корректен или отсутствует.
     - Invalid street! - Улица не корректен или отсутствует.
     - Invalid house! - Номер дома не корректен или отсутствует.
-
 - 409 указывает на редирект на корзину
   - User cart empty!
     > Корзина пользователя пустая. Не возможно создать заказ.
@@ -70,7 +69,31 @@
      Для данной ошибки доступна переменная messages со следующими сообщениями:
     - Not enough product in stock. (Имя продукта) - Продукта не хватает на складе для заказа
     - Product from cart is not available. (Name) - Продукт не доступен для продажи.
-  
+### user.php (post)
+  - 400
+    - Nothing to change!
+    > Нет данных для изменения. Массив входящих параметров пуст
+- 406 ошибки валидации
+  - Data not acceptable!
+    > Ошибка валидации.  
+    Для данной ошибки доступна переменная messages со следующими сообщениями:
+    - Current password not found! - Действующий пароль не указан.
+    - Current password wrong. - Действующий пароль не верный.
+    - New passwords do not match! - Новые пароли не совпадают.
+    - New password not acceptable! - Новый пароль не соответствует минимальным требованиям.
+    - Invalid region! - Регион не корректен или отсутствует.
+    - Invalid first name! - Имя не корректно или отсутствует.
+    - Invalid last name! - Фамилия не корректно или отсутствует.
+    - E-Mail is incorrect - E-Mail не корректен или отсутствует.
+    - Invalid phone! - Номер телефона не корректно или отсутствует.
+    - Invalid ZIP code! - Почтовый индекс не корректен.
+    - Invalid house! - Номер дома не корректен.
+    - E-Mail is busy! - Указанный E-Mail уже занят.
+    - Delivery identifier not found! - Такого способа доставки не существует
+    - Payment method identifier not found! - Такого способа оплаты не существует
+    - Invalid delivery type! - Способ доставки не корректен (0 спосле конвертации)
+    - Invalid payment type! - Метод оплаты не корректен (0 спосле конвертации)
+
 ## Code 200 (Ok) with Errors
   - Nothing to change!
     > Данные для добавления в базу данных не обнаружены. (updateUserData,prepareNewData) запрос patch->user

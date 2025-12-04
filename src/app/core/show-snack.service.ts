@@ -120,14 +120,17 @@ export class ShowSnackService {
         [AppLanguages.ru]:'Данные не соответствуют требованиям!',
         [AppLanguages.en]:'Data does not meet the requirements!',
         [AppLanguages.de]:'Die Daten erfüllen die Anforderungen nicht!',
-      },
-      {
+      },{
         error: 'User with this email is already registered!',
         [AppLanguages.ru]:'Пользователь с таким E-mail уже зарегистрирован!',
         [AppLanguages.en]:'User with this email is already registered!',
         [AppLanguages.de]:'Dieser Benutzer ist bereits registriert!',
-      },
-      {
+      },{
+        error: 'E-Mail is busy!',
+        [AppLanguages.ru]:'Пользователь с таким E-mail уже зарегистрирован!',
+        [AppLanguages.en]:'User with this email is already registered!',
+        [AppLanguages.de]:'Dieser Benutzer ist bereits registriert!',
+      },{
         error: 'default',
         [AppLanguages.ru]:'Введен некорректный E-Mail!',
         [AppLanguages.en]:'Registration error. Please try again.',
@@ -245,6 +248,25 @@ export class ShowSnackService {
         [AppLanguages.de]: 'Fehler beim Erstellen der Bestellung. Bitte versuchen Sie es erneut.',
       }
     ],
+    [ReqErrorTypes.editUserData]:[
+      {
+        error:'Nothing to change!',
+        [AppLanguages.ru]:'Данных для изменения не найдено.',
+        [AppLanguages.en]:"Nothing to change!",
+        [AppLanguages.de]:'Nichts zu ändern!',
+      },{
+        error:'Data not acceptable!',
+        [AppLanguages.ru]:'Введенные данные не корректны.',
+        [AppLanguages.en]:'The entered data is incorrect.',
+        [AppLanguages.de]:'Die eingegebenen Daten sind falsch.',
+      },{
+        error: 'default',
+        [AppLanguages.ru]: 'Ошибка изменения данных. Повторите попытку.',
+        [AppLanguages.en]: 'Error changing data. Please try again.',
+        [AppLanguages.de]: 'Fehler beim Ändern der Daten.',
+      }
+    ],
+
   };//ошибки сгруппированные по запросам
 
   private userMessages:Array<UserInfoMsgType> = [
@@ -333,6 +355,61 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Нераспознанные продукты были удалены из корзины.',
       [AppLanguages.en]:'Unrecognized products have been removed from cart.',
       [AppLanguages.de]:'Nicht erkannte Produkte wurden aus Ihrem Warenkorb entfernt.',
+    },{
+      info:'Current password not found!',
+      [AppLanguages.ru]:'Действующий пароль не указан.',
+      [AppLanguages.en]:'The current password is not specified.',
+      [AppLanguages.de]:'Das aktuelle Passwort ist nicht angegeben.',
+    },{
+      info:'Current password wrong.',
+      [AppLanguages.ru]:'Действующий пароль не верен.',
+      [AppLanguages.en]:'The current password is incorrect.',
+      [AppLanguages.de]:'Das aktuelle Passwort ist falsch.',
+    },{
+      info:'New passwords do not match!',
+      [AppLanguages.ru]:'Новые пароли не совпадают.',
+      [AppLanguages.en]:'The new passwords do not match.',
+      [AppLanguages.de]:'Die neuen Passwörter stimmen nicht überein.',
+    },{
+      info:'New password not acceptable!',
+      [AppLanguages.ru]:'Новый пароль не соответствует требованиям.',
+      [AppLanguages.en]:'The new password does not meet the requirements.',
+      [AppLanguages.de]:'Das neue Passwort erfüllt die Anforderungen nicht.',
+    },{
+      info:'ZIP code not valid!',
+      [AppLanguages.ru]:'Почтовый индекс не корректен.',
+      [AppLanguages.en]:'The postal code is incorrect.',
+      [AppLanguages.de]:'Die Postleitzahl ist falsch.',
+    },{
+      info:'House number not valid!',
+      [AppLanguages.ru]:'Номер дома некорректный!',
+      [AppLanguages.en]:'The house number is incorrect!',
+      [AppLanguages.de]:'Die Hausnummer ist falsch!',
+    },{
+      info:'E-Mail is busy!',
+      [AppLanguages.ru]:'Указанный E-Mail уже занят.',
+      [AppLanguages.en]:'The specified email is already in use.',
+      [AppLanguages.de]:'Die angegebene E-Mail-Adresse ist bereits vergeben.',
+    },{
+      info:'Delivery identifier not found!',
+      [AppLanguages.ru]:'Такого способа доставки не существует.',
+      [AppLanguages.en]:'This delivery method does not exist.',
+      [AppLanguages.de]:'Diese Zustellungsart existiert nicht.',
+    },{
+      info:'Payment method identifier not found!',
+      [AppLanguages.ru]:'Такого способа оплаты не существует.',
+      [AppLanguages.en]:'This payment method does not exist.',
+      [AppLanguages.de]:'Diese Zahlungsmethode existiert nicht.',
+    },{
+      info:'Invalid delivery type!',
+      [AppLanguages.ru]:'Способ доставки не корректен.',
+      [AppLanguages.en]:'The delivery method is incorrect.',
+      [AppLanguages.de]:'Die Liefermethode ist falsch.',
+    },{
+      info:'Invalid payment type!',
+      [AppLanguages.ru]:'Способ оплаты не корректен.',
+      [AppLanguages.en]:'The payment method is incorrect.',
+      [AppLanguages.de]:'Die Zahlungsmethode ist falsch.',
     },
   ];//сообщения валидации из переменной [messages]
   private userSuccess:Array<UserSuccessMsgType> = [
@@ -361,6 +438,11 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Запись удалена',
       [AppLanguages.en]:'Record has been deleted.',
       [AppLanguages.de]:'Der Eintrag wurde gelöscht',
+    },{
+      success:'old password is correct',
+      [AppLanguages.ru]:'Пароль принят. Разблокировано изменение Е-Mail и пароля',
+      [AppLanguages.en]:'Password accepted. Email and password changes unlocked.',
+      [AppLanguages.de]:'Passwort akzeptiert. E-Mail- und Passwortänderungen freigeschaltet.',
     }
   ];//Подтверждения
   private userInfos:Array<UserInfoMsgType> = [

@@ -21,10 +21,10 @@
       align-items: center;
       .personal-page{
         border-bottom: 2px solid $page-selector-color;
-        padding: 0 15px 12px 0;
+        padding: 0 15px 12px 14px;
         cursor: pointer;
         &.active{
-          border-bottom: 3px solid $page-selector-color;
+          border-bottom: 3px solid $page-selector-active-color;
         }
       }
     }
