@@ -6,7 +6,7 @@ import {Config} from '../../../shared/config';
 import {DeliveryService} from '../../../shared/services/delivery.service';
 import {PaymentService} from '../../../shared/services/payment.service';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {catchError, combineLatest, Observable, of, Subscription} from 'rxjs';
+import {catchError, combineLatest, Observable, of, Subscription, throwError} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {DeliveryTypesResponseType} from '../../../../assets/types/responses/delivery-types-response.type';
 import {PaymentTypesResponseType} from '../../../../assets/types/responses/payment-types-response.type';
@@ -14,7 +14,10 @@ import {UserService} from '../../../shared/services/user.service';
 import {DefaultResponseType} from '../../../../assets/types/responses/default-response.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {newPasswordsMatchValidator} from '../../../shared/validators/new-passwords-match.validator';
-
+import {ExtErrorResponseType} from '../../../../assets/types/responses/ext-error-response';
+import {ErrorSources} from '../../../../assets/enums/error-sources.enum';
+import {UserDataResponseType} from '../../../../assets/types/responses/user-data-response.type';
+import {DeliveryInfoType, UserDataType, UserPatchData} from '../../../../assets/types/user-data.type';
 
 @Component({
   selector: 'app-info',
@@ -35,6 +38,8 @@ export class InfoComponent implements OnInit, OnDestroy {
   protected regionList: Array<string> = Config.regionList;
   protected oldPassChecked: boolean = false;
   protected oldPassFalse: boolean = false;//переменная для окрашивания рамки, если пароль не верен
+
+  protected userData:UserDataType|null=null;
 
   get firstName() {
     return this.infoForm.get('firstName');
@@ -85,7 +90,7 @@ export class InfoComponent implements OnInit, OnDestroy {
   }
 
   get deliveryTypeField() {
-    return this.infoForm.get('deliveryType');
+    return this.infoForm.get('deliveryType_id');
   }
 
   infoForm = this.fb.group({
@@ -99,13 +104,13 @@ export class InfoComponent implements OnInit, OnDestroy {
     oldPassword: [{value: '', disabled: false}, Validators.pattern(/^$|^.{6,}$/)],
     newPassword: [{value: '', disabled: true}, Validators.pattern(/^$|^.{6,}$/)],
     newPasswordRepeat: [{value: '', disabled: true}, Validators.pattern(/^$|^.{6,}$/)],
-    deliveryType: [0],
+    deliveryType_id: [0],
     region: [''],//Валидация всех полей адреса зависит от выбранного DeliveryType, flag:addressNeed
     zip: ['', Validators.pattern(/^$|^[0-9]{5}$/)],
     city: [''],
     street: [''],
     house: ['', Validators.pattern(/^$|^\d{1,3}[A-Za-z]?$/)],
-    paymentType: [0],
+    paymentType_id: [0],
   });
 
   checkOldPassword(oldPasswordElement:HTMLInputElement) {
@@ -155,6 +160,10 @@ export class InfoComponent implements OnInit, OnDestroy {
   }
 
   protected changeDeliveryType(deliveryType: DeliveryTypeType) {
+    if (this.deliveryTypeField?.value === deliveryType.id){
+      this.deliveryTypeField?.setValue(0);
+      return;
+    }
     this.deliveryTypeField?.setValue(deliveryType.id);
     this.infoForm.markAsDirty();
   }
@@ -166,7 +175,38 @@ export class InfoComponent implements OnInit, OnDestroy {
   }
 
   protected updateUserInfo() {
-
+    if (!this.userData || this.infoForm.valid || this.infoForm.untouched) return;
+    let userPatchData:UserPatchData = {};
+    if (this.firstName && this.firstName.value !== this.userData.firstName) userPatchData.firstName = this.firstName.value;
+    if (this.lastName && this.lastName.value !== this.userData.lastName) userPatchData.lastName = this.lastName.value;
+    if (this.phone && this.phone.value !== this.userData.phone) userPatchData.phone = this.phone.value;
+    if (this.infoForm.value.deliveryType_id !== this.userData.deliveryType_id) userPatchData.deliveryType_id = this.infoForm.value.deliveryType_id;
+    if (this.infoForm.value.paymentType_id !== this.userData.paymentType_id) userPatchData.paymentType_id = this.infoForm.value.paymentType_id;
+    //формирование адреса доставки "deliveryInfo"
+    if (this.region?.value || this.zip?.value || this.city?.value || this.street?.value || this.house?.value){
+      let deliveryInfo:DeliveryInfoType = {};
+      if (this.region?.value && this.region?.value !== this.userData.region) deliveryInfo.region=this.region?.value;
+      if (this.zip?.value && this.zip?.value !== this.userData.zip) deliveryInfo.zip=this.zip?.value;
+      if (this.city?.value && this.city?.value !== this.userData.city) deliveryInfo.city=this.city?.value;
+      if (this.street?.value && this.street?.value !== this.userData.street) deliveryInfo.street=this.street?.value;
+      if (this.house?.value && this.house?.value !== this.userData.house) deliveryInfo.house=this.house?.value;
+      userPatchData.deliveryInfo = deliveryInfo;
+    }else{
+      if(this.userData.region || this.userData.zip || this.userData.city || this.userData.street || this.userData.house) userPatchData.deliveryInfo=null;
+    }
+    if (this.oldPassChecked){
+      if (this.email && this.email.value && this.userData.email !== this.email.value ) userPatchData.email = this.email.value;
+      if (this.newPassword && this.newPasswordRepeat && this.oldPassword){
+        if (this.newPassword.value && this.newPassword.value === this.newPasswordRepeat.value && this.oldPassword.value){
+          userPatchData.oldPassword = this.oldPassword.value;
+          userPatchData.newPassword = this.newPassword.value;
+          userPatchData.newPasswordRepeat = this.newPassword.value;
+        }
+      }
+    }
+    if (Object.keys(userPatchData).length > 0){
+      console.log(userPatchData);
+    }
   }
 
   ngOnInit() {
@@ -176,11 +216,21 @@ export class InfoComponent implements OnInit, OnDestroy {
     const getPaymentTypes$: Observable<PaymentTypesResponseType | HttpErrorResponse> = this.paymentService.getPaymentTypes().pipe(
       catchError((error: HttpErrorResponse): Observable<HttpErrorResponse> => of(error)));//Ошибка не ломает combineLatest и перенаправляет ошибочный ответ в next
 
-    const combinedRequest$: Observable<[DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse]> =
-      combineLatest([getDeliveryTypes$, getPaymentTypes$]);
+    const getUserData$:Observable<UserDataResponseType> = this.userService.getUserData().pipe(
+      catchError((error:HttpErrorResponse):Observable<ExtErrorResponseType> => {
+        return throwError(():ExtErrorResponseType=>{
+          return {
+            __source:ErrorSources.UserData,
+            ...error
+          } as ExtErrorResponseType;
+        });
+      }));//обязательный запрос, без которого летим в error при подписке
+
+    const combinedRequest$: Observable<[DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse,UserDataResponseType]> =
+      combineLatest([getDeliveryTypes$, getPaymentTypes$, getUserData$]);
 
     this.subscriptions$.add(combinedRequest$.subscribe({
-      next: ([deliveryTypesResp, paymentTypesResp]: [DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse]) => {
+      next: ([deliveryTypesResp, paymentTypesResp, userDataResp]: [DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse, UserDataResponseType]) => {
         if ((deliveryTypesResp as HttpErrorResponse).hasOwnProperty('ok') && !(paymentTypesResp as HttpErrorResponse).ok) {
           console.error(deliveryTypesResp);
         } else {
@@ -197,7 +247,16 @@ export class InfoComponent implements OnInit, OnDestroy {
             this.paymentTypes = paymentTypesResponse.paymentTypes;
           }
         }
-
+        if (userDataResp.error || !userDataResp.user || !userDataResp.userData) {
+          this.showSnackService.error(this.userService.getUserDataError);
+          throw new Error(userDataResp.message);
+        }
+        this.userData = userDataResp.userData;
+        this.infoForm.patchValue(this.userData);
+      },
+      error: (extError: ExtErrorResponseType) => {
+        this.showSnackService.error(this.userService.getUserDataError);
+        console.error(extError.error.message ? extError.error.message : `Unexpected error (getUserData)! Code:${extError.status}`);
       }
     }));
   }

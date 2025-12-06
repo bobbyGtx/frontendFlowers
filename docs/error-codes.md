@@ -95,8 +95,6 @@
     - Invalid payment type! - Метод оплаты не корректен (0 спосле конвертации)
 
 ## Code 200 (Ok) with Errors
-  - Nothing to change!
-    > Данные для добавления в базу данных не обнаружены. (updateUserData,prepareNewData) запрос patch->user
 
 ## Code 200 (Ok)
 - Request success!

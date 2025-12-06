@@ -3,7 +3,7 @@ import {BehaviorSubject, map, Observable, throwError} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {ResponseDataValidator} from '../../shared/utils/response-data-validator.util';
-import {UserType} from '../../../assets/types/user.type';
+import {AuthInfoType} from '../../../assets/types/auth-info.type';
 import {DefaultResponseType} from '../../../assets/types/responses/default-response.type';
 import {LoginResponseType} from '../../../assets/types/responses/login-response.type';
 
@@ -17,7 +17,7 @@ export class AuthService {
   private userIdKey: string = 'userId';
   public isLogged$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  userTemplate: UserType = {
+  userTemplate: AuthInfoType = {
     userId: 0,
     accessToken: '',
     refreshToken: '',
