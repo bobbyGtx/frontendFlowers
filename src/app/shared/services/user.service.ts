@@ -7,7 +7,7 @@ import {environment} from '../../../environments/environment';
 import {AppLanguages} from '../../../assets/enums/app-languages.enum';
 import {UserDataResponseType} from '../../../assets/types/responses/user-data-response.type';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
-import {UserDataType, UserType} from '../../../assets/types/user-data.type';
+import {UserDataType, UserPatchDataType, UserType} from '../../../assets/types/user-data.type';
 
 export type userErrorsType = {
   checkPassword:{
@@ -84,6 +84,22 @@ export class UserService {
       })
     );
   }
+
+  updateUserData(params:UserPatchDataType):Observable<UserDataResponseType> {
+    return this.http.patch<UserDataResponseType>(environment.api + 'user.php',params).pipe(
+      map((response:UserDataResponseType) => {
+        if (response.error) return response;
+        if (!response.user || !ResponseDataValidator.validateRequiredFields(this.userDataTemplate,response.user)){
+          response.error=true;//Эта ошибка для консоли
+          response.message = 'patchUserData error. User data was not found in the server response or has an invalid structure.';
+          return response;
+        }
+        response.userData = this.createUserDataProperty(response.user);
+        return response;
+      })
+    );
+  }
+
   /*
   *Функуия распаковывает полученное с сервера поле "deliveryInfo" в json формате
   * и распаковывает данные в отдельные поля для удобства работы

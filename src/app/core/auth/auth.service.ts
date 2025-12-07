@@ -95,6 +95,10 @@ export class AuthService {
       );
   }
 
+  checkEmail(email: string): Observable<DefaultResponseType> {
+    return this.http.post<DefaultResponseType>(environment.api + 'emailcheck.php', {email: email});
+  }
+
   public setTokens(accessToken: string, refreshToken: string) {
     if (this.rememberMe) {
       localStorage.setItem(this.accessTokenKey, accessToken);

@@ -34,6 +34,9 @@
     .data-form{
       .button{
         width: 169px;
+        &.small-btn{
+          width: unset;
+        }
       }
     }
     .page-image{

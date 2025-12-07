@@ -12,7 +12,7 @@ export interface UserType {
   lastName: string|null,
   phone: string|null,
   emailVerification:boolean,
-}
+}//ответ от сервера с json полем "deliveryInfo"
 
 export interface UserDataType {
   id: number,
@@ -28,9 +28,9 @@ export interface UserDataType {
   lastName: string,
   phone: string,
   emailVerification:boolean,
-}
+}//данные пользователя для удобной работы с формами
 
-export interface UserPatchData {
+export interface UserPatchDataType {
   email?: string,
   paymentType_id?: number|null,
   deliveryType_id?: number|null,
@@ -41,7 +41,7 @@ export interface UserPatchData {
   oldPassword?: string,
   newPassword?: string,
   newPasswordRepeat?: string,
-}
+}//тип для передачи изменений на сервер
 
 export interface DeliveryInfoType{
   region?: string,

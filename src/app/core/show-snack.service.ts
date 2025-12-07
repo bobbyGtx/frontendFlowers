@@ -127,12 +127,22 @@ export class ShowSnackService {
         [AppLanguages.de]:'Dieser Benutzer ist bereits registriert!',
       },{
         error: 'E-Mail is busy!',
-        [AppLanguages.ru]:'Пользователь с таким E-mail уже зарегистрирован!',
-        [AppLanguages.en]:'User with this email is already registered!',
-        [AppLanguages.de]:'Dieser Benutzer ist bereits registriert!',
+        [AppLanguages.ru]:'Указанный E-mail занят!',
+        [AppLanguages.en]:'Specified email is busy!',
+        [AppLanguages.de]:'Die angegebene E-Mail-Adresse ist nicht erreichbar!',
+      },{
+        error: 'E-Mail not recognized!',
+        [AppLanguages.ru]:'E-Mail не найден!',
+        [AppLanguages.en]:'E-Mail not found!',
+        [AppLanguages.de]:'E-Mail nicht gefunden!',
+      },{
+        error: 'Email not valid!',
+        [AppLanguages.ru]:'Введен некорректный E-Mail!',
+        [AppLanguages.en]:'Incorrect email entered!',
+        [AppLanguages.de]:'Falsche E-Mail-Adresse eingegeben!',
       },{
         error: 'default',
-        [AppLanguages.ru]:'Введен некорректный E-Mail!',
+        [AppLanguages.ru]:'Ошибка регистрации. Попробуйте позже.',
         [AppLanguages.en]:'Registration error. Please try again.',
         [AppLanguages.de]:'Registrierungsfehler. Bitte versuchen Sie es erneut.',
       }
@@ -410,6 +420,11 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Способ оплаты не корректен.',
       [AppLanguages.en]:'The payment method is incorrect.',
       [AppLanguages.de]:'Die Zahlungsmethode ist falsch.',
+    },{
+      info:'Old and new passwords are the same!',
+      [AppLanguages.ru]:'Старый и новый пароли одинаковые!',
+      [AppLanguages.en]:'Old and new passwords are the same!',
+      [AppLanguages.de]:'Das alte und das neue Passwort sind identisch!',
     },
   ];//сообщения валидации из переменной [messages]
   private userSuccess:Array<UserSuccessMsgType> = [
@@ -487,6 +502,16 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Необходимо авторизоваться!',
       [AppLanguages.en]:'Authorization required!',
       [AppLanguages.de]:'Autorisierung erforderlich!',
+    },{
+      info: "Saved delivery type unavailable",
+      [AppLanguages.ru]:'Сохраненный способ доставки сейчас недоступен.',
+      [AppLanguages.en]:'Saved shipping method is currently unavailable.',
+      [AppLanguages.de]:'Die gespeicherte Versandart ist momentan nicht verfügbar.',
+    },{
+      info: "Saved payment type unavailable",
+      [AppLanguages.ru]:'Сохраненный способ оплаты сейчас недоступен.',
+      [AppLanguages.en]:'Saved payment method is currently unavailable.',
+      [AppLanguages.de]:'Die gespeicherte Zahlungsmethode ist momentan nicht verfügbar.',
     }
 
   ];//Информационные сообщения

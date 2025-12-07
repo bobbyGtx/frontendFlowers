@@ -19,6 +19,10 @@ import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {OrderService} from '../../../shared/services/order.service';
 import {OrderParamsType} from '../../../../assets/types/order-params.type';
 import {OrderResponseType} from '../../../../assets/types/responses/order-response.type';
+import {UserService} from '../../../shared/services/user.service';
+import {AuthService} from '../../../core/auth/auth.service';
+import {UserDataResponseType} from '../../../../assets/types/responses/user-data-response.type';
+import {UserDataType} from '../../../../assets/types/user-data.type';
 
 @Component({
   selector: 'app-order',
@@ -34,6 +38,8 @@ export class OrderComponent implements OnInit, OnDestroy {
   private deliveryService: DeliveryService = inject(DeliveryService);
   private paymentService: PaymentService = inject(PaymentService);
   private orderService: OrderService = inject(OrderService);
+  private userService: UserService = inject(UserService);
+  private authService: AuthService = inject(AuthService);
   private fb: FormBuilder = inject(FormBuilder);
   private router: Router = inject(Router);
   private dialog: MatDialog = inject(MatDialog);
@@ -48,6 +54,7 @@ export class OrderComponent implements OnInit, OnDestroy {
   protected regionList: Array<string> = Config.regionList;
   protected finalAmount: number = 0;//Конечная стоимость заказа. Заполняется в deliveryAndTotalAmountCalculate
   protected lowDeliveryPrice: boolean = false;//Если активна, то цена доставки снижена согласно условия
+  private userDataFromServer:UserDataType|null = null;
 
   get firstName() {
     return this.orderForm.get('firstName');
@@ -85,6 +92,10 @@ export class OrderComponent implements OnInit, OnDestroy {
     return this.orderForm.get('house');
   }
 
+  get paymentType() {
+    return this.orderForm.get('paymentType');
+  }
+
   get comment() {
     return this.orderForm.get('comment');
   }
@@ -93,7 +104,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     firstName: ['', [Validators.required, Validators.pattern(/^(?=.{2,50}$)([A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*(?:\s[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*)*)$/u)]],
     lastName: ['', [Validators.required, Validators.pattern(/^(?=.{2,50}$)([A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*(?:\s[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*)*)$/u)]],
     phone: ['', [Validators.required, Validators.pattern(/^\+[1-9]\d{11,14}$/iu)]],//+14155552671, +497116666777
-    email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
+    email: [{value:'', disabled:false}, [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
     region: [''],//Валидация всех полей адреса зависит от выбранного DeliveryType, flag:addressNeed
     zip: [''],
     city: [''],
@@ -134,6 +145,15 @@ export class OrderComponent implements OnInit, OnDestroy {
       this.city?.setValidators(Validators.required);
       this.street?.setValidators(Validators.required);
       this.house?.setValidators([Validators.required,Validators.pattern(/^\d{1,3}[A-Za-z]?$/)]);
+
+      if (this.userDataFromServer){
+        if (this.userDataFromServer.region) this.region?.setValue(this.userDataFromServer.region);
+        if (this.userDataFromServer.zip) this.zip?.setValue(this.userDataFromServer.zip);
+        if (this.userDataFromServer.city) this.city?.setValue(this.userDataFromServer.city);
+        if (this.userDataFromServer.street) this.street?.setValue(this.userDataFromServer.street);
+        if (this.userDataFromServer.house) this.house?.setValue(this.userDataFromServer.house);
+      }
+
       this.region?.markAsUntouched();this.region?.markAsPristine();
       this.zip?.markAsUntouched();this.zip?.markAsPristine();
       this.city?.markAsUntouched();this.city?.markAsPristine();
@@ -195,7 +215,6 @@ export class OrderComponent implements OnInit, OnDestroy {
           });
         },
         error: (errorResponse: HttpErrorResponse) => {
-          console.log(errorResponse.error);
           this.showSnackService.errorObj(errorResponse.error, ReqErrorTypes.createOrder);
           console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getProducts)! Code:${errorResponse.status}`);
           if (errorResponse.status === 409) this.router.navigate(['/cart']);//ошибка товаров. редирект на корзину для проверки
@@ -211,6 +230,35 @@ export class OrderComponent implements OnInit, OnDestroy {
     if (control && typeof control.value === 'string' ) {
       control.setValue(control.value.replace(/^\p{L}/u, c => c.toUpperCase()));
     }
+  }
+
+  private setDefaultPayment(){
+    //Применение первого доступного метода оплаты и проверка наличия хоть одного доступного метода
+    for (let i = 0; i < this.paymentTypes.length; i++) {
+      if (!this.paymentTypes[i].disabled) {
+        this.paymentType?.setValue(this.paymentTypes[i].id)
+        i = this.paymentTypes.length;
+      }
+    }//Установка активного paymentType
+    if (!this.orderForm.value.paymentType) {
+      this.showSnackService.error(this.paymentService.notAvailableError);
+      this.router.navigate(['/cart']);
+      return;
+    }//Проверка наличия хоть одного доступного метода
+  }
+  private setDefaultDelivery(){
+    for (let i = 0; i < this.deliveryTypes.length; i++) {
+      if (!this.deliveryTypes[i].disabled) {
+        this.activeDeliveryType = this.deliveryTypes[i];
+        i = this.deliveryTypes.length;
+      }
+    }//Установка активного deliveryType
+    if (!this.activeDeliveryType) {
+      this.showSnackService.error(this.deliveryService.notAvailableError);
+      console.error(this.deliveryService.notAvailableError);
+      this.router.navigate(['/cart']);
+      return;
+    }//Если нет активных методов доставки
   }
 
   ngOnInit() {
@@ -266,31 +314,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             return;
           }
           this.paymentTypes = paymentTypesResp.paymentTypes;
-          //Применение первого доступного метода оплаты и проверка наличия хоть одного доступного метода
-          for (let i = 0; i < this.paymentTypes.length; i++) {
-            if (!this.paymentTypes[i].disabled) {
-              this.orderForm.patchValue({paymentType: this.paymentTypes[i].id});
-              i = this.paymentTypes.length;
-            }
-          }//Установка активного paymentType
-          if (!this.orderForm.value.paymentType) {
-            this.showSnackService.error(this.paymentService.notAvailableError);
-            this.router.navigate(['/cart']);
-            return;
-          }//Проверка наличия хоть одного доступного метода
 
-          for (let i = 0; i < this.deliveryTypes.length; i++) {
-            if (!this.deliveryTypes[i].disabled) {
-              this.activeDeliveryType = this.deliveryTypes[i];
-              i = this.deliveryTypes.length;
-            }
-          }//Установка активного deliveryType
-          if (!this.activeDeliveryType) {
-            this.showSnackService.error(this.deliveryService.notAvailableError);
-            console.error(this.deliveryService.notAvailableError);
-            this.router.navigate(['/cart']);
-            return;
-          }//Если нет активных методов доставки
+
           //Может быть error с нормальным ответом при проблемах с товарами
           if (cartResp.error || !cartResp.cart) {
             this.showSnackService.error(this.cartService.getCartError);
@@ -304,6 +329,60 @@ export class OrderComponent implements OnInit, OnDestroy {
             return;
           }
           this.cart = cartResp.cart;
+
+          if (this.authService.getIsLoggedIn()){
+            this.subscriptions$.add(
+              this.userService.getUserData().subscribe({
+                next: (data:UserDataResponseType) => {
+                  if (data.error || !data.userData || !data.user){
+                    this.showSnackService.error(this.userService.getUserDataError);
+                    throw new Error(data.message);
+                  }
+                  this.userDataFromServer=data.userData;
+                  if (data.userData.deliveryType_id){
+                    const deliveryTypeIndex:number = this.deliveryTypes.findIndex((deliveryItem:DeliveryTypeType)=>deliveryItem.id===data.userData?.deliveryType_id);
+                    if (deliveryTypeIndex>-1 && !this.deliveryTypes[deliveryTypeIndex].disabled) {
+                      this.changeDeliveryType(this.deliveryTypes[deliveryTypeIndex]);
+                    }else {
+                      this.setDefaultDelivery();
+                      this.showSnackService.infoObj('Saved delivery type unavailable');
+                    }
+                  }else this.setDefaultDelivery();
+
+                  if (data.userData.paymentType_id) {
+                    const paymentTypeIndex:number = this.paymentTypes.findIndex((paymentItem:PaymentTypeType)=>paymentItem.id === data.userData!.paymentType_id);
+                    if (paymentTypeIndex>-1 && !this.paymentTypes[paymentTypeIndex].disabled) {
+                      this.paymentType?.setValue(this.paymentTypes[paymentTypeIndex].id);
+                    }else{
+                      this.setDefaultPayment();
+                      this.showSnackService.infoObj('Saved payment type unavailable');
+                    }
+                  }else this.setDefaultPayment();
+
+                  const paramsToUpdate = {
+                    email:data.userData.email,
+                    firstName: data.userData.firstName,
+                    lastName: data.userData.lastName,
+                    phone:data.userData.phone,
+                    region:data.userData.region,
+                    zip:data.userData.zip,
+                    city:data.userData.city,
+                    street:data.userData.street,
+                    house:data.userData.house,
+                  }
+                  this.orderForm.patchValue(paramsToUpdate);
+                  this.email?.disable();
+                },
+                error: (errorResponse:HttpErrorResponse) => {
+                  this.showSnackService.error(this.userService.getUserDataError);
+                  console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getUserData)! Code:${errorResponse.status}`);
+                },
+              })
+            );//Подписка на данные из профиля пользователя, если он залогинен
+          }else{
+            this.setDefaultPayment();
+            this.setDefaultDelivery();
+          }
 
           this.deliveryAndTotalAmountCalculate();
 

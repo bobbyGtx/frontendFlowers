@@ -31,7 +31,8 @@ textarea{
   color: $gray-text-color;
   outline: none;
   &.ng-invalid.ng-touched,
-  &.ng-invalid.ng-dirty {
+  &.ng-invalid.ng-dirty,
+  &.ngInvalid{
     border: 2px solid red;
   }//стилизация ошибок валидации
   &[disabled] {

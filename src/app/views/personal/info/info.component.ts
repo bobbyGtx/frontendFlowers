@@ -17,7 +17,8 @@ import {newPasswordsMatchValidator} from '../../../shared/validators/new-passwor
 import {ExtErrorResponseType} from '../../../../assets/types/responses/ext-error-response';
 import {ErrorSources} from '../../../../assets/enums/error-sources.enum';
 import {UserDataResponseType} from '../../../../assets/types/responses/user-data-response.type';
-import {DeliveryInfoType, UserDataType, UserPatchData} from '../../../../assets/types/user-data.type';
+import {DeliveryInfoType, UserDataType, UserPatchDataType} from '../../../../assets/types/user-data.type';
+import {emailExistsValidator} from '../../../shared/validators/email-exists.validator';
 
 @Component({
   selector: 'app-info',
@@ -40,6 +41,7 @@ export class InfoComponent implements OnInit, OnDestroy {
   protected oldPassFalse: boolean = false;//переменная для окрашивания рамки, если пароль не верен
 
   protected userData:UserDataType|null=null;
+  private stockUserDeliveryInfo: DeliveryInfoType|null=null;//переменная для быстрого сравнения.
 
   get firstName() {
     return this.infoForm.get('firstName');
@@ -97,10 +99,19 @@ export class InfoComponent implements OnInit, OnDestroy {
     firstName: ['', [Validators.pattern(/^(?=.{2,50}$)([A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*(?:\s[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*)*)$/u)]],
     lastName: ['', [Validators.pattern(/^(?=.{2,50}$)([A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*(?:\s[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*)*)$/u)]],
     phone: ['', [Validators.pattern(/^\+[1-9]\d{11,14}$/iu)]],//+14155552671, +497116666777
-    email: [{
-      value: 'bobbygtx@gmail.com',
-      disabled: true
-    }, [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
+    email: this.fb.control(
+      { value: '', disabled: true },
+      {
+        validators: [
+          Validators.required,
+          Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)
+        ],
+        asyncValidators: [
+          emailExistsValidator(() => this.userData?.email)//для передачи актуального значения
+        ],
+        updateOn: 'blur'
+      }
+    ),
     oldPassword: [{value: '', disabled: false}, Validators.pattern(/^$|^.{6,}$/)],
     newPassword: [{value: '', disabled: true}, Validators.pattern(/^$|^.{6,}$/)],
     newPasswordRepeat: [{value: '', disabled: true}, Validators.pattern(/^$|^.{6,}$/)],
@@ -162,10 +173,18 @@ export class InfoComponent implements OnInit, OnDestroy {
   protected changeDeliveryType(deliveryType: DeliveryTypeType) {
     if (this.deliveryTypeField?.value === deliveryType.id){
       this.deliveryTypeField?.setValue(0);
+      this.infoForm.markAsDirty();
       return;
     }
     this.deliveryTypeField?.setValue(deliveryType.id);
     this.infoForm.markAsDirty();
+  }
+
+  protected resetRegion():void{
+    if (this.region?.value){
+      this.region?.setValue('');
+      this.infoForm.markAsDirty();
+    }
   }
 
   protected changeFirstLetter(control: AbstractControl<string | null, string | null> | null) {
@@ -175,8 +194,8 @@ export class InfoComponent implements OnInit, OnDestroy {
   }
 
   protected updateUserInfo() {
-    if (!this.userData || this.infoForm.valid || this.infoForm.untouched) return;
-    let userPatchData:UserPatchData = {};
+    if (!this.userData || this.infoForm.invalid || (this.infoForm.untouched && !this.infoForm.dirty)) return;
+    let userPatchData:UserPatchDataType = {};
     if (this.firstName && this.firstName.value !== this.userData.firstName) userPatchData.firstName = this.firstName.value;
     if (this.lastName && this.lastName.value !== this.userData.lastName) userPatchData.lastName = this.lastName.value;
     if (this.phone && this.phone.value !== this.userData.phone) userPatchData.phone = this.phone.value;
@@ -185,12 +204,20 @@ export class InfoComponent implements OnInit, OnDestroy {
     //формирование адреса доставки "deliveryInfo"
     if (this.region?.value || this.zip?.value || this.city?.value || this.street?.value || this.house?.value){
       let deliveryInfo:DeliveryInfoType = {};
-      if (this.region?.value && this.region?.value !== this.userData.region) deliveryInfo.region=this.region?.value;
-      if (this.zip?.value && this.zip?.value !== this.userData.zip) deliveryInfo.zip=this.zip?.value;
-      if (this.city?.value && this.city?.value !== this.userData.city) deliveryInfo.city=this.city?.value;
-      if (this.street?.value && this.street?.value !== this.userData.street) deliveryInfo.street=this.street?.value;
-      if (this.house?.value && this.house?.value !== this.userData.house) deliveryInfo.house=this.house?.value;
-      userPatchData.deliveryInfo = deliveryInfo;
+      if (this.region?.value) deliveryInfo.region=this.region?.value;
+      if (this.zip?.value) deliveryInfo.zip=this.zip?.value;
+      if (this.city?.value) deliveryInfo.city=this.city?.value;
+      if (this.street?.value) deliveryInfo.street=this.street?.value;
+      if (this.house?.value) deliveryInfo.house=this.house?.value;
+
+      if (this.stockUserDeliveryInfo && Object.keys(this.stockUserDeliveryInfo).length === Object.keys(deliveryInfo).length) {
+        for (let objKey in deliveryInfo) {
+          if (this.stockUserDeliveryInfo.hasOwnProperty(objKey) && this.stockUserDeliveryInfo[objKey as keyof DeliveryInfoType] !== deliveryInfo[objKey as keyof DeliveryInfoType]) {
+            userPatchData.deliveryInfo = deliveryInfo;
+          }
+        }
+      }else userPatchData.deliveryInfo = deliveryInfo;
+
     }else{
       if(this.userData.region || this.userData.zip || this.userData.city || this.userData.street || this.userData.house) userPatchData.deliveryInfo=null;
     }
@@ -206,7 +233,42 @@ export class InfoComponent implements OnInit, OnDestroy {
     }
     if (Object.keys(userPatchData).length > 0){
       console.log(userPatchData);
+      this.subscriptions$.add(
+        this.userService.updateUserData(userPatchData).subscribe({
+          next: (response:UserDataResponseType) => {
+            if (response.error){
+              this.showSnackService.error(this.userService.postUserDataError);
+              throw new Error(response.message);
+            }
+            if (response.userData && response.user){
+              this.userData = response.userData;
+              if (response.user.deliveryInfo) this.stockUserDeliveryInfo = response.user.deliveryInfo;
+              this.showSnackService.success(response.message);
+              this.resetForm();
+              this.infoForm.patchValue(this.userData);
+
+            }
+          },
+          error: (errorResponse:HttpErrorResponse) => {
+            this.showSnackService.errorObj(errorResponse.error,ReqErrorTypes.editUserData);
+            console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (updateUserData)! Code:${errorResponse.status}`);
+          }
+          }));
     }
+  }
+
+  private resetForm():void{
+    this.email?.disable();
+    this.oldPassword?.setValue('');
+    this.oldPassword?.enable();
+    this.newPassword?.setValue('');
+    this.newPassword?.disable();
+    this.newPasswordRepeat?.setValue('');
+    this.newPasswordRepeat?.disable();
+    this.oldPassChecked=false;
+    this.oldPassFalse=false;
+    this.infoForm.markAsUntouched();
+    this.infoForm.markAsPristine();
   }
 
   ngOnInit() {
@@ -252,13 +314,25 @@ export class InfoComponent implements OnInit, OnDestroy {
           throw new Error(userDataResp.message);
         }
         this.userData = userDataResp.userData;
+        if (userDataResp.user.deliveryInfo) this.stockUserDeliveryInfo = userDataResp.user.deliveryInfo;
         this.infoForm.patchValue(this.userData);
+
       },
       error: (extError: ExtErrorResponseType) => {
         this.showSnackService.error(this.userService.getUserDataError);
         console.error(extError.error.message ? extError.error.message : `Unexpected error (getUserData)! Code:${extError.status}`);
       }
     }));
+    this.subscriptions$.add(
+      this.email?.statusChanges.subscribe(status => {
+        const ctrl = this.email;
+        if (status === 'INVALID' && ctrl?.touched && ctrl?.hasError('emailProblem')) {
+          queueMicrotask(() => {
+            if (this.userData) ctrl.setValue(this.userData.email, { emitEvent: false });
+          });
+        }
+    })
+    );//Подписка на изменение статуса контрола email. В случае невалидности поля по асинхронному валидатору, откат.
   }
 
   ngOnDestroy() {

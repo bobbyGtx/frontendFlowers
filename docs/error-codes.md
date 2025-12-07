@@ -78,6 +78,7 @@
     > Ошибка валидации.  
     Для данной ошибки доступна переменная messages со следующими сообщениями:
     - Current password not found! - Действующий пароль не указан.
+    - Old and new passwords are the same! - Старый и новый пароли одинаковые.
     - Current password wrong. - Действующий пароль не верный.
     - New passwords do not match! - Новые пароли не совпадают.
     - New password not acceptable! - Новый пароль не соответствует минимальным требованиям.
@@ -94,6 +95,14 @@
     - Invalid delivery type! - Способ доставки не корректен (0 спосле конвертации)
     - Invalid payment type! - Метод оплаты не корректен (0 спосле конвертации)
 
+### emailcheck.php (post)
+- 400
+  - E-Mail not recognized!
+  > E-Mail не найден
+  - Email not valid!
+  > Адрес электронной почты не корректен (регулярка)
+  - E-Mail is busy!
+  > Адрес электронной почты занят
 ## Code 200 (Ok) with Errors
 
 ## Code 200 (Ok)
