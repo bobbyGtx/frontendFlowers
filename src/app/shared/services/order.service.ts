@@ -9,6 +9,7 @@ import {LanguageService} from '../../core/language.service';
 import {OrderType} from '../../../assets/types/order.type';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
 import {OrderProductType} from '../../../assets/types/order-product.type';
+import {OrdersResponseType} from '../../../assets/types/responses/orders-response.type';
 
 export type userErrorsType = {
   getOrders: { [key in AppLanguages]: string; },
@@ -35,6 +36,7 @@ export class OrderService {
     comment:null,//может прити пустая строка
     status_id: 0,
     statusName:'',
+    class:'',
     items:[{
         id: 0,
         url: '',
@@ -55,9 +57,9 @@ export class OrderService {
     },
     createOrder: {
       [AppLanguages.ru]: 'Ошибка при создании заказа. Повторите попытку.',
-      [AppLanguages.en]: 'Error creating order. Please try again.',
+      [AppLanguages.en]: 'Error creating order. Please try again. Refresh the page.',
       [AppLanguages.de]: 'Fehler beim Erstellen der Bestellung. Bitte versuchen Sie es erneut.',
-    },
+    }
   };
   get getOrdersError(): string {
     return this.userErrors.getOrders[this.languageService.appLang];
@@ -80,5 +82,17 @@ export class OrderService {
       );
   }
 
+  getOrders():Observable<OrdersResponseType>{
+    return this.http.get<OrdersResponseType>(environment.api+'orders.php').pipe(
+      map((response:OrdersResponseType)=>{
+        if (response.error) return response;
+        if (!response.orders || !Array.isArray(response.orders)){
+          response.error=true;
+          response.message = 'Orders not found in response or have invalid structure.';
+        }
+        return response;
+      })
+    );
+  }
 
 }

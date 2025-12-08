@@ -21,6 +21,7 @@ export interface OrderType {
   comment: string|null,
   status_id: number,
   statusName:string,
+  class:string,//для добавления класса к бирке статуса заказа
   items:OrderProductType[],
   createdAt: string|null,
   updatedAt: string|null,

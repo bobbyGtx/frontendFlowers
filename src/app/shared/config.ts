@@ -4,4 +4,5 @@ export class Config {
   static accessTokenHeader:string = 'x-access-token';
   static reqLanguageHeader:string = 'x-language';//Язык, на котором формируется ответ от сервера
   static regionList:Array<string> = ['Saarland','Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen'];
+
 }

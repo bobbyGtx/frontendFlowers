@@ -5,5 +5,25 @@
       <div class="personal-page" routerLink="/profile">Личные данные</div>
       <div class="personal-page active">Ваши заказы</div>
     </div>
+
+    <div class="orders-title">Ваши заказы</div>
+    <div class="orders-title-additional">Здесь отображается история ваших заказов.</div>
+    <div class="orders-list" *ngIf="orders.length">
+      <div class="orders-list-item" *ngFor="let order of orders">
+        <div class="orders-list-item-number">Заказ №{{order.id}}</div>
+        <div class="orders-list-item-products" *ngIf="order.items && order.items.length">
+          <div class="orders-list-item-products-count">Кол-во товаров: {{order.items.length}}</div>
+          <table class="orders-list-item-products-list">
+            <tr *ngFor="let item of order.items">
+              <td>&#183; <a [routerLink]="'/product/'+item.url">{{item.name}}</a></td>
+              <td>{{item.quantity}} шт.</td>
+            </tr>
+          </table>
+
+        </div>
+        <div class="orders-list-item-status" [classList]="order.class" >{{order.statusName}}</div>
+        <div class="orders-list-item-price">{{order.totalAmount}} EUR</div>
+      </div>
+    </div>
   </div>
 </div>
