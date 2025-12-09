@@ -3,9 +3,10 @@
 @import "data-form";
 
 .orders{
-  padding-top: 50px;
-  padding-bottom: 128px;
+  padding-top: 56px;
+  padding-bottom: 156px;
   .container{
+    font-size: 16px;
     .personal-title{
       @include head-lora(32px);
       margin-bottom: 30px;
@@ -19,6 +20,7 @@
       font-weight: 400;
       display: flex;
       align-items: center;
+      user-select: none;
       .personal-page{
         border-bottom: 2px solid $page-selector-color;
         padding: 0 15px 12px 14px;
@@ -26,6 +28,120 @@
         &.active{
           border-bottom: 3px solid $page-selector-active-color;
         }
+      }
+    }
+    .orders-title{
+      font-family: "Montserrat", "sans-serif";
+      font-weight: 500;
+      color: $gray-text-color;
+      margin-bottom: 14px;
+    }
+    .orders-title-additional{
+      font-weight: 400;
+      color: $gray-text-color;
+      margin-bottom: 67px;
+    }
+    .orders-empty{
+      margin-top: 100px;
+      margin-bottom: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      .orders-empty-message{
+        font-size: 26px;
+        margin-bottom: 20px;
+      }
+      .button{
+        width: 255px;
+      }
+    }
+    .orders-list{
+      .orders-list-item{
+        border-bottom: 1px solid $separator-color;
+        padding-bottom: 46px;
+        margin-bottom: 47px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+
+        *:last-child{
+          border-bottom: unset;
+          padding-bottom: unset;
+          margin-bottom: unset;
+        }
+        .orders-list-item-number{
+          font-size: 20px;
+          text-decoration-line: underline;
+          color: $order-number-color;
+          width: 297px;
+          margin-right: 20px;
+        }
+        .orders-list-item-products{
+          width: 509px;
+          margin-right: 20px;
+          color: $order-number-color;
+          .orders-list-item-products-count{
+            margin-bottom: 12px;
+          }
+          .orders-list-item-products-list{
+            .product-link{
+              color: $product-list-link-color;
+              text-decoration: none;
+              &:visited{
+                color: $product-list-link-color;
+              }
+              &:hover{
+                color: $product-list-link-color-h;
+              }
+            }
+            tr td:first-child{
+                padding-left: 10px;
+                padding-right: 20px;
+            }
+          }
+        }
+        .orders-list-group{
+          width: 393px;
+          display: flex;
+          flex-direction: row;
+
+          justify-content: space-between;
+          gap: 20px;
+          .orders-list-item-status{
+            padding: 8px 24px;
+            text-align: center;
+            border-radius: 50px;
+            box-sizing: border-box;
+            background: transparent;
+            border: 1px solid transparent;
+            &.processing{
+              color:$order-status-color-processing;
+              border-color: $order-status-color-processing;
+            }
+            &.awaiting-shipment{
+              color:$order-status-color-awaiting-shipment;
+              border-color: $order-status-color-awaiting-shipment;
+            }
+            &.out-of-delivery{
+              color:$order-status-color-out-of-delivery;
+              border-color: $order-status-color-out-of-delivery;
+            }
+            &.completed{
+              color:$order-status-color-completed;
+              border-color: $order-status-color-completed;
+            }
+            &.cancelled{
+              color:$order-status-color-cancelled;
+              border-color: $order-status-color-cancelled;
+            }
+          }
+          .orders-list-item-price{
+            font-weight: 600;
+            color: $gray-text-color;
+          }
+        }
+
       }
     }
   }

@@ -6,8 +6,12 @@
       <div class="personal-page active">Ваши заказы</div>
     </div>
 
-    <div class="orders-title">Ваши заказы</div>
-    <div class="orders-title-additional">Здесь отображается история ваших заказов.</div>
+    <div class="orders-title" *ngIf="orders.length">Ваши заказы</div>
+    <div class="orders-title-additional" *ngIf="orders.length">Здесь отображается история ваших заказов.</div>
+    <div class="orders-empty" *ngIf="!orders.length">
+      <div class="orders-empty-message">У Вас ещё нет заказов</div>
+      <button class="button" routerLink="/catalog">В каталог</button>
+    </div>
     <div class="orders-list" *ngIf="orders.length">
       <div class="orders-list-item" *ngFor="let order of orders">
         <div class="orders-list-item-number">Заказ №{{order.id}}</div>
@@ -15,14 +19,16 @@
           <div class="orders-list-item-products-count">Кол-во товаров: {{order.items.length}}</div>
           <table class="orders-list-item-products-list">
             <tr *ngFor="let item of order.items">
-              <td>&#183; <a [routerLink]="'/product/'+item.url">{{item.name}}</a></td>
+              <td><a class="product-link" [routerLink]="'/product/'+item.url">&#183; {{item.name}}</a></td>
               <td>{{item.quantity}} шт.</td>
             </tr>
           </table>
-
         </div>
-        <div class="orders-list-item-status" [classList]="order.class" >{{order.statusName}}</div>
-        <div class="orders-list-item-price">{{order.totalAmount}} EUR</div>
+        <div class="orders-list-group">
+          <div class="orders-list-item-status" [class]="order.class" >{{order.statusName}}</div>
+          <div class="orders-list-item-price">{{order.totalAmount}} EUR</div>
+        </div>
+
       </div>
     </div>
   </div>

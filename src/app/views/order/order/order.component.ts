@@ -183,14 +183,14 @@ export class OrderComponent implements OnInit, OnDestroy {
 
   protected createOrder() {
     //Сделать заказ без регистрации
-    if (this.orderForm.valid && this.activeDeliveryType && this.orderForm.value.paymentType && this.orderForm.value.firstName && this.orderForm.value.lastName && this.orderForm.value.phone && this.orderForm.value.email) {
+    if (this.orderForm.valid && this.activeDeliveryType && this.orderForm.value.paymentType && this.orderForm.value.firstName && this.orderForm.value.lastName && this.orderForm.value.phone && this.email?.value) {
       const paramsObject:OrderParamsType={
         deliveryType: this.activeDeliveryType.id,
         paymentType:this.orderForm.value.paymentType,
         firstName: this.orderForm.value.firstName,
         lastName: this.orderForm.value.lastName,
         phone: this.orderForm.value.phone,
-        email: this.orderForm.value.email,
+        email: this.email.value,
       };//Сформировали обязательные поля
       if (this.orderForm.value.region) paramsObject.region = this.orderForm.value.region;
       if (this.orderForm.value.zip) paramsObject.zip = this.orderForm.value.zip;
