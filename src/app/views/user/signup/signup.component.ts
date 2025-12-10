@@ -7,6 +7,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {DefaultResponseType} from '../../../../assets/types/responses/default-response.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {emailExistsValidator} from '../../../shared/validators/email-exists.validator';
 
 @Component({
   selector: 'app-signup',
@@ -21,12 +22,18 @@ export class SignupComponent {
   subscriptions$:Subscription=new Subscription();
 
   signUpForm: FormGroup=this.fb.group({
-    email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
+    email: ['', {
+      validators:[Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)],
+      asyncValidators: [
+        emailExistsValidator(()=>undefined)//для передачи актуального значения
+      ],
+      updateOn: 'blur'
+    }
+    ],
     password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
     passwordRepeat: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
     agree: [false, Validators.requiredTrue],
   });
-
 
   get email() {
     return this.signUpForm.get('email');
@@ -39,6 +46,14 @@ export class SignupComponent {
   }
   get agree() {
     return this.signUpForm.get('agree');
+  }
+
+  protected showHidePassword(event:MouseEvent) {
+    const svg = event.currentTarget as HTMLElement;
+    const wrapper = svg.parentElement;
+    const input = wrapper?.querySelector('input') as HTMLInputElement;
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
   }
 
   signUp(){

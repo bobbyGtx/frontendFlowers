@@ -14,7 +14,10 @@
     </div>
     <div class="orders-list" *ngIf="orders.length">
       <div class="orders-list-item" *ngFor="let order of orders">
-        <div class="orders-list-item-number">Заказ №{{order.id}}</div>
+        <div class="orders-list-item-number-group">
+          <div class="orders-list-item-number">Заказ №{{order.id}}</div>
+          <div class="orders-list-item-date" *ngIf="order.createdAt">от {{order.createdAt}}</div>
+        </div>
         <div class="orders-list-item-products" *ngIf="order.items && order.items.length">
           <div class="orders-list-item-products-count">Кол-во товаров: {{order.items.length}}</div>
           <table class="orders-list-item-products-list">
@@ -25,7 +28,11 @@
           </table>
         </div>
         <div class="orders-list-group">
-          <div class="orders-list-item-status" [class]="order.class" >{{order.statusName}}</div>
+          <div class="orders-list-item-status" [class]="order.class"
+               [matTooltip]="order.updatedAt?'Изменение статуса от '+(order.updatedAt):''"
+               matTooltipClass="mat-tooltip-compact" matTooltipPosition="below"
+               matTooltipShowDelay="200" matTooltipHideDelay="200"
+>{{order.statusName}}</div>
           <div class="orders-list-item-price">{{order.totalAmount}} EUR</div>
         </div>
 

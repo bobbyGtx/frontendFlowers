@@ -70,13 +70,24 @@
           padding-bottom: unset;
           margin-bottom: unset;
         }
-        .orders-list-item-number{
-          font-size: 20px;
-          text-decoration-line: underline;
-          color: $order-number-color;
+        .orders-list-item-number-group{
           width: 297px;
           margin-right: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          .orders-list-item-number{
+            font-size: 20px;
+            text-decoration-line: underline;
+            color: $order-number-color;
+          }
+          .orders-list-item-date{
+            font-size: 16px;
+            color: $product-list-link-color;
+          }
+
         }
+
         .orders-list-item-products{
           width: 509px;
           margin-right: 20px;
@@ -85,6 +96,7 @@
             margin-bottom: 12px;
           }
           .orders-list-item-products-list{
+            color: $product-list-link-color;
             .product-link{
               color: $product-list-link-color;
               text-decoration: none;
@@ -105,8 +117,8 @@
           width: 393px;
           display: flex;
           flex-direction: row;
-
           justify-content: space-between;
+          align-items: center;
           gap: 20px;
           .orders-list-item-status{
             padding: 8px 24px;
@@ -137,6 +149,7 @@
             }
           }
           .orders-list-item-price{
+            font-size: 22px;
             font-weight: 600;
             color: $gray-text-color;
           }
