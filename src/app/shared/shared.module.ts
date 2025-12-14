@@ -11,9 +11,10 @@ import { ProductsCarouselComponent } from './components/products-carousel/produc
 import {CarouselModule} from 'ngx-owl-carousel-o';
 import { CountSelectorComponent } from './components/count-selector/count-selector.component';
 import {MatTooltip} from "@angular/material/tooltip";
+import { LoaderComponent } from './components/loader/loader.component';
 
 @NgModule({
-    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent],
+    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent],
     imports: [
         CommonModule,
         MatButton,
@@ -22,7 +23,7 @@ import {MatTooltip} from "@angular/material/tooltip";
         CarouselModule,
         MatTooltip
     ],
-    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent],
+    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent],
 })
 export class SharedModule {
 }

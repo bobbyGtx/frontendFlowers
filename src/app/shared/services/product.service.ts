@@ -11,6 +11,7 @@ import {RecommendedProductsResponseType} from '../../../assets/types/responses/r
 import {ActiveParamsType} from '../../../assets/types/active-params.type';
 import {ProductResponseType} from '../../../assets/types/responses/product-response.type';
 import {ProductsResponseType} from '../../../assets/types/responses/products-response.type';
+import {SearchProductsResponseType} from '../../../assets/types/responses/search-products-response.type';
 
 export type userErrorsType = {
   getBestProducts:{
@@ -23,6 +24,9 @@ export type userErrorsType = {
     [key in AppLanguages]:string;
   },
   getProduct:{
+    [key in AppLanguages]:string;
+  },
+  searchProducts:{
     [key in AppLanguages]:string;
   },
 }
@@ -74,6 +78,11 @@ export class ProductService {
       [AppLanguages.en]:'Requested product was not found.',
       [AppLanguages.de]:'Das angeforderte Produkt wurde nicht gefunden.',
     },
+    searchProducts: {
+      [AppLanguages.ru]:'Ошибка поиска товаров.',
+      [AppLanguages.en]:'Error searching for products.',
+      [AppLanguages.de]:'Fehler bei der Produktsuche.',
+    },
   };
 
   get getBestProductsError():string{
@@ -87,6 +96,9 @@ export class ProductService {
   }
   get getProductError():string{
     return this.userErrors.getProduct[this.languageService.appLang];
+  }
+  get getSearchProductsError():string{
+    return this.userErrors.searchProducts[this.languageService.appLang];
   }
 
   getBestProducts(): Observable<BestProductsResponseType> {
@@ -149,6 +161,11 @@ export class ProductService {
           return response;
         })
       );
+  }
+
+  searchProduct(queryParam: string): Observable<SearchProductsResponseType> {
+    const params:HttpParams = new HttpParams().set('query', queryParam);
+    return this.http.get<SearchProductsResponseType>(environment.api + 'products/search',{params});
   }
 
   private buildQueryParams(params: ActiveParamsType): HttpParams {

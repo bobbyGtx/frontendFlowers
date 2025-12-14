@@ -152,6 +152,55 @@ header.header{
               fill: $green-text-color;
             }
           }
+          .search-products{
+            position: absolute;
+            z-index: 3;
+            background-color: $result-background-color;
+            top: 61px;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            width: 400px;
+            border-radius: 5px;
+            border: 1px solid $result-border-color;
+            box-shadow: 0 4px 12px rgba(0,0,0, 0.1), 0 16px 24px rgba(0,0,0, 0.2);
+            overflow: hidden;
+            .search-product{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              justify-content: start;
+              padding: 12px 23px;
+              gap: 24px;
+              background-color: $result-background-color;
+              cursor: pointer;
+              user-select: none;
+
+              .search-product-image{
+                width: 48px;
+                height: 48px;
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center;
+                &.disabled{
+                  filter: grayscale(1);
+                }
+              }
+              .search-product-name{
+                color: $result-text-color;
+              }
+              &:hover{
+                background-color: $result-background-color-h;
+                .search-product-image.disabled{
+                  filter: grayscale(0);
+                }
+                .search-product-name{
+                  color: $result-text-color-h;
+                }
+              }
+            }
+          }
         }
       }
     }

@@ -5,7 +5,7 @@ import {
   HttpInterceptor,
   HttpRequest
 } from '@angular/common/http';
-import {catchError, Observable, switchMap, throwError} from 'rxjs';
+import {catchError, finalize, Observable, switchMap, tap, throwError} from 'rxjs';
 import {inject, Injectable} from '@angular/core';
 import {AuthService} from './auth.service';
 import {Config} from '../../shared/config';
@@ -15,10 +15,12 @@ import {LoginResponseType} from '../../../assets/types/responses/login-response.
 import {ShowSnackService} from '../show-snack.service';
 import {ReqErrorTypes} from '../../../assets/enums/auth-req-error-types.enum';
 import {Router} from '@angular/router';
+import {LoaderService} from '../../shared/services/loader.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private authService: AuthService = inject(AuthService);
+  private loaderService: LoaderService = inject(LoaderService);
   private languageService: LanguageService = inject(LanguageService);
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private router: Router = inject(Router);
@@ -30,6 +32,7 @@ export class AuthInterceptor implements HttpInterceptor {
   * */
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    this.loaderService.loaderShow();
     const tokens: { accessToken: string | null, refreshToken: string | null } = this.authService.getTokens();
     const language: AppLanguages = this.languageService.appLang;
     let headers = req.headers.set(Config.reqLanguageHeader, language);
@@ -40,6 +43,7 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         //берем ошибочный ответ и проверяем на 401 код
         if (error.status === 401 && !newReq.url.includes('/login.php') && !newReq.url.includes('/signup.php') && !newReq.url.includes('/refresh')) {
+          this.loaderService.loaderHide();
           return this.handle401Error(newReq, next);
         }
         if (error.status === 403){
@@ -49,6 +53,9 @@ export class AuthInterceptor implements HttpInterceptor {
           return throwError(() => error);
         }//Обработка блокировки пользователя
         return throwError(() => error);//Возврат ошибки
+      }),
+      finalize(() => {
+        this.loaderService.loaderHide();
       })
     );
   }
@@ -75,6 +82,9 @@ export class AuthInterceptor implements HttpInterceptor {
           this.authService.removeTokens();
           this.router.navigate(['/']);
           return throwError(() => error);
+        }),
+        finalize(() => {
+          this.loaderService.loaderHide();
         })
       );
   }
