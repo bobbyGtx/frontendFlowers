@@ -5,7 +5,7 @@ import {
   HttpInterceptor,
   HttpRequest
 } from '@angular/common/http';
-import {catchError, finalize, Observable, switchMap, tap, throwError} from 'rxjs';
+import {catchError, finalize, Observable, switchMap, throwError} from 'rxjs';
 import {inject, Injectable} from '@angular/core';
 import {AuthService} from './auth.service';
 import {Config} from '../../shared/config';

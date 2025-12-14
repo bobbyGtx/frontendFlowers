@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  HostListener,
   inject,
   Input,
   OnDestroy,
@@ -16,7 +15,6 @@ import {ShowSnackService} from '../../../core/show-snack.service';
 import {CategoryWithTypesType} from '../../../../assets/types/category-with-types.type';
 import {CartService} from '../../services/cart.service';
 import {ProductService} from '../../services/product.service';
-import {ProductsResponseType} from '../../../../assets/types/responses/products-response.type';
 import {HttpErrorResponse} from '@angular/common/http';
 import {SearchProductsResponseType} from '../../../../assets/types/responses/search-products-response.type';
 import {ProductType} from '../../../../assets/types/product.type';
