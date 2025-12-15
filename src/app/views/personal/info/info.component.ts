@@ -232,7 +232,6 @@ export class InfoComponent implements OnInit, OnDestroy {
       }
     }
     if (Object.keys(userPatchData).length > 0){
-      console.log(userPatchData);
       this.subscriptions$.add(
         this.userService.updateUserData(userPatchData).subscribe({
           next: (response:UserDataResponseType) => {

@@ -11,7 +11,6 @@ export class LoaderService {
   loaderShow(){
     this.activeRequests++;
     if (this.activeRequests===1) this.isShowed$.next(true);
-    console.log('add '+this.activeRequests);
   }
 
   loaderHide(){
@@ -19,6 +18,5 @@ export class LoaderService {
       this.activeRequests = 0;
       this.isShowed$.next(false);
     }else this.activeRequests--;
-    console.log('decrease '+this.activeRequests);
   }
 }

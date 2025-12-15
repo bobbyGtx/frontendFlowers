@@ -7,7 +7,7 @@ import {ShowSnackService} from '../../../core/show-snack.service';
 import {ProductType} from '../../../../assets/types/product.type';
 import {CartService} from '../../../shared/services/cart.service';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
-import {environment} from '../../../../environments/environment.development';
+import {environment} from '../../../../environments/environment';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
 import {CartProductType} from '../../../../assets/types/cart-product.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';

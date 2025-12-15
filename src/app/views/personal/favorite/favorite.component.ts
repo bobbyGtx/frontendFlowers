@@ -4,7 +4,7 @@ import {Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShowSnackService} from '../../../core/show-snack.service';
 import {FavoritesResponseType} from '../../../../assets/types/responses/favorites-response.type';
-import {environment} from '../../../../environments/environment.development';
+import {environment} from '../../../../environments/environment';
 import {FavoriteProductType} from '../../../../assets/types/favorite-product.type';
 
 @Component({
