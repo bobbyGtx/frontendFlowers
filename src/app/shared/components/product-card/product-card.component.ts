@@ -1,5 +1,4 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {environment} from '../../../../environments/environment.development';
 import {ProductType} from '../../../../assets/types/product.type';
 import {CartService} from '../../services/cart.service';
 import {Subscription} from 'rxjs';
@@ -12,6 +11,7 @@ import {FavoritesResponseType} from '../../../../assets/types/responses/favorite
 import {AddToFavoritesResponseType} from '../../../../assets/types/responses/add-to-favorites-response.type';
 import {AuthService} from '../../../core/auth/auth.service';
 import {FavoriteService} from '../../services/favorite.service';
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'product-card',

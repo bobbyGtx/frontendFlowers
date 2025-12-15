@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {environment} from '../../../../environments/environment.development';
+
 import {catchError, combineLatest, Observable, of, Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProductService} from '../../../shared/services/product.service';
@@ -18,6 +18,7 @@ import {FavoritesResponseType} from '../../../../assets/types/responses/favorite
 import {FavoriteProductType} from '../../../../assets/types/favorite-product.type';
 import {AuthService} from '../../../core/auth/auth.service';
 import {Config} from '../../../shared/config';
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-detail',
@@ -140,8 +141,10 @@ export class DetailComponent implements OnInit, OnDestroy {
   }
 //Объединить все 3 запроса
   ngOnInit(): void {
+    let initialized:boolean = false;
     this.subscriptions$.add(
       this.activatedRoute.params.subscribe(params => {
+        initialized?window.scrollTo({top: 0, behavior: 'smooth'}):initialized = true;
         const getProduct$: Observable<ProductResponseType> = this.productService.getProduct(params['url'])
           .pipe(catchError((err: HttpErrorResponse): Observable<ProductResponseType> => of({__error: true, err} as any)));
         const getUserCart$: Observable<CartResponseType> = this.cartService.getCart()
