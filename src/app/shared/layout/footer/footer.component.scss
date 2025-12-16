@@ -47,8 +47,8 @@ footer.footer{
           margin-bottom: 55px;
           a{
             position: relative;
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             &:before{
               content: "";
               position: absolute;
@@ -75,16 +75,15 @@ footer.footer{
             svg{
               position: relative;
               fill: $gray-text-color;
-
               z-index: 3;
               width: 18px;
               height: 18px;
               &.tiktok{
                 fill: none;
-                width: 21px;
-                height: 21px;
-                left: -2px;
-                top: -2px;
+                width: 20px;
+                height: 20px;
+                left: -1px;
+                top: -1px;
                 stroke: $gray-text-color;
               }
             }

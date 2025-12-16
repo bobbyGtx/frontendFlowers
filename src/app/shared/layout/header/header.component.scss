@@ -59,6 +59,7 @@ header.header{
           }
         }
         .header-top-phone{
+          height: 14px;
           a{
             color: $green-text-color;
             font-size: 16px;
@@ -70,10 +71,13 @@ header.header{
         .header-top-actions{
           display: flex;
           align-items: center;
-          margin-right: 18px;
+          margin-right: 22px;
+          gap: 8px;
           a{
-            margin-right: 8px;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             span{
               position: absolute;
               top: 10px;

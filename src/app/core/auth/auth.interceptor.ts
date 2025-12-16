@@ -37,8 +37,7 @@ export class AuthInterceptor implements HttpInterceptor {
     const language: AppLanguages = this.languageService.appLang;
     let headers:HttpHeaders = req.headers.set(Config.reqLanguageHeader, language);
     if (!tokens || !tokens.accessToken || req.url.includes('/login')||req.url.includes('/signup')||req.url.includes('/refresh')){
-      this.loaderService.loaderHide();
-      return next.handle(req.clone({headers}));
+      return next.handle(req.clone({headers})).pipe(finalize(() => {this.loaderService.loaderHide();}));
     }
     headers = headers.set(Config.accessTokenHeader, tokens.accessToken);
     const newReq = req.clone({headers});//Клонируем запрос и добавляем хедер языка

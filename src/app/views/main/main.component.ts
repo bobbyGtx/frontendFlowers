@@ -35,9 +35,9 @@ export class MainComponent implements OnInit, OnDestroy {
   protected bestProducts:ProductType[]=[];
   protected customOptionsReviews: OwlOptions = {
     loop: true,
-    mouseDrag: false,
-    touchDrag: false,
-    pullDrag: false,
+    mouseDrag: true,
+    touchDrag: true,
+    pullDrag: true,
     margin: 26,
     dots: false,
     navSpeed: 700,
