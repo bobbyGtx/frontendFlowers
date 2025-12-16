@@ -1,7 +1,7 @@
 import {
   HttpErrorResponse,
   HttpEvent,
-  HttpHandler,
+  HttpHandler, HttpHeaders,
   HttpInterceptor,
   HttpRequest
 } from '@angular/common/http';
@@ -35,7 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
     this.loaderService.loaderShow();
     const tokens: { accessToken: string | null, refreshToken: string | null } = this.authService.getTokens();
     const language: AppLanguages = this.languageService.appLang;
-    let headers = req.headers.set(Config.reqLanguageHeader, language);
+    let headers:HttpHeaders = req.headers.set(Config.reqLanguageHeader, language);
     if (!tokens || !tokens.accessToken || req.url.includes('/login')||req.url.includes('/signup')||req.url.includes('/refresh')){
       this.loaderService.loaderHide();
       return next.handle(req.clone({headers}));
