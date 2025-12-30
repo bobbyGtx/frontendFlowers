@@ -34,7 +34,13 @@ export class LoginComponent implements OnDestroy {
   get password() {
     return this.loginForm.get('password');
   }
-
+  protected showHidePassword(event:MouseEvent) {
+    const svg = event.currentTarget as HTMLElement;
+    const wrapper = svg.parentElement;
+    const input = wrapper?.querySelector('input') as HTMLInputElement;
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
   login():void{
     if (this.loginForm.valid && this.loginForm.value.email) {
       if (this.loginForm.value.password) {
