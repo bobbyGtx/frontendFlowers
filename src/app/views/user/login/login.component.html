@@ -13,10 +13,16 @@
                  [ngStyle]="{'border-color':password?.invalid && (password?.dirty || password?.touched)?'red':''}"
                  formControlName="password">
         </div>
-        <div class="auth-checkbox">
-          <input type="checkbox" id = "remember" formControlName="rememberMe">
-          <label for="remember">Запомнить меня</label>
+        <div class="auth-group">
+          <div class="auth-checkbox">
+            <input type="checkbox" id = "remember" formControlName="rememberMe">
+            <label for="remember">Запомнить меня</label>
+          </div>
+          <div class="auth-forgot-pass">
+            <a routerLink="/reset-password">Забыли пароль?</a>
+          </div>
         </div>
+
       </div>
       <div class="auth-button">
         <button class="button" [disabled]="loginForm.invalid" (click)="login()">Войти</button>

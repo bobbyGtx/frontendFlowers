@@ -17,6 +17,28 @@
         width: 422px;
       }
     }
+    .auth-group{
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 422px;
+
+      .auth-forgot-pass{
+        a{
+          color: $link-color;
+          text-decoration: none;
+          &:visited{
+            color: $link-color;
+            text-decoration: none;
+          }
+          &:hover{
+            color: $link-color-h;
+          }
+        }
+      }
+
+    }
     .auth-checkbox{
       max-width: 422px;
       display: flex;
@@ -31,9 +53,13 @@
         a{
           color: $link-color;
           text-decoration: none;
+          &:hover{
+            color: $link-color-h;
+          }
         }
       }
     }
+
   }
   .auth-button{
     margin-top: 30px;
@@ -47,6 +73,9 @@
     color:$gray-text-color;
     a{
       color: $link-color;
+      &:hover{
+        color: $link-color-h;
+      }
     }
   }
 }

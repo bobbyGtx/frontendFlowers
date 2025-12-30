@@ -109,7 +109,7 @@ export class InfoComponent implements OnInit, OnDestroy {
         asyncValidators: [
           emailExistsValidator(() => this.userData?.email)//для передачи актуального значения
         ],
-        updateOn: 'blur'
+        updateOn: 'change'
       }
     ),
     oldPassword: [{value: '', disabled: false}, Validators.pattern(/^$|^.{6,}$/)],
@@ -225,11 +225,11 @@ export class InfoComponent implements OnInit, OnDestroy {
       if (this.email && this.email.value && this.userData.email !== this.email.value ) userPatchData.email = this.email.value;
       if (this.newPassword && this.newPasswordRepeat && this.oldPassword){
         if (this.newPassword.value && this.newPassword.value === this.newPasswordRepeat.value && this.oldPassword.value){
-          userPatchData.oldPassword = this.oldPassword.value;
           userPatchData.newPassword = this.newPassword.value;
           userPatchData.newPasswordRepeat = this.newPassword.value;
         }
       }
+      if (this.oldPassword?.value && (userPatchData.email || userPatchData.newPassword)) userPatchData.oldPassword = this.oldPassword.value;
     }
     if (Object.keys(userPatchData).length > 0){
       this.subscriptions$.add(
