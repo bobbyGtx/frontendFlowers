@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormBuilder, Validators} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {DefaultResponseType} from '../../../../assets/types/responses/default-response.type';
@@ -15,11 +15,12 @@ import {UserRequestService} from '../../../core/user-request.service';
 })
 export class ChangePasswordComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private router: Router=inject(Router);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private fb: FormBuilder = inject(FormBuilder);
   private userRequestService: UserRequestService = inject(UserRequestService);
   private subscriptions$: Subscription = new Subscription();
-  private rToken: string | null = null;
+  protected rToken: string | null = null;
   protected requestSuccessful: boolean = false;
 
   changePassForm = this.fb.group({
@@ -64,11 +65,11 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const lngParam:string|null = this.activatedRoute.snapshot.params['lng']?this.activatedRoute.snapshot.params['lng']:null;
-    const rToken:string|null = this.activatedRoute.snapshot.params['rToken']?this.activatedRoute.snapshot.params['rToken']:null;
+    const lngParam:string|null = this.activatedRoute.snapshot.queryParams['lng']?this.activatedRoute.snapshot.queryParams['lng']:null;
+    const rToken:string|null = this.activatedRoute.snapshot.queryParams['rToken']?this.activatedRoute.snapshot.queryParams['rToken']:null;
+
     if (!rToken || !lngParam) {
-      this.showSnackService.error(this.userRequestService.checkChangePassTokenError);
-      //Переход на страницу 404
+      this.router.navigate(['/404']);
       return;
     }
     //Проверка токена на сервере
@@ -82,8 +83,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
               this.rToken = rToken;
             },
             error: () => {
-              this.showSnackService.error(this.userRequestService.checkChangePassTokenError);
-              //Переход на страницу 404
+              this.router.navigate(['/404']);
+              return;
             }
           }));
   }

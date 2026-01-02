@@ -23,7 +23,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
     LayoutComponent,
     HeaderComponent,
     FooterComponent,
-    MainComponent
+    MainComponent,
   ],
   imports: [
     BrowserModule,

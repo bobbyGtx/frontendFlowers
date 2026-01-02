@@ -15,6 +15,8 @@ const routes: Routes = [
       {path:'', loadChildren:()=>import('./views/product/product.module').then(m => m.ProductModule)},
       {path:'', loadChildren:()=>import('./views/order/order.module').then(m => m.OrderModule)},
       {path:'', loadChildren:()=>import('./views/personal/personal.module').then(m => m.PersonalModule), canActivate:[authGuard]},
+      {path:'', loadChildren:()=>import('./views/not-found/not-found.module').then(m=>m.NotFoundModule)},
+      {path:'**', redirectTo:'404'}
     ]
   }
 ];
