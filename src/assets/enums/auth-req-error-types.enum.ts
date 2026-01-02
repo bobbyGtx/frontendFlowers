@@ -6,4 +6,6 @@ export enum ReqErrorTypes {
   cartRebase='cartRebase',
   createOrder='createOrder',
   editUserData='editUserData',
+  saveNewPassword='saveNewPassword',
+
 }

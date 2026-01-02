@@ -36,7 +36,11 @@ export class AuthInterceptor implements HttpInterceptor {
     const tokens: { accessToken: string | null, refreshToken: string | null } = this.authService.getTokens();
     const language: AppLanguages = this.languageService.appLang;
     let headers:HttpHeaders = req.headers.set(Config.reqLanguageHeader, language);
-    if (!tokens || !tokens.accessToken || req.url.includes('/login')||req.url.includes('/signup')||req.url.includes('/refresh')){
+    if (!tokens || !tokens.accessToken
+      || req.url.includes('/login')
+      ||req.url.includes('/signup')
+      ||req.url.includes('/refresh')
+      ||req.url.includes('/reset-password')){
       return next.handle(req.clone({headers})).pipe(finalize(() => {this.loaderService.loaderHide();}));
     }
     headers = headers.set(Config.accessTokenHeader, tokens.accessToken);

@@ -108,6 +108,26 @@ export class ShowSnackService {
         [AppLanguages.en]:'Authorization required!',
         [AppLanguages.de]:'Autorisierung erforderlich!',
       },{
+        error: 'Email verification request limit exceeded!',
+        [AppLanguages.ru]:'Превышен лимит запросов на подтверждение электронной почты!',
+        [AppLanguages.en]:'Email verification request limit exceeded!',
+        [AppLanguages.de]:'Limit für E-Mail-Verifizierungsanfragen überschritten!',
+      },{
+        error: 'Reset password request limit exceeded!',
+        [AppLanguages.ru]:'Превышен лимит запросов на сброс пароля! ',
+        [AppLanguages.en]:'Reset password request limit exceeded!',
+        [AppLanguages.de]:'Limit für Passwortzurücksetzungsanfragen überschritten!',
+      },{
+        error: 'default',
+        [AppLanguages.ru]:'Ошибка авторизации. Попробуйте войти ещё раз.',
+        [AppLanguages.en]:'Authorization error. Please try again.',
+        [AppLanguages.de]:'Autorisierungsfehler. Bitte versuchen Sie, sich erneut anzumelden.',
+      },{
+        error: 'default',
+        [AppLanguages.ru]:'Ошибка авторизации. Попробуйте войти ещё раз.',
+        [AppLanguages.en]:'Authorization error. Please try again.',
+        [AppLanguages.de]:'Autorisierungsfehler. Bitte versuchen Sie, sich erneut anzumelden.',
+      },{
         error: 'default',
         [AppLanguages.ru]:'Ошибка авторизации. Попробуйте войти ещё раз.',
         [AppLanguages.en]:'Authorization error. Please try again.',
@@ -274,6 +294,44 @@ export class ShowSnackService {
         [AppLanguages.ru]: 'Ошибка изменения данных. Повторите попытку.',
         [AppLanguages.en]: 'Error changing data. Please try again.',
         [AppLanguages.de]: 'Fehler beim Ändern der Daten.',
+      }
+    ],
+    [ReqErrorTypes.saveNewPassword]:[
+      {
+        error:'Link not valid',
+        [AppLanguages.ru]: 'Запрашиваемая страница не найдена!',
+        [AppLanguages.en]: 'The requested page was not found!',
+        [AppLanguages.de]: 'Die angeforderte Seite wurde nicht gefunden!',
+      },{
+        error:'Confirmation token not found!',
+        [AppLanguages.ru]:'Токен подтверждения не найден!',
+        [AppLanguages.en]:'Confirmation token not found!',
+        [AppLanguages.de]:'Bestätigungstoken nicht gefunden!',
+      },{
+        error: 'Operation token out of date!',
+        [AppLanguages.ru]: 'Срок действия ссылки истёк!',
+        [AppLanguages.en]: 'The link has expired!',
+        [AppLanguages.de]: 'Der Link ist abgelaufen!',
+      },{
+        error: 'New password not recognized!',
+        [AppLanguages.ru]: 'Новый пароль не найден!',
+        [AppLanguages.en]: 'New password not found!',
+        [AppLanguages.de]: 'Neues Passwort nicht gefunden!',
+      },{
+        error: 'New password is too simple!',
+        [AppLanguages.ru]: 'Новый пароль слишком прост!.',
+        [AppLanguages.en]: 'New password is too simple!',
+        [AppLanguages.de]: 'Das neue Passwort ist zu einfach!',
+      },{
+        error: "Passwords don't match!",
+        [AppLanguages.ru]: 'Пароли не совпадают.',
+        [AppLanguages.en]: 'The passwords do not match.',
+        [AppLanguages.de]: 'Die Passwörter stimmen nicht überein.',
+      },{
+        error: 'default',
+        [AppLanguages.ru]: 'Ошибка изменения пароля. Повторите попытку.',
+        [AppLanguages.en]: 'Error changing password. Please try again.',
+        [AppLanguages.de]: 'Fehler beim Ändern des Passworts. Bitte versuchen Sie es erneut.',
       }
     ],
 
@@ -458,6 +516,11 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Пароль принят. Разблокировано изменение Е-Mail и пароля',
       [AppLanguages.en]:'Password accepted. Email and password changes unlocked.',
       [AppLanguages.de]:'Passwort akzeptiert. E-Mail- und Passwortänderungen freigeschaltet.',
+    },{
+      success:'The password has been changed!',
+      [AppLanguages.ru]:'Пароль успешно изменен!',
+      [AppLanguages.en]:'Password changed successfully!',
+      [AppLanguages.de]:'Passwort erfolgreich geändert!',
     }
   ];//Подтверждения
   private userInfos:Array<UserInfoMsgType> = [
@@ -507,11 +570,6 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Сохраненный способ доставки сейчас недоступен.',
       [AppLanguages.en]:'Saved shipping method is currently unavailable.',
       [AppLanguages.de]:'Die gespeicherte Versandart ist momentan nicht verfügbar.',
-    },{
-      info: "Saved payment type unavailable",
-      [AppLanguages.ru]:'Сохраненный способ оплаты сейчас недоступен.',
-      [AppLanguages.en]:'Saved payment method is currently unavailable.',
-      [AppLanguages.de]:'Die gespeicherte Zahlungsmethode ist momentan nicht verfügbar.',
     }
 
   ];//Информационные сообщения

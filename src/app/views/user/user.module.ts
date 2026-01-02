@@ -6,11 +6,15 @@ import { SignupComponent } from './signup/signup.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../../shared/shared.module';
 import {MatTooltip} from "@angular/material/tooltip";
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 @NgModule({
   declarations: [
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    ResetPasswordComponent,
+    ChangePasswordComponent
   ],
     imports: [
         CommonModule,

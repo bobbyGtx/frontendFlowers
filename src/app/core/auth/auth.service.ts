@@ -1,5 +1,11 @@
-import {inject, Injectable} from '@angular/core';
-import {BehaviorSubject, map, Observable, throwError} from 'rxjs';
+import {inject, Injectable, OnDestroy} from '@angular/core';
+import {
+  BehaviorSubject,
+  map,
+  Observable,
+  Subscription,
+  throwError
+} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {ResponseDataValidator} from '../../shared/utils/response-data-validator.util';
@@ -9,13 +15,15 @@ import {LoginResponseType} from '../../../assets/types/responses/login-response.
 
 @Injectable({providedIn: 'root'})
 
-export class AuthService {
+export class AuthService implements OnDestroy {
   private http: HttpClient = inject(HttpClient);
   rememberMe: boolean = false;
   private accessTokenKey: string = 'accessToken';
   private refreshTokenKey: string = 'refreshToken';
   private userIdKey: string = 'userId';
   public isLogged$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  private subscriptions$:Subscription = new Subscription();
 
   userTemplate: AuthInfoType = {
     userId: 0,
@@ -134,5 +142,9 @@ export class AuthService {
     sessionStorage.removeItem(this.userIdKey);
     this.isLogged$.next(false);
     this.rememberMe = false;
+  }
+
+  ngOnDestroy() {
+    this.subscriptions$.unsubscribe();
   }
 }
