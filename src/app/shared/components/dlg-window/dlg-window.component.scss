@@ -1,0 +1,38 @@
+@import 'variables';
+@import 'mixins';
+.popup-message{
+  padding: 100px 70px 220px 70px;
+  box-sizing: border-box;
+  max-width: 727px;
+  position: relative;
+  text-align: center;
+  color: $green-text-color;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  background-image: url("../../../../../public/images/page/order-image.png");
+  background-size: 296px 216px;
+
+  .order-popup-close{
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    cursor: pointer;
+    svg{
+      fill:none;
+      stroke: $remove-btn-color;
+      &:hover{
+        cursor: pointer;
+        stroke: $remove-btn-color-h;
+      }
+    }
+  }
+  .order-popup-title{
+    @include head-lora(32px);
+    margin-bottom: 40px;
+  }
+  .order-popup-content{
+
+  }
+}

@@ -12,18 +12,21 @@ import {CarouselModule} from 'ngx-owl-carousel-o';
 import { CountSelectorComponent } from './components/count-selector/count-selector.component';
 import {MatTooltip} from "@angular/material/tooltip";
 import { LoaderComponent } from './components/loader/loader.component';
+import {MatDialogClose} from "@angular/material/dialog";
+import { DlgWindowComponent } from './components/dlg-window/dlg-window.component';
 
 @NgModule({
-    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent],
+    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent, DlgWindowComponent],
     imports: [
         CommonModule,
         MatButton,
         RouterLink,
         FormsModule,
         CarouselModule,
-        MatTooltip
+        MatTooltip,
+        MatDialogClose
     ],
-    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent],
+    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent,DlgWindowComponent],
 })
 export class SharedModule {
 }

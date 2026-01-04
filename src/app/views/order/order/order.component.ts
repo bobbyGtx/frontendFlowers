@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CartService} from '../../../shared/services/cart.service';
 import {catchError, combineLatest, Observable, of, Subscription} from 'rxjs';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
@@ -15,7 +15,6 @@ import {PaymentTypesResponseType} from '../../../../assets/types/responses/payme
 import {PaymentTypeType} from '../../../../assets/types/payment-type.type';
 import {AbstractControl, FormBuilder, Validators} from '@angular/forms';
 import {Config} from '../../../shared/config';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {OrderService} from '../../../shared/services/order.service';
 import {OrderParamsType} from '../../../../assets/types/order-params.type';
 import {OrderResponseType} from '../../../../assets/types/responses/order-response.type';
@@ -23,6 +22,7 @@ import {UserService} from '../../../shared/services/user.service';
 import {AuthService} from '../../../core/auth/auth.service';
 import {UserDataResponseType} from '../../../../assets/types/responses/user-data-response.type';
 import {UserDataType} from '../../../../assets/types/user-data.type';
+import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 
 @Component({
   selector: 'app-order',
@@ -30,8 +30,6 @@ import {UserDataType} from '../../../../assets/types/user-data.type';
   styleUrl: './order.component.scss'
 })
 export class OrderComponent implements OnInit, OnDestroy {
-
-  @ViewChild('popup') popup!: TemplateRef<ElementRef>;
 
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private cartService: CartService = inject(CartService);
@@ -42,8 +40,7 @@ export class OrderComponent implements OnInit, OnDestroy {
   private authService: AuthService = inject(AuthService);
   private fb: FormBuilder = inject(FormBuilder);
   private router: Router = inject(Router);
-  private dialog: MatDialog = inject(MatDialog);
-  private dialogRef: MatDialogRef<any> | null = null;
+  private dlgWindowService: DlgWindowService=inject(DlgWindowService);
 
   private subscriptions$: Subscription = new Subscription();
 
@@ -55,6 +52,13 @@ export class OrderComponent implements OnInit, OnDestroy {
   protected finalAmount: number = 0;//Конечная стоимость заказа. Заполняется в deliveryAndTotalAmountCalculate
   protected lowDeliveryPrice: boolean = false;//Если активна, то цена доставки снижена согласно условия
   private userDataFromServer:UserDataType|null = null;
+
+  private dialogContents={
+      title:'Благодарим за заказ!',
+      content:'<div class="additional-title">Ваш заказ оформлен.</div>'+
+        '<div class="message-string">Вся информация о заказе была выслана вам на почту.</div>'+
+        '<div class="message-string">Курьер свяжется с вами за два часа до доставки товара.</div>',
+  }
 
   get firstName() {
     return this.orderForm.get('firstName');
@@ -206,13 +210,7 @@ export class OrderComponent implements OnInit, OnDestroy {
             throw new Error(data.message);
           }
           this.cartService.resetCartCache();
-          this.dialogRef = this.dialog.open(this.popup, {
-            height: 'unset',
-            maxWidth: 'unset'
-          });
-          this.dialogRef.afterClosed().subscribe(() => {
-            this.router.navigate(['/']);
-          });
+          this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,'/');
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.errorObj(errorResponse.error, ReqErrorTypes.createOrder);

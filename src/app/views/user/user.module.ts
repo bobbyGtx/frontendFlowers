@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { UserRoutingModule } from './user-routing.module';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
@@ -21,7 +21,8 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
         SharedModule,
         ReactiveFormsModule,
         UserRoutingModule,
-        MatTooltip
+        MatTooltip,
+        NgOptimizedImage
     ]
 })
 export class UserModule { }

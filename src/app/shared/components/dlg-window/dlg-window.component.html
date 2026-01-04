@@ -1,0 +1,13 @@
+<ng-template #popup>
+  <div class="popup-message">
+    <div class="order-popup-close" mat-dialog-close>
+      <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
+        <line x1="13.9238" y1="2.62971" x2="1.90301" y2="14.6505" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="order-popup-title">{{title}}</div>
+    <div class="order-popup-content" [innerHTML]="htmlContent">
+    </div>
+  </div>
+</ng-template>

@@ -47,7 +47,6 @@ export class UserRequestService implements OnDestroy {
           let stillActive = false;
           if (this.resetPassCounter > 0) {
             this.resetPassCounter--;
-            console.log(this.resetPassCounter);
             this.resetPasswordCooldown$.next(this.resetPassCounter > 0 ? ConverterUtils.secondsToMinutes(this.resetPassCounter) : null);
             stillActive = true;
           }
@@ -113,6 +112,7 @@ export class UserRequestService implements OnDestroy {
       }),
       catchError((errorResponse:HttpErrorResponse)=>{
         if (errorResponse.error.timer){
+          ConverterUtils.secondsToMinutes(errorResponse.error.timer);
           this.resetPassCounter = errorResponse.error.timer;
           this.timerActive$.next(true);
         }else this.resetPasswordCooldown$.next(null);

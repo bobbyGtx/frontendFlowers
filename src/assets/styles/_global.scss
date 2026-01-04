@@ -283,6 +283,9 @@ input::-webkit-inner-spin-button {
     background-color: gray;
     cursor: not-allowed;
   }
+  .monospace{
+    font-family: 'Courier New', Courier, monospace;
+  }
 }
 a.button{
   display: inline-block;
@@ -365,3 +368,14 @@ a.button{
   }
 }
 
+//-------Стили для контента диалогового окна
+
+.additional-title{
+  font-size: 22px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.message-string{
+  font-size: 18px;
+  margin-bottom: 8px;
+}

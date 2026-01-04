@@ -7,6 +7,7 @@ import {DefaultResponseType} from '../../../../assets/types/responses/default-re
 import {HttpErrorResponse} from '@angular/common/http';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {UserRequestService} from '../../../core/user-request.service';
+import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 
 @Component({
   selector: 'app-change-password',
@@ -19,9 +20,16 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private fb: FormBuilder = inject(FormBuilder);
   private userRequestService: UserRequestService = inject(UserRequestService);
+  private dlgWindowService: DlgWindowService=inject(DlgWindowService);
+
   private subscriptions$: Subscription = new Subscription();
   protected rToken: string | null = null;
   protected requestSuccessful: boolean = false;
+  private dialogContents={
+      title:'Пароль изменен',
+      content:'<div class="additional-title">Новый пароль успешно сохранен.</div>' +
+        '<div class="message-string">Вы можете использовать новый пароль для входа в свою учетную запись.</div>\n',
+  }
 
   changePassForm = this.fb.group({
     password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
@@ -47,6 +55,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
           }
           this.showSnackService.success(data.message);
           this.requestSuccessful = true;
+          this.changePassForm.reset();
+          this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,'/login');
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(errorResponse.error.message, ReqErrorTypes.saveNewPassword);

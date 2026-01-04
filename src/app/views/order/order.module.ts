@@ -6,10 +6,8 @@ import {OrderComponent} from './order/order.component';
 import {SharedModule} from '../../shared/shared.module';
 import {MatTooltip} from "@angular/material/tooltip";
 import {ReactiveFormsModule} from '@angular/forms';
-import {MatDialogModule} from '@angular/material/dialog';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from '@angular/material/select';
-
 
 @NgModule({
   declarations: [
@@ -21,7 +19,6 @@ import {MatOption, MatSelect} from '@angular/material/select';
     SharedModule,
     ReactiveFormsModule,
     MatTooltip,
-    MatDialogModule,
     OrderRoutingModule,
     MatFormField,
     MatLabel,
