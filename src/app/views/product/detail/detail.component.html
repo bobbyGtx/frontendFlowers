@@ -69,7 +69,7 @@
         <div class="detail-info-params">
           <div class="detail-info-params-count" *ngIf="!product.disabled && product.count>0">
             <span>Количество: </span>
-            <count-selector (onCountChange)="updateCount($event)" [count]="product.countInCart?product.countInCart:count" [maxCount]="product.count" [disabled]="product.disabled"></count-selector>
+            <count-selector (onCountChange)="updateCount($event)" [count]="product.countInCart?product.countInCart:count" [maxCount]="product.count" [disabled]="product.disabled" [filterOn]="!!product.countInCart"></count-selector>
           </div>
           <div class="product-not-allowed" *ngIf="product.disabled || product.count===0">Товар не доступен!</div>
           <div class="detail-info-params-price" [style.opacity]="product.disabled || product.count==0?0.4:1">{{product.price}} EUR</div>
