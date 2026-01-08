@@ -25,7 +25,7 @@
     </div>
   </div>
   <div class="product-card-extra" *ngIf="!isLight">
-    <count-selector (onCountChange)="updateCount($event)" [count]="product.countInCart?product.countInCart:count" [maxCount]="product.count" [disabled]="product.disabled"></count-selector>
+    <count-selector (onCountChange)="updateCount($event)" [count]="product.countInCart?product.countInCart:count" [maxCount]="product.count" [disabled]="product.disabled" [filterOn]="!!product.countInCart"></count-selector>
     <a [routerLink]="'/product/' + product.url" class="product-card-detail">
       <svg width="18" height="4" viewBox="0 0 18 4" xmlns="http://www.w3.org/2000/svg">
         <circle cx="2" cy="2" r="2" fill="#9AA89B"/>

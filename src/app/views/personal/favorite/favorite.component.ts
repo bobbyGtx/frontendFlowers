@@ -35,11 +35,10 @@ export class FavoriteComponent implements OnInit, OnDestroy {
     const product:FavoriteProductType = this.favoriteProducts[arrIndex];
     if (product.isInCart) this.updateCart(product.id, count);
     else product.countInCart = count;
-    console.log(count);
   }
 
   protected updateCart(productId:number,quantity:number|undefined):void{
-    if (quantity === undefined) return;
+    if (quantity===undefined) return;
     const product:FavoriteProductType|undefined = this.favoriteProducts.find((favProductItem:FavoriteProductType) => favProductItem.id === productId);
     if (!product) return;
     const cartProduct:CartProductType = {
