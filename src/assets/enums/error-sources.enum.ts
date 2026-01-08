@@ -3,4 +3,6 @@ export enum ErrorSources {
   PaymentTypes='PaymentTypes',
   UserData='UserData',
   Orders='Orders',
+  Favorites='Favorites',
+  UserCart='UserCart',
 }

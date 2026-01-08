@@ -6,7 +6,7 @@
         <div class="auth-input">
           <input type="text" placeholder="Электроная почта" #tooltip="matTooltip"
                  formControlName="email"
-                 [matTooltip]="email?.errors?.['emailProblem']?'Этот адрес E-Mail занят!':'Введите имя получателя'" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+                 [matTooltip]="email?.errors?.['emailProblem']?'Этот адрес E-Mail занят!':'Введите Ваш E-Mail адрес'" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
         </div>
         <div class="auth-input password-input">

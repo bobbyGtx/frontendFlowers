@@ -29,48 +29,6 @@ export class CartComponent implements OnInit , OnDestroy {
   totalCount:number=0;
   showedMessages:Array<string>=[];
 
-  ngOnInit() {
-    this.subscriptions$.add(
-      this.cartService.getCart(true).subscribe({
-        next: (data: CartResponseType) => {
-          //Может быть error с нормальным ответом при проблемах с товарами
-          if (data.error && !data.cart) {
-            this.showSnackService.error(this.cartService.getCartError);
-            throw new Error(data.message);
-          }//Если ошибка есть - выводим её и завершаем функцию
-          //if (data.error && data.cart) this.showSnackService.error(data.message,ReqErrorTypes.cartGetCart);Инфо сообщение выводим только в сервисе
-          if (data.messages) this.showMessages(data);
-          //if (data.messages) this.showSnackService.infoObj(data);
-          if (data.cart){
-            this.cartItems = data.cart.items;
-            this.totalCount=data.cart.count;
-            this.totalAmount=data.cart.amount;
-            if (this.cartItems.length > 0){
-              this.subscriptions$.add(
-                this.productService.getBestProducts().subscribe({
-                  next: (data:BestProductsResponseType) => {
-                    if (data.error){
-                      this.showSnackService.error(this.productService.getBestProductsError);
-                      throw new Error(data.message);
-                    }
-                    if (data.products)this.extraProducts=data.products;
-                  },
-                  error: (errorResponse:HttpErrorResponse) => {
-                    this.showSnackService.error(this.productService.getBestProductsError);
-                    console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getBestProducts)! Code:${errorResponse.status}`);
-                  }
-                })
-              );
-            }
-          }
-        },
-        error: (errorResponse: HttpErrorResponse) => {
-          if (errorResponse.status !==401 && errorResponse.status !== 403) this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
-          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
-        }
-      }));
-  }
-
   editCount(cartProduct:CartProductType, count:number){
     this.subscriptions$.add(
       this.cartService.updateCart(cartProduct,count).subscribe({
@@ -125,6 +83,48 @@ export class CartComponent implements OnInit , OnDestroy {
 
   updateCount(cartProduct:CartProductType,value:number) {
     this.editCount(cartProduct,value);
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(
+      this.cartService.getCart(true).subscribe({
+        next: (data: CartResponseType) => {
+          //Может быть error с нормальным ответом при проблемах с товарами
+          if (data.error && !data.cart) {
+            this.showSnackService.error(this.cartService.getCartError);
+            throw new Error(data.message);
+          }//Если ошибка есть - выводим её и завершаем функцию
+          //if (data.error && data.cart) this.showSnackService.error(data.message,ReqErrorTypes.cartGetCart);Инфо сообщение выводим только в сервисе
+          if (data.messages) this.showMessages(data);
+          //if (data.messages) this.showSnackService.infoObj(data);
+          if (data.cart){
+            this.cartItems = data.cart.items;
+            this.totalCount=data.cart.count;
+            this.totalAmount=data.cart.amount;
+            if (this.cartItems.length > 0){
+              this.subscriptions$.add(
+                this.productService.getBestProducts().subscribe({
+                  next: (data:BestProductsResponseType) => {
+                    if (data.error){
+                      this.showSnackService.error(this.productService.getBestProductsError);
+                      throw new Error(data.message);
+                    }
+                    if (data.products)this.extraProducts=data.products;
+                  },
+                  error: (errorResponse:HttpErrorResponse) => {
+                    this.showSnackService.error(this.productService.getBestProductsError);
+                    console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (getBestProducts)! Code:${errorResponse.status}`);
+                  }
+                })
+              );
+            }
+          }
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          if (errorResponse.status !==401 && errorResponse.status !== 403) this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartGetCart);
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
+        }
+      }));
   }
 
   ngOnDestroy() {

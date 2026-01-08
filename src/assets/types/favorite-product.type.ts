@@ -7,4 +7,6 @@ export type FavoriteProductType = {
   count: number,
   disabled: boolean,
   ends: boolean,//Маркер того, что товар заканчивается
+  countInCart?: number,//флаг корзины фронтенда
+  isInCart?: boolean,
 }

@@ -51,8 +51,9 @@ header.header{
                 line-height: 1;
                 cursor: pointer;
                 &.active{
-                  text-shadow: 0 2px 4px rgba($green-text-color, 0.30);
-                  //font-weight: bold;
+                  //text-shadow: 0 2px 4px rgba($green-text-color, 0.30);
+                  font-weight: 500;
+                  color: $header-icon-color-h;
                 }
               }
             }
@@ -61,11 +62,14 @@ header.header{
         .header-top-phone{
           height: 14px;
           a{
-            color: $green-text-color;
+            color: $header-icon-color;
             font-size: 16px;
             line-height: 1;
             text-decoration: none;
             margin-right: 59px;
+            &:hover{
+              color: $header-icon-color-h;
+            }
           }
         }
         .header-top-actions{
@@ -211,7 +215,12 @@ header.header{
   }
 }
 
-.login-icon,.user-icon{
-  fill:none;
+.svg-icon{
+  width: 24px;
+  height: 24px;
+  fill:$header-icon-color;
+  &:hover{
+    fill:$header-icon-color-h;
+  }
 }
 

@@ -114,8 +114,12 @@ footer.footer{
           max-width: 230px;
           .payment-item{
             height: 35px;
-            background-position: top;
+            background-position: center;
             background-size: cover;
+            transition: transform .2s;
+            &:hover{
+              transform: scale(1.1);
+            }
           }
         }
       }
@@ -132,6 +136,9 @@ footer.footer{
             font-weight: 500;
           }
           .footer-contact-info{
+            a, a:visited{
+              color:$gray-text-color;
+            }
           }
         }
       }

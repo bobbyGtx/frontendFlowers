@@ -7,11 +7,17 @@
     </div>
 
     <div class="favorite-products" *ngIf="favoriteProducts.length">
-      <div class="favorite-product" *ngFor="let favProduct of favoriteProducts">
+      <div class="favorite-product" *ngFor="let favProduct of favoriteProducts; let arrIndex = index;">
         <div class="first-group">
-          <div class="favorite-product-image" [class.disabled]="favProduct.disabled"
-               [style.background-image]="'url('+serverImagesPath + favProduct.image + ')'"></div>
-          <div class="favorite-product-name">{{ favProduct.name }}</div>
+          <div class="favorite-product-image-wrapper">
+            <div class="favorite-product-image"
+                 [routerLink]="'/product/'+ favProduct.url"
+                 [class.disabled]="favProduct.disabled"
+                 [style.background-image]="'url('+serverImagesPath + favProduct.image + ')'"></div>
+          </div>
+          <div class="favorite-product-name"><a [routerLink]="'/product/'+ favProduct.url">{{ favProduct.name }}</a>
+
+          </div>
         </div>
         <div class="second-group">
           <div class="favorite-product-price">{{ favProduct.price }} EUR</div>
@@ -21,8 +27,13 @@
               matTooltipPosition="above"
               matTooltipHideDelay="200"
               *ngIf="favProduct.ends && !favProduct.disabled">Заканчивается</span></div>
+          <count-selector (onCountChange)="updateCount($event,arrIndex)" [count]="favProduct.countInCart?favProduct.countInCart:1" [maxCount]="favProduct.count" [disabled]="favProduct.disabled"></count-selector>
           <div class="favorite-product-action">
-            <button [routerLink]="'/product/'+favProduct.url" class="button">Открыть</button>
+            <button class="button" *ngIf="!favProduct.isInCart" [disabled]="favProduct.disabled" (click)="updateCart(favProduct.id,favProduct.countInCart)">В корзину</button>
+            <button class="button button-transparent button-in-cart" *ngIf="favProduct.isInCart" [disabled]="favProduct.disabled" (click)="removeFromCart(arrIndex)">
+              <span>В корзине</span>
+              <span>Удалить</span>
+            </button>
           </div>
           <div class="favorite-product-remove">
             <a title="Удалить из избранного" (click)="removeFromFavorites(favProduct.id)">

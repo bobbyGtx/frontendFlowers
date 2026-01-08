@@ -7,7 +7,12 @@
           </svg>
         </span>
   </div>
-  <div class="product-card-image" [class.disabled]="product.disabled" [style.background-image]="'url('+images+product.image+')'"></div>
+  <div class="product-card-image-wrapper">
+    <div class="product-card-image"
+         [routerLink]="['/product/'+product.url]"
+         [class.disabled]="product.disabled" [style.background-image]="'url('+images+product.image+')'"></div>
+  </div>
+
   <div class="product-card-name">{{product.name}}</div>
   <div class="product-card-info" *ngIf="!isLight">
     <div class="product-card-price">{{product.price}} EUR</div>

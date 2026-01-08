@@ -8,7 +8,7 @@
          matTooltipClass="mat-tooltip-compact"
          matTooltipPosition="above"
          matTooltipHideDelay="200"
-         [class.invalid]="count>maxCount" [min]="disabled?0:1" [max]="disabled?0:maxCount" [disabled]="disabled" [(ngModel)]="count" (keyup)="onChangeCount($event)">
+         [class.invalid]="count>maxCount" [min]="disabled?0:1" [max]="disabled?0:maxCount" [disabled]="disabled" [(ngModel)]="count" (keyup)="onChangeCount($event)" (blur)="onBlur($event)">
   <div class="svg-btn" (click)="increaseCount()">
     <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
       <path d="M7.20871 12V7.20896H12V4.81343H7.20871V0H4.81307V4.81343H0V7.20896H4.81307V12H7.20871Z"/>

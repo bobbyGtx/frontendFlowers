@@ -63,7 +63,6 @@ class ProductCardComponent implements OnInit, OnDestroy{
     this.count=1;
     this.product.countInCart=0;
     this.updateCart(0);
-
   }
 
   updateCount(count:number){

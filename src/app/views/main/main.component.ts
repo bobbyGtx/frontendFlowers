@@ -95,11 +95,8 @@ export class MainComponent implements OnInit, OnDestroy {
   private favoriteProducts:FavoriteProductType[]=[];
 
   ngOnInit() {
-    const bestProducts$ = this.productService.getBestProducts().pipe(
-      catchError((err: HttpErrorResponse) =>
-        of({ __error: true, err } as any)
-      )
-    );
+    const bestProducts$ = this.productService.getBestProducts()
+      .pipe(catchError((err: HttpErrorResponse) => of({ __error: true, err } as any)));
     const cart$ = this.cartService.getCart()
       .pipe(catchError((err: HttpErrorResponse) => of({ __error: true, err } as any)));
     const favorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites()

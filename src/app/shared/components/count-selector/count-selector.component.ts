@@ -1,6 +1,6 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {debounceTime, Subject,} from 'rxjs';
+import {debounceTime, filter, Subject,} from 'rxjs';
 
 @Component({
   selector: 'count-selector',
@@ -23,6 +23,7 @@ export class CountSelectorComponent implements OnInit {
     this.filter
       .pipe(
         debounceTime(300),
+        filter((cartCount:number) => cartCount !== -1)
       )
       .subscribe(cartCount => {
         this.onCountChange.emit(cartCount);
@@ -34,14 +35,17 @@ export class CountSelectorComponent implements OnInit {
       this.count = 0;
       return
     }
+    if (!(event.target as HTMLInputElement).value) this.filter.next(-1);
     let newValue:number=Number((event.target as HTMLInputElement).value);
+    if (!newValue || newValue < 1) return;
     if (newValue > this.maxCount){
       this.count = this.maxCount;
-      console.log(this.count);
       this.showSnackService.error(`Доступно ${this.maxCount} единиц товара!`);
     }
-    if (!newValue || newValue < 1) this.count = 1;
     this.filter.next(this.count);
+  }
+  onBlur(event:Event){
+    if (!(event.target as HTMLInputElement).value) this.filter.next(1);
   }
 
   decreaseCount(){

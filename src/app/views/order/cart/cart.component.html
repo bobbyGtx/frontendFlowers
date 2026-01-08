@@ -4,8 +4,13 @@
     <div class="cart-info" *ngIf="cartItems.length">
       <div class="cart-products">
         <div class="cart-product" *ngFor="let cartProduct of cartItems">
-          <div class="cart-product-image" [class.disabled]="cartProduct.product.disabled" [style.background-image]="'url('+serverImagesPath + cartProduct.product.image + ')'">
+          <div class="cart-product-image-wrapper">
+            <div class="cart-product-image" [routerLink]="'/product/'+cartProduct.product.url"
+                 [class.disabled]="cartProduct.product.disabled"
+                 [style.background-image]="'url('+serverImagesPath + cartProduct.product.image + ')'">
+            </div>
           </div>
+
           <div class="cart-product-name"><a [routerLink]="'/product/'+cartProduct.product.url">{{cartProduct.product.name}}</a></div>
           <count-selector (onCountChange)="updateCount(cartProduct.product,$event)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled"></count-selector>
           <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
