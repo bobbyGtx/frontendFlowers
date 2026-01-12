@@ -127,6 +127,7 @@
             box-sizing: border-box;
             background: transparent;
             border: 1px solid transparent;
+            user-select: none;
             &.processing{
               color:$order-status-color-processing;
               border-color: $order-status-color-processing;
@@ -152,6 +153,7 @@
             font-size: 22px;
             font-weight: 600;
             color: $gray-text-color;
+            user-select: none;
           }
         }
 

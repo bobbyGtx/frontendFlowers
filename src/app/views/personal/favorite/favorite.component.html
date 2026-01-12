@@ -29,14 +29,18 @@
               *ngIf="favProduct.ends && !favProduct.disabled">Заканчивается</span></div>
           <count-selector (onCountChange)="updateCount($event,arrIndex)" [count]="favProduct.countInCart?favProduct.countInCart:1" [maxCount]="favProduct.count" [disabled]="favProduct.disabled" [filterOn]="favProduct.isInCart"></count-selector>
           <div class="favorite-product-action">
-            <button class="button" *ngIf="!favProduct.isInCart" [disabled]="favProduct.disabled" (click)="updateCart(favProduct.id,favProduct.countInCart)">В корзину</button>
-            <button class="button button-transparent button-in-cart" *ngIf="favProduct.isInCart" [disabled]="favProduct.disabled" (click)="removeFromCart(arrIndex)">
+            <button class="button" matTooltip='Добавить в корзину' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+                    matTooltipShowDelay="200" matTooltipHideDelay="200" *ngIf="!favProduct.isInCart" [disabled]="favProduct.disabled" (click)="updateCart(favProduct.id,favProduct.countInCart)">В корзину</button>
+            <button class="button button-transparent button-in-cart" matTooltip='Удалить из корзины' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+                    matTooltipShowDelay="200" matTooltipHideDelay="200"
+                    *ngIf="favProduct.isInCart" [disabled]="favProduct.disabled" (click)="removeFromCart(arrIndex)">
               <span>В корзине</span>
               <span>Удалить</span>
             </button>
           </div>
           <div class="favorite-product-remove">
-            <a title="Удалить из избранного" (click)="removeFromFavorites(favProduct.id)">
+            <a matTooltip='Удалить из избранного' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+               matTooltipShowDelay="200" matTooltipHideDelay="200" (click)="removeFromFavorites(favProduct.id)">
               <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                 <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
                 <line x1="13.9238" y1="2.62996" x2="1.90301" y2="14.6508" stroke-linecap="round"/>

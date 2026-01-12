@@ -16,6 +16,7 @@ import {CarouselModule} from 'ngx-owl-carousel-o';
 import {NgOptimizedImage} from "@angular/common";
 import {AuthInterceptor} from './core/auth/auth.interceptor';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -25,17 +26,18 @@ import {MatTooltipModule} from '@angular/material/tooltip';
     FooterComponent,
     MainComponent,
   ],
-  imports: [
-    BrowserModule,
-    MatSnackBarModule,
-    SharedModule,
-    MatMenuModule,
-    MatIcon,
-    MatTooltipModule,
-    CarouselModule,
-    NgOptimizedImage,
-    AppRoutingModule
-  ],
+    imports: [
+        BrowserModule,
+        MatSnackBarModule,
+        SharedModule,
+        MatMenuModule,
+        MatIcon,
+        MatTooltipModule,
+        CarouselModule,
+        NgOptimizedImage,
+        AppRoutingModule,
+        ReactiveFormsModule
+    ],
   providers: [provideHttpClient(), provideAnimationsAsync(),provideHttpClient(withInterceptorsFromDi()),
     {
       provide:HTTP_INTERCEPTORS,
