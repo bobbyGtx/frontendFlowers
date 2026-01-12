@@ -115,7 +115,7 @@ export class FavoriteComponent implements OnInit, OnDestroy {
         }
       ));//обязательный запрос, без которого летим в error при подписке
 
-    const favorites$:Observable<FavoritesResponseType> = this.favoriteService.getFavorites()
+    const favorites$:Observable<FavoritesResponseType> = this.favoriteService.getFavorites(true)
       .pipe(
         catchError((error: HttpErrorResponse):Observable<ExtErrorResponseType>=>{
           return throwError(():ExtErrorResponseType=>{

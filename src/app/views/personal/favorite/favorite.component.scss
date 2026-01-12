@@ -89,6 +89,23 @@
               }
             }
           }
+          .favorite-product-attention{
+            width: 26px;
+            height: 26px;
+            svg{
+              height: 100%;
+              width: 100%;
+              fill: $attention-icon-color;
+              animation: attention-rotate 4s infinite linear;
+            }
+            &:hover{
+              svg{
+                fill: $attention-icon-color-h;
+                cursor: pointer;
+              }
+
+            }
+          }
         }
         .second-group{
           display: flex;
@@ -99,13 +116,6 @@
             font-weight: 600;
             color: $gray-text-color;
             user-select: none;
-          }
-          .favorite-product-end{
-            width: 140px;
-            color: red;
-            text-align: center;
-            user-select: none;
-
           }
           .favorite-product-action{
             margin-left: 20px;
@@ -136,4 +146,21 @@
   }
 }
 
+@keyframes attention-rotate {
+  0%{
+    transform: rotateY(0deg);
+  }
+  25%{
+    transform: rotateY(45deg);
+  }
+  50%{
+    transform: rotateY(0deg);
+  }
+  75%{
+    transform: rotateY(-45deg);
+  }
+  100%{
+    transform: rotateY(0deg);
+  }
+}
 
