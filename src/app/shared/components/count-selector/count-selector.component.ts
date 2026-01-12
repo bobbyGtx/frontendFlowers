@@ -69,6 +69,7 @@ export class CountSelectorComponent implements OnInit {
   }
 
   emitChanges(value:number){
+    if (value === -1)return;
     if (this.filterOn) this.filter.next(value);
     else this.onCountChange.emit(value);
   }

@@ -22,7 +22,6 @@
       box-shadow: 0 0 8px 0 $filter-header-bg;
       .product-card-image{
         background-size: 102%;
-
       }
     }
   }
@@ -40,13 +39,23 @@
       path:first-child{
         fill: black;
       }
+      &:hover{
+        path:first-child{
+          fill: #6dd478;
+        }
+      }
     }
     .in-favorites {
       svg{
         path{
-          fill: #B6D5B9;
-          &:first-child{
-            fill: #6dd478;
+          fill: #6dd478;
+        }
+        &:hover{
+          path{
+            fill: #B6D5B9;
+            &:first-child{
+              fill: #6dd478;
+            }
           }
         }
       }
@@ -64,7 +73,7 @@
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
-      cursor: pointer;
+      cursor: default;
       transition: transform 0.3s ease-in-out;
       &.disabled {
         filter: grayscale(1);
@@ -85,7 +94,6 @@
       color: $link-color;
     }
   }
-
 
   .product-card-name {
     margin-top: 15px;
@@ -140,12 +148,24 @@
     .product-card-detail {
       display: flex;
       align-items: center;
+      svg{
+        fill:$more-link-color;
+      }
 
       span {
         margin-left: 8px;
         color: $more-link-color;
         font-size: 16px;
         font-weight: 400;
+      }
+
+      &:hover{
+        svg{
+          fill: $link-color;
+        }
+        span{
+          color: $link-color;
+        }
       }
 
     }
