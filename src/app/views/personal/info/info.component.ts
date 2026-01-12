@@ -43,57 +43,31 @@ export class InfoComponent implements OnInit, OnDestroy {
   protected userData:UserDataType|null=null;
   private stockUserDeliveryInfo: DeliveryInfoType|null=null;//переменная для быстрого сравнения.
 
-  get firstName() {
-    return this.infoForm.get('firstName');
-  }
+  get firstName() {return this.infoForm.get('firstName');}
 
-  get lastName() {
-    return this.infoForm.get('lastName');
-  }
+  get lastName() {return this.infoForm.get('lastName');}
 
-  get phone() {
-    return this.infoForm.get('phone');
-  }
+  get phone() {return this.infoForm.get('phone');}
 
-  get email() {
-    return this.infoForm.get('email');
-  }
+  get email() {return this.infoForm.get('email');}
 
-  get newPassword() {
-    return this.infoForm.get('newPassword');
-  }
+  get newPassword() {return this.infoForm.get('newPassword');}
 
-  get newPasswordRepeat() {
-    return this.infoForm.get('newPasswordRepeat');
-  }
+  get newPasswordRepeat() {return this.infoForm.get('newPasswordRepeat');}
 
-  get oldPassword() {
-    return this.infoForm.get('oldPassword');
-  }
+  get oldPassword() {return this.infoForm.get('oldPassword');}
 
-  get region() {
-    return this.infoForm.get('region');
-  }
+  get region() {return this.infoForm.get('region');}
 
-  get zip() {
-    return this.infoForm.get('zip');
-  }
+  get zip() {return this.infoForm.get('zip');}
 
-  get city() {
-    return this.infoForm.get('city');
-  }
+  get city() {return this.infoForm.get('city');}
 
-  get street() {
-    return this.infoForm.get('street');
-  }
+  get street() {return this.infoForm.get('street');}
 
-  get house() {
-    return this.infoForm.get('house');
-  }
+  get house() {return this.infoForm.get('house');}
 
-  get deliveryTypeField() {
-    return this.infoForm.get('deliveryType_id');
-  }
+  get deliveryTypeField() {return this.infoForm.get('deliveryType_id');}
 
   infoForm = this.fb.group({
     firstName: ['', [Validators.pattern(/^(?=.{2,50}$)([A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*(?:\s[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+(?:-[A-ZА-ЯЁÄÖÜ][a-zа-яёßäöü]+)*)*)$/u)]],
@@ -167,13 +141,6 @@ export class InfoComponent implements OnInit, OnDestroy {
     this.infoForm.markAsDirty();
   }
 
-  protected resetRegion():void{
-    if (this.region?.value){
-      this.region?.setValue('');
-      this.infoForm.markAsDirty();
-    }
-  }
-
   protected changeFirstLetter(control: AbstractControl<string | null, string | null> | null) {
     if (control && typeof control.value === 'string') {
       control.setValue(control.value.replace(/^\p{L}/u, c => c.toUpperCase()));
@@ -191,7 +158,7 @@ export class InfoComponent implements OnInit, OnDestroy {
     //формирование адреса доставки "deliveryInfo"
     if (this.region?.value || this.zip?.value || this.city?.value || this.street?.value || this.house?.value){
       let deliveryInfo:DeliveryInfoType = {};
-      if (this.region?.value) deliveryInfo.region=this.region?.value;
+      if (this.region?.value && this.region?.value !=='-') deliveryInfo.region=this.region?.value;
       if (this.zip?.value) deliveryInfo.zip=this.zip?.value;
       if (this.city?.value) deliveryInfo.city=this.city?.value;
       if (this.street?.value) deliveryInfo.street=this.street?.value;

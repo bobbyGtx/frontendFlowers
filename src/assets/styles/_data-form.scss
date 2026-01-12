@@ -112,15 +112,12 @@
         //grid-template-columns: 428px;
         grid-template-columns: 316px 104px;
         grid-template-areas:
-              "region reset-region"
+              "region region"
               "town zip"
               "street house";
 
         .region {
           grid-area: region;
-        }
-        .reset-region {
-          grid-area: reset-region;
         }
 
         .town {
