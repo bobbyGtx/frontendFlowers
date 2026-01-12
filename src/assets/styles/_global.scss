@@ -41,45 +41,20 @@ textarea{
   }
 }
 
-.password-input{
-  position: relative;
-  input{
-    width: 100%;
+.password-eye,.password-eye-hide{
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  right: 20px;
+  top: calc(50% - 10px);
+  fill: $password-eye-color;
+  z-index: 1;
+  &:hover{
+    fill: $password-eye-color-h;
+    cursor: pointer;
   }
-  &.old-pass{
-    input.ng-valid.ng-dirty.inValid{
-      border-color: red;
-    }
-  }
-  &.new-pass-repeat{
-    input.inValid{
-      border-color: red;
-    }
-  }
-  .password-eye,.password-eye-hide{
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    right: 15px;
-    top: calc(50% - 10px);
-    fill: $password-eye-color;
-    z-index: 1;
-    &:hover{
-      fill: $password-eye-color-h;
-      cursor: pointer;
-    }
-  }
-  input[type=text]~.password-eye{
-      display: none;
-    }
-  input[type=password]~.password-eye-hide{
-    display: none;
-  }
-  input[disabled]~.password-eye,
-  input[disabled]~.password-eye-hide{
-    display: none;
-  }
-}//расширенные стили для полей паролей
+}
+
 input::-ms-reveal,
 input::-ms-clear {
   display: none;

@@ -66,15 +66,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   }
 
-  protected showHidePassword(event: MouseEvent) {
-    const svg = event.currentTarget as HTMLElement;
-    const wrapper = svg.parentElement;
-    const input = wrapper?.querySelector('input') as HTMLInputElement;
-    if (!input) return;
-    input.type = input.type === 'password' ? 'text' : 'password';
-  }
-
   ngOnInit() {
+
     const lngParam:string|null = this.activatedRoute.snapshot.queryParams['lng']?this.activatedRoute.snapshot.queryParams['lng']:null;
     const rToken:string|null = this.activatedRoute.snapshot.queryParams['rToken']?this.activatedRoute.snapshot.queryParams['rToken']:null;
 

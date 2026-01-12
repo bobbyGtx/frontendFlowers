@@ -48,14 +48,6 @@ export class SignupComponent {
     return this.signUpForm.get('agree');
   }
 
-  protected showHidePassword(event:MouseEvent) {
-    const svg = event.currentTarget as HTMLElement;
-    const wrapper = svg.parentElement;
-    const input = wrapper?.querySelector('input') as HTMLInputElement;
-    if (!input) return;
-    input.type = input.type === 'password' ? 'text' : 'password';
-  }
-
   signUp(){
     if (this.signUpForm.valid && this.signUpForm.value.email && this.signUpForm.value.password && this.signUpForm.value.passwordRepeat && this.signUpForm.value.agree) {
       this.subscriptions$.add(

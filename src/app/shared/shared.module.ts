@@ -14,9 +14,10 @@ import {MatTooltip} from "@angular/material/tooltip";
 import { LoaderComponent } from './components/loader/loader.component';
 import {MatDialogClose} from "@angular/material/dialog";
 import { DlgWindowComponent } from './components/dlg-window/dlg-window.component';
+import { ShowPasswordDirective } from './directives/show-password.directive';
 
 @NgModule({
-    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent, DlgWindowComponent],
+    declarations: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent, DlgWindowComponent, ShowPasswordDirective],
     imports: [
         CommonModule,
         MatButton,
@@ -26,7 +27,7 @@ import { DlgWindowComponent } from './components/dlg-window/dlg-window.component
         MatTooltip,
         MatDialogClose
     ],
-    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent,DlgWindowComponent],
+    exports: [PasswordRepeatDirective, SnackbarMessageComponent, ProductCardComponent, CategoryFilterComponent, ProductsCarouselComponent, CountSelectorComponent, LoaderComponent,DlgWindowComponent,ShowPasswordDirective],
 })
 export class SharedModule {
 }

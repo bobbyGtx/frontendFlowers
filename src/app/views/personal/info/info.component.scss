@@ -32,6 +32,11 @@
     }
 
     .data-form{
+      .input-wrapper{
+        input{
+          width: 100%;
+        }
+      }
       .button{
         width: 169px;
         &.small-btn{

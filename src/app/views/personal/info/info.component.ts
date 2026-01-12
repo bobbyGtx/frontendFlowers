@@ -157,19 +157,6 @@ export class InfoComponent implements OnInit, OnDestroy {
     );
   }
 
-  oldPassKeyDwnFunc(event:KeyboardEvent,oldPasswordElement:HTMLInputElement){
-    this.oldPassFalse = false;
-    if (this.oldPassword?.valid && event.key === 'Enter') this.checkOldPassword(oldPasswordElement);
-  }
-
-  protected showHidePassword(event:MouseEvent) {
-    const svg = event.currentTarget as HTMLElement;
-    const wrapper = svg.parentElement;
-    const input = wrapper?.querySelector('input') as HTMLInputElement;
-    if (!input) return;
-    input.type = input.type === 'password' ? 'text' : 'password';
-  }
-
   protected changeDeliveryType(deliveryType: DeliveryTypeType) {
     if (this.deliveryTypeField?.value === deliveryType.id){
       this.deliveryTypeField?.setValue(0);
