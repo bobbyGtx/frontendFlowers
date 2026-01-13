@@ -99,6 +99,11 @@ header.header{
               border-radius: 50%;
               background-color: #B6D5B9;
             }
+            &.active-svg{
+              svg{
+                fill:$header-icon-color-h;
+              }
+            }
           }
         }
 

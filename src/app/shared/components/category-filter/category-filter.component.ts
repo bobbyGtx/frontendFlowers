@@ -8,6 +8,7 @@ import {CategoryFilters} from '../../../../assets/enums/category-filters.enum';
 import {ActiveParamsType} from '../../../../assets/types/active-params.type';
 import {TypeType} from '../../../../assets/types/type.type';
 import {UrlParamsEnum} from '../../../../assets/enums/url-params.enum';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 
 
 @Component({
@@ -45,6 +46,7 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   @Input() categoryWithTypes: CategoryWithTypesType | null = null;
   @Input() type: CategoryFilters | null = null;
+  @Input() appLanguage:AppLanguages | null = null;
 
   subscriptions$: Subscription = new Subscription();
 
@@ -117,7 +119,7 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
       this.activeParams.types = [url];
     }
     if (this.activeParams.page)this.activeParams.page=1;
-    this.router.navigate(['/catalog'], {
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
       queryParams: this.activeParams
     });
   }
@@ -131,7 +133,7 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
       }
     }
       if (this.activeParams.page)this.activeParams.page=1;
-      this.router.navigate(['/catalog'], {
+      this.router.navigate(['/',this.appLanguage,'catalog'], {
         queryParams: this.activeParams
       });
   }

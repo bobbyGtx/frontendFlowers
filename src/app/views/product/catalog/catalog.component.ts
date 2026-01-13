@@ -24,6 +24,8 @@ import {FavoriteProductType} from '../../../../assets/types/favorite-product.typ
 import {FavoritesResponseType} from '../../../../assets/types/responses/favorites-response.type';
 import {AuthService} from '../../../core/auth/auth.service';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 
 @Component({
   selector: 'app-catalog',
@@ -33,13 +35,16 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
 export class CatalogComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private authService: AuthService=inject(AuthService);
+  private languageService: LanguageService = inject(LanguageService);
   private productService: ProductService = inject(ProductService);
   private categoryService: CategoryService = inject(CategoryService);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private cartService: CartService = inject(CartService);
   private favoriteService: FavoriteService = inject(FavoriteService);
   protected router: Router = inject(Router);
+
   private subscriptions$: Subscription = new Subscription();
+  protected appLanguage:AppLanguages;
 
   protected activeParams: ActiveParamsType = {types: []};
   protected appliedFilters: Array<AppliedFilterType> = [];
@@ -60,8 +65,14 @@ export class CatalogComponent implements OnInit, OnDestroy {
     {name: 'По возрастанию цены', value: 'price-asc'},
     {name: 'По убыванию цены', value: 'price-desc'},
   ];
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
 
   ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
+      if (this.appLanguage !== language) this.appLanguage = language;
+    }));
     const clicks:Observable<Event> = fromEvent(document, 'click');
     this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
 
@@ -112,7 +123,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     }
     if (this.activeParams.page) this.activeParams.page = 1;
     this.debounce = false;
-    this.router.navigate(['/catalog'], {
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
       queryParams: this.activeParams
     });
   }
@@ -177,7 +188,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     }
     this.sortingOpened = false;
     this.debounce = false;
-    this.router.navigate(['/catalog'], {
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
       queryParams: this.activeParams
     });
   }
@@ -197,9 +208,11 @@ export class CatalogComponent implements OnInit, OnDestroy {
       this.activeParams.page = page;
       this.activePage = page;
       this.debounce=false;
-      this.router.navigate(['/catalog'], {
+      window.scrollTo({top: 200, behavior: 'smooth'})
+      this.router.navigate(['/',this.appLanguage,'catalog'], {
         queryParams: this.activeParams
       });
+
     }
   }
 
@@ -207,7 +220,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     let clearParams: ActiveParamsType = {types: []};
     if (this.activeParams.sort) clearParams.sort = this.activeParams.sort;
 
-    this.router.navigate(['/catalog'], {
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
       queryParams: clearParams
     });
   }

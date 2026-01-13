@@ -1,4 +1,4 @@
-<div class="product-card" *ngIf="product" [routerLink]="isLight?['/product/'+product.url]:null" [class.clickable]="isLight">
+<div class="product-card" *ngIf="product" [routerLink]="isLight?['/',appLanguage,'product',product.url]:null" [class.clickable]="isLight">
   <div class="product-card-favorite" *ngIf="!isLight" (click)="toggleFavorite()">
         <span [class.in-favorites]="product.isInFavorite">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
@@ -11,7 +11,7 @@
   </div>
   <div class="product-card-image-wrapper">
     <div class="product-card-image"
-         [routerLink]="['/product/'+product.url]"
+         [routerLink]="['/',appLanguage,'product',product.url]"
          [class.disabled]="product.disabled" [style.background-image]="'url('+images+product.image+')'"></div>
   </div>
 
@@ -33,7 +33,7 @@
   </div>
   <div class="product-card-extra" *ngIf="!isLight">
     <count-selector (onCountChange)="updateCount($event)" [count]="product.countInCart?product.countInCart:count" [maxCount]="product.count" [disabled]="product.disabled" [filterOn]="!!product.countInCart"></count-selector>
-    <a [routerLink]="'/product/' + product.url" class="product-card-detail"
+    <a [routerLink]="['/',appLanguage,'product',product.url]" class="product-card-detail"
        matTooltip="Открыть описание" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
        matTooltipShowDelay="200" matTooltipHideDelay="200">
       <svg width="18" height="4" viewBox="0 0 18 4" xmlns="http://www.w3.org/2000/svg">

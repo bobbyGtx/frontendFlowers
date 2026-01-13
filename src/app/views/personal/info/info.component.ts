@@ -19,6 +19,8 @@ import {ErrorSources} from '../../../../assets/enums/error-sources.enum';
 import {UserDataResponseType} from '../../../../assets/types/responses/user-data-response.type';
 import {DeliveryInfoType, UserDataType, UserPatchDataType} from '../../../../assets/types/user-data.type';
 import {emailExistsValidator} from '../../../shared/validators/email-exists.validator';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {LanguageService} from '../../../core/language.service';
 
 @Component({
   selector: 'app-info',
@@ -31,8 +33,10 @@ export class InfoComponent implements OnInit, OnDestroy {
   private deliveryService: DeliveryService = inject(DeliveryService);
   private paymentService: PaymentService = inject(PaymentService);
   private fb: FormBuilder = inject(FormBuilder);
+  private languageService:LanguageService=inject(LanguageService);
 
   private subscriptions$: Subscription = new Subscription();
+  protected appLanguage:AppLanguages;
 
   protected deliveryTypes: DeliveryTypeType[] = [];
   protected paymentTypes: PaymentTypeType[] = [];
@@ -42,6 +46,10 @@ export class InfoComponent implements OnInit, OnDestroy {
 
   protected userData:UserDataType|null=null;
   private stockUserDeliveryInfo: DeliveryInfoType|null=null;//переменная для быстрого сравнения.
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
 
   get firstName() {return this.infoForm.get('firstName');}
 
@@ -225,6 +233,9 @@ export class InfoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
+      if (this.appLanguage !== language) this.appLanguage = language;
+    }));
     const getDeliveryTypes$: Observable<DeliveryTypesResponseType | HttpErrorResponse> = this.deliveryService.getDeliveryTypes().pipe(
       catchError((error: HttpErrorResponse): Observable<HttpErrorResponse> => of(error)));//Ошибка не ломает combineLatest и перенаправляет ошибочный ответ в next
 

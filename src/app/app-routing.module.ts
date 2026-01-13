@@ -4,21 +4,34 @@ import {LayoutComponent} from './shared/layout/layout.component';
 import {MainComponent} from './views/main/main.component';
 import {authForwardGuard} from './core/auth/auth-forward.guard';
 import {authGuard} from './core/auth/auth.guard';
+import {languageGuard} from './core/language.guard';
 
 const routes: Routes = [
   {
-    path:'',
-    component:LayoutComponent,
-    children:[
-      {path:'', component:MainComponent},
-      {path:'', loadChildren:()=>import('./views/user/user.module').then(m => m.UserModule), canActivate:[authForwardGuard]},
-      {path:'', loadChildren:()=>import('./views/product/product.module').then(m => m.ProductModule)},
-      {path:'', loadChildren:()=>import('./views/order/order.module').then(m => m.OrderModule)},
-      {path:'', loadChildren:()=>import('./views/personal/personal.module').then(m => m.PersonalModule), canActivate:[authGuard]},
-      {path:'', loadChildren:()=>import('./views/not-found/not-found.module').then(m=>m.NotFoundModule)},
-      {path:'**', redirectTo:'404'}
+    path: ':lang',
+    component: LayoutComponent,
+    canActivate: [languageGuard],
+    children: [
+      // Главная
+      { path: '', component: MainComponent },
+      // User
+      {path: '', loadChildren: () => import('./views/user/user.module').then(m => m.UserModule), canActivate: [authForwardGuard]},
+      // Product
+      {path: '', loadChildren: () => import('./views/product/product.module').then(m => m.ProductModule)},
+      // Order
+      {path: '', loadChildren: () => import('./views/order/order.module').then(m => m.OrderModule)},
+      // Personal
+      {path: '', loadChildren: () => import('./views/personal/personal.module').then(m => m.PersonalModule), canActivate: [authGuard]},
+      // 404
+      {path: '', loadChildren: () => import('./views/not-found/not-found.module').then(m => m.NotFoundModule)},
+      // fallback внутри языка
+      { path: '**', redirectTo: '404' }
     ]
-  }
+  },
+  // редирект с корня
+  { path: '', redirectTo: 'ru', pathMatch: 'full' },
+  // глобальный fallback
+  { path: '**', redirectTo: 'ru' }
 ];
 
 @NgModule({
