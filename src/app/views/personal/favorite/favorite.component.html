@@ -31,7 +31,7 @@
           <count-selector (onCountChange)="updateCount($event,arrIndex)" [count]="favProduct.countInCart?favProduct.countInCart:1" [maxCount]="favProduct.count" [disabled]="favProduct.disabled" [filterOn]="favProduct.isInCart"></count-selector>
           <div class="favorite-product-action">
             <button class="button" matTooltip='Добавить в корзину' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
-                    matTooltipShowDelay="200" matTooltipHideDelay="200" *ngIf="!favProduct.isInCart" [disabled]="favProduct.disabled" (click)="updateCart(favProduct.id,favProduct.countInCart)">В корзину</button>
+                    matTooltipShowDelay="200" matTooltipHideDelay="200" *ngIf="!favProduct.isInCart" [disabled]="favProduct.disabled" (click)="updateCart(favProduct.id,favProduct.countInCart?favProduct.countInCart:1)">В корзину</button>
             <button class="button button-transparent button-in-cart" matTooltip='Удалить из корзины' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
                     matTooltipShowDelay="200" matTooltipHideDelay="200"
                     *ngIf="favProduct.isInCart" [disabled]="favProduct.disabled" (click)="removeFromCart(arrIndex)">
