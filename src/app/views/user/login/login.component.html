@@ -29,7 +29,7 @@
               <span class="chk-title">Запомнить меня</span>
             </label>
           <div class="auth-forgot-pass">
-            <a routerLink="/reset-password">Забыли пароль?</a>
+            <a [routerLink]="['/',appLanguage,'reset-password']">Забыли пароль?</a>
           </div>
         </div>
 
@@ -38,7 +38,7 @@
         <button class="button" [disabled]="loginForm.invalid" (click)="login()">Войти</button>
       </div>
       <div class="auth-link">
-        Нет аккаунта? <a routerLink="/signup">Зарегистрируйтесь</a>
+        Нет аккаунта? <a [routerLink]="['/',appLanguage,'signup']">Зарегистрируйтесь</a>
       </div>
 
     </div>

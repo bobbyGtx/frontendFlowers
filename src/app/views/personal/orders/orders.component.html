@@ -10,7 +10,7 @@
     <div class="orders-title-additional" *ngIf="orders.length">Здесь отображается история ваших заказов.</div>
     <div class="orders-empty" *ngIf="!orders.length">
       <div class="orders-empty-message">У Вас ещё нет заказов</div>
-      <button class="button" routerLink="/catalog">В каталог</button>
+      <button class="button" [routerLink]="['/',appLanguage,'catalog']">В каталог</button>
     </div>
     <div class="orders-list" *ngIf="orders.length">
       <div class="orders-list-item" *ngFor="let order of orders">
@@ -22,7 +22,7 @@
           <div class="orders-list-item-products-count">Кол-во товаров: {{order.items.length}}</div>
           <table class="orders-list-item-products-list">
             <tr *ngFor="let item of order.items">
-              <td><a class="product-link" [routerLink]="'/product/'+item.url">&#183; {{item.name}}</a></td>
+              <td><a class="product-link" [routerLink]="['/',appLanguage,'product',item.url]">&#183; {{item.name}}</a></td>
               <td>{{item.quantity}} шт.</td>
             </tr>
           </table>
@@ -31,8 +31,9 @@
           <div class="orders-list-item-status" [class]="order.class"
                [matTooltip]="order.updatedAt?'Изменение статуса от '+(order.updatedAt):''"
                matTooltipClass="mat-tooltip-compact" matTooltipPosition="below"
-               matTooltipShowDelay="200" matTooltipHideDelay="200"
->{{order.statusName}}</div>
+               matTooltipShowDelay="200" matTooltipHideDelay="200">
+            {{order.statusName}}
+          </div>
           <div class="orders-list-item-price">{{order.totalAmount}} EUR</div>
         </div>
 

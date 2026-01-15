@@ -39,7 +39,7 @@
         <button class="button" [disabled]="signUpForm.invalid" (click)="signUp()">Зарегистрироваться</button>
       </div>
       <div class="auth-link">
-        Уже есть аккаунт? <a routerLink="/login">Войдите</a>
+        Уже есть аккаунт? <a [routerLink]="['/',appLanguage,'login']">Войдите</a>
       </div>
 
     </div>

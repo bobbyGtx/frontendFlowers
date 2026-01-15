@@ -13,6 +13,8 @@ import {FavoritesResponseType} from '../../../assets/types/responses/favorites-r
 import {AuthService} from '../../core/auth/auth.service';
 import {FavoriteService} from '../../shared/services/favorite.service';
 import {FavoriteProductType} from '../../../assets/types/favorite-product.type';
+import {LanguageService} from '../../core/language.service';
+import {AppLanguages} from '../../../assets/enums/app-languages.enum';
 
 type ReviewType={
   name: string,
@@ -26,12 +28,16 @@ type ReviewType={
   styleUrl: './main.component.scss'
 })
 export class MainComponent implements OnInit, OnDestroy {
-  private productService: ProductService=inject(ProductService);
   private showSnackService: ShowSnackService=inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
+  private productService: ProductService=inject(ProductService);
   private cartService: CartService=inject(CartService);
   private authService: AuthService=inject(AuthService);
   private favoriteService:FavoriteService=inject(FavoriteService);
+
   private subscriptions$: Subscription=new Subscription();
+  appLanguage:AppLanguages;
+
   protected bestProducts:ProductType[]=[];
   protected customOptionsReviews: OwlOptions = {
     loop: true,
@@ -94,7 +100,14 @@ export class MainComponent implements OnInit, OnDestroy {
   ];
   private favoriteProducts:FavoriteProductType[]=[];
 
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
+
   ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language)this.appLanguage = language;
+    }));
     const bestProducts$ = this.productService.getBestProducts()
       .pipe(catchError((err: HttpErrorResponse) => of({ __error: true, err } as any)));
     const cart$ = this.cartService.getCart()

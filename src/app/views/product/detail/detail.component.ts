@@ -19,6 +19,8 @@ import {FavoriteProductType} from '../../../../assets/types/favorite-product.typ
 import {AuthService} from '../../../core/auth/auth.service';
 import {Config} from '../../../shared/config';
 import {environment} from '../../../../environments/environment';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {LanguageService} from '../../../core/language.service';
 
 @Component({
   selector: 'app-detail',
@@ -26,20 +28,27 @@ import {environment} from '../../../../environments/environment';
   styleUrl: './detail.component.scss'
 })
 export class DetailComponent implements OnInit, OnDestroy {
-  private productService: ProductService = inject(ProductService);
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
+  private productService: ProductService = inject(ProductService);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private cartService: CartService = inject(CartService);
   private authService: AuthService = inject(AuthService);
   private favoriteService: FavoriteService = inject(FavoriteService);
+
+  subscriptions$: Subscription = new Subscription();
+  appLanguage:AppLanguages;
 
   serverImagesPath: string = environment.images;
   recommendedProducts: ProductType[] = [];
   product: ProductType | null = null;
   cartProducts: CartItemType[] = [];
   favoriteProducts: FavoriteProductType[] = [];
-  subscriptions$: Subscription = new Subscription();
   count: number = 1;
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
 
   protected updateCount(value: number) {
     this.count = value;
@@ -141,6 +150,9 @@ export class DetailComponent implements OnInit, OnDestroy {
   }
 //Объединить все 3 запроса
   ngOnInit(): void {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language)this.appLanguage = language;
+    }));
     let initialized:boolean = false;
     this.subscriptions$.add(
       this.activatedRoute.params.subscribe(params => {

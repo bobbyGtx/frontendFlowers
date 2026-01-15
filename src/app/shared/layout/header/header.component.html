@@ -1,7 +1,7 @@
 <header class="header">
   <div class="container">
     <div class="logo">
-      <a routerLink="/" class="logo-link">
+      <a [routerLink]="['/',appLanguage]" class="logo-link">
         <img ngSrc="/images/logo.png" priority width="396" height="240" alt="Logo">
       </a>
     </div>
@@ -57,7 +57,7 @@
           <nav>
             <ul>
               <li *ngFor="let category of categories">
-                <a routerLink="/catalog" [queryParams]="{types:category.typesUrl}">{{category.name}}</a>
+                <a [routerLink]="['/',appLanguage,'catalog']" [queryParams]="{types:category.typesUrl}">{{category.name}}</a>
               </li>
             </ul>
           </nav>

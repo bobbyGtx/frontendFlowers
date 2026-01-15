@@ -3,7 +3,7 @@
     <div class="favorite-title">Избранное</div>
     <div class="favorite-empty" *ngIf="!favoriteProducts.length">
       <div class="cart-empty-message">В избранном нет товаров</div>
-      <button class="button" routerLink="/catalog">В каталог</button>
+      <button class="button" [routerLink]="['/',appLanguage,'catalog']">В каталог</button>
     </div>
 
     <div class="favorite-products" *ngIf="favoriteProducts.length">
@@ -11,12 +11,12 @@
         <div class="first-group">
           <div class="favorite-product-image-wrapper">
             <div class="favorite-product-image"
-                 [routerLink]="'/product/'+ favProduct.url"
+                 [routerLink]="['/',appLanguage,'product', favProduct.url]"
                  [class.disabled]="favProduct.disabled"
                  [style.background-image]="'url('+serverImagesPath + favProduct.image + ')'"></div>
           </div>
           <div class="favorite-product-name">
-            <a [routerLink]="'/product/'+ favProduct.url">{{ favProduct.name }}</a>
+            <a [routerLink]="['/',appLanguage,'product', favProduct.url]">{{ favProduct.name }}</a>
           </div>
           <div class="favorite-product-attention" [matTooltip]="'Товар заканчивается! Доступно '+favProduct.count + ' единиц'"
                matTooltipClass="mat-tooltip-compact"

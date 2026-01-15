@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../core/auth/auth.service';
@@ -8,18 +8,23 @@ import {ShowSnackService} from '../../../core/show-snack.service';
 import {DefaultResponseType} from '../../../../assets/types/responses/default-response.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {emailExistsValidator} from '../../../shared/validators/email-exists.validator';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
-export class SignupComponent {
-  showSnackService:ShowSnackService = inject(ShowSnackService);
-  router:Router = inject(Router);
-  fb:FormBuilder = inject(FormBuilder);
-  authService:AuthService=inject(AuthService);
+export class SignupComponent implements OnInit, OnDestroy {
+  private showSnackService:ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
+  private router:Router = inject(Router);
+  private fb:FormBuilder = inject(FormBuilder);
+  private authService:AuthService=inject(AuthService);
+
   subscriptions$:Subscription=new Subscription();
+  appLanguage:AppLanguages;
 
   signUpForm: FormGroup=this.fb.group({
     email: ['', {
@@ -34,6 +39,10 @@ export class SignupComponent {
     passwordRepeat: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
     agree: [false, Validators.requiredTrue],
   });
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
 
   get email() {
     return this.signUpForm.get('email');
@@ -59,7 +68,7 @@ export class SignupComponent {
                 throw new Error(data.message);
               }
               this.showSnackService.success(data.message);
-              this.router.navigate(['/login']);
+              this.router.navigate(['/',this.appLanguage,'login']);
             },
             error: (errorResponse:HttpErrorResponse)=> {
               console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected Sign Up error! Code:${errorResponse.status}`);
@@ -68,5 +77,15 @@ export class SignupComponent {
           })
       );
     }
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language)this.appLanguage = language;
+    }));
+  }
+
+  ngOnDestroy() {
+    this.subscriptions$.unsubscribe();
   }
 }

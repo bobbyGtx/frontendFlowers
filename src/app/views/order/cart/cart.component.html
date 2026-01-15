@@ -5,13 +5,13 @@
       <div class="cart-products">
         <div class="cart-product" *ngFor="let cartProduct of cartItems">
           <div class="cart-product-image-wrapper">
-            <div class="cart-product-image" [routerLink]="'/product/'+cartProduct.product.url"
+            <div class="cart-product-image" [routerLink]="['/',appLanguage,'product',cartProduct.product.url]"
                  [class.disabled]="cartProduct.product.disabled"
                  [style.background-image]="'url('+serverImagesPath + cartProduct.product.image + ')'">
             </div>
           </div>
 
-          <div class="cart-product-name"><a [routerLink]="'/product/'+cartProduct.product.url">{{cartProduct.product.name}}</a></div>
+          <div class="cart-product-name"><a [routerLink]="['/',appLanguage,'product',cartProduct.product.url]">{{cartProduct.product.name}}</a></div>
           <count-selector (onCountChange)="updateCount(cartProduct.product,$event)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled" [filterOn]="true"></count-selector>
           <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
           <div class="cart-product-remove" (click)="editCount(cartProduct.product,0)">
@@ -40,18 +40,18 @@
           <div class="cart-details-info-delivery">* без учета доставки</div>
         </div>
         <div class="cart-details-actions">
-          <button class="button button-transparent" routerLink="/catalog">Продолжить покупки</button>
-          <button class="button" routerLink="/order">Оформить заказ</button>
+          <button class="button button-transparent" [routerLink]="['/',appLanguage,'catalog']">Продолжить покупки</button>
+          <button class="button" [routerLink]="['/',appLanguage,'order']">Оформить заказ</button>
         </div>
       </div>
     </div>
     <div class="cart-empty" *ngIf="!cartItems.length">
       <div class="cart-empty-message">В корзине нет товаров</div>
-      <button class="button" routerLink="/catalog">В каталог</button>
+      <button class="button" [routerLink]="['/',appLanguage,'catalog']">В каталог</button>
     </div>
 
     <div class="extra-products" *ngIf="extraProducts.length">
-      <products-carousel [title]="'С этими товарами также покупают'" [products]="extraProducts" [lightMode]="true"></products-carousel>
+      <products-carousel [products]="extraProducts" [title]="'С этими товарами также покупают'" [lightMode]="true" [appLanguage]="appLanguage"></products-carousel>
     </div>
   </div>
 </div>

@@ -6,7 +6,7 @@ import {DialogDataType} from '../../../assets/types/dialog-data.type';
 export class DlgWindowService {
   public dlgOpenState$:Subject<DialogDataType> = new Subject<DialogDataType>();
 
-  public openDialog(title:string, htmlContent:string,redirectURL:string|null=null):void{
+  public openDialog(title:string, htmlContent:string,redirectURL:string[]|null=null):void{
     this.dlgOpenState$.next({
       title:title,
       htmlContent:htmlContent,

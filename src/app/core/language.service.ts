@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {AppLanguages} from '../../assets/enums/app-languages.enum';
 import {BehaviorSubject, Observable, tap} from 'rxjs';
+import {Config} from '../shared/config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LanguageService {
-  private appLanguage: AppLanguages=AppLanguages.ru;
+  private appLanguage: AppLanguages=Config.defaultLanguage;
 
   private appLanguage$:BehaviorSubject<AppLanguages> = new BehaviorSubject(this.appLanguage);
 

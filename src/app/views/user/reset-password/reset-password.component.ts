@@ -9,6 +9,8 @@ import {ConverterUtils} from '../../../shared/utils/converter.utils';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {UserRequestService} from '../../../core/user-request.service';
 import {DlgWindowService} from '../../../shared/services/dlg-window.service';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 
 @Component({
   selector: 'app-reset-password',
@@ -17,10 +19,14 @@ import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 })
 export class ResetPasswordComponent implements OnInit, OnDestroy {
   private showSnackService:ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
   protected router:Router = inject(Router);
   private fb:FormBuilder = inject(FormBuilder);
   private dlgWindowService: DlgWindowService=inject(DlgWindowService);
+
   private subscriptions$:Subscription = new Subscription();
+  appLanguage:AppLanguages;
+
   private userRequestService: UserRequestService = inject(UserRequestService);
   protected resetPassLink:string|null = null;
   private dialogContents={
@@ -39,6 +45,10 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   resetPassForm = this.fb.group({
     email:['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
   });
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
   get email() {
     return this.resetPassForm.get('email');
   }
@@ -69,12 +79,15 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     }
 
   ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language)this.appLanguage = language;
+    }));
     this.subscriptions$.add(this.userRequestService.resetPasswordCooldown$.subscribe((timer:string|null)=>{
       this.timer = timer?`(${timer})`:null;
     }));
   }
+
   ngOnDestroy() {
     this.subscriptions$.unsubscribe();
   }
-
 }

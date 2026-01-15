@@ -1,7 +1,7 @@
 <footer class="footer">
   <div class="container">
     <div class="logo">
-      <a routerLink="/" class="logo-link">
+      <a [routerLink]="['/',appLanguage]" class="logo-link">
         <img ngSrc="/images/logo.png" priority width="396" height="240" alt="Logo">
       </a>
     </div>
@@ -9,11 +9,10 @@
       <div class="footer-head">Меню</div>
       <nav class="footer-items">
         <ul>
-          <li><a routerLink="/">Главная</a></li>
-          <li><a routerLink="/catalog">Каталог</a></li>
-          <li><a routerLink="/" fragment="info">Доставка и оплата</a></li>
-<!--          <li><a>Новости</a></li>-->
-          <li><a routerLink="/" fragment="reviews">Отзывы</a></li>
+          <li><a [routerLink]="['/',appLanguage]">Главная</a></li>
+          <li><a routerLink="catalog">Каталог</a></li>
+          <li><a [routerLink]="['/',appLanguage]" fragment="info">Доставка и оплата</a></li>
+          <li><a [routerLink]="['/',appLanguage]" fragment="reviews">Отзывы</a></li>
         </ul>
       </nav>
     </div>
@@ -23,7 +22,7 @@
       </div>
       <nav class="footer-items">
         <ul>
-          <li routerLink="/catalog" [queryParams]="{types:category.typesUrl}" *ngFor="let category of categories"><a>{{category.name}}</a></li>
+          <li [routerLink]="['/',appLanguage,'catalog']" [queryParams]="{types:category.typesUrl}" *ngFor="let category of categories"><a>{{category.name}}</a></li>
         </ul>
       </nav>
     </div>

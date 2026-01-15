@@ -14,6 +14,8 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
 import {CartItemType} from '../../../../assets/types/cart-item.type';
 import {Router} from '@angular/router';
 import {CartProductType} from '../../../../assets/types/cart-product.type';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 
 @Component({
   selector: 'app-favorite',
@@ -22,14 +24,21 @@ import {CartProductType} from '../../../../assets/types/cart-product.type';
 })
 export class FavoriteComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
   private favoriteService: FavoriteService = inject(FavoriteService);
   private cartService: CartService=inject(CartService);
   private router:Router = inject(Router);
+
   private subscriptions$: Subscription = new Subscription();
+  appLanguage:AppLanguages;
 
   serverImagesPath: string = environment.images;
   favoriteProducts: FavoriteProductType[] = [];
   cartProducts: CartItemType[]=[];
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
 
   protected updateCount(count:number, arrIndex:number):void{
     const product:FavoriteProductType = this.favoriteProducts[arrIndex];
@@ -103,6 +112,10 @@ export class FavoriteComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language)this.appLanguage = language;
+    }));
+
     const cart$:Observable<CartResponseType> = this.cartService.getCart()
       .pipe(
         catchError((error: HttpErrorResponse):Observable<ExtErrorResponseType> => {
@@ -134,14 +147,14 @@ export class FavoriteComponent implements OnInit, OnDestroy {
         next:([cartResp,favoritesResp]:[CartResponseType,FavoritesResponseType])=>{
           if (cartResp.error || !cartResp.cart || !cartResp.cart.items || !Array.isArray(cartResp.cart.items)){
             this.showSnackService.error(this.cartService.getCartError);
-            this.router.navigate(['/']);
+            this.router.navigate(['/',this.appLanguage]);
             throw new Error(cartResp.message);
           }
           this.cartProducts = cartResp.cart.items;
 
           if (favoritesResp.error || !favoritesResp.favorites || !Array.isArray(favoritesResp.favorites)){
             this.showSnackService.error(this.favoriteService.getFavoritesError);
-            this.router.navigate(['/']);
+            this.router.navigate(['/',this.appLanguage]);
             throw new Error(favoritesResp.message);
           }
           if (favoritesResp.favorites.length===0) return;

@@ -11,6 +11,8 @@ import {environment} from '../../../../environments/environment';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
 import {CartProductType} from '../../../../assets/types/cart-product.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 
 @Component({
   selector: 'app-cart',
@@ -18,16 +20,26 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
   styleUrl: './cart.component.scss'
 })
 export class CartComponent implements OnInit , OnDestroy {
+  private showSnackService:ShowSnackService=inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
   productService:ProductService=inject(ProductService);
   cartService:CartService=inject(CartService);
-  showSnackService:ShowSnackService=inject(ShowSnackService);
+
   subscriptions$:Subscription = new Subscription();
+  appLanguage:AppLanguages;
+
   serverImagesPath: string = environment.images;
   extraProducts:ProductType[]=[];
   cartItems:CartItemType[]=[];
   totalAmount:number=0;
   totalCount:number=0;
   showedMessages:Array<string>=[];
+
+
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+  }
 
   editCount(cartProduct:CartProductType, count:number){
     this.subscriptions$.add(
@@ -86,6 +98,9 @@ export class CartComponent implements OnInit , OnDestroy {
   }
 
   ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language)this.appLanguage = language;
+    }));
     this.subscriptions$.add(
       this.cartService.getCart(true).subscribe({
         next: (data: CartResponseType) => {

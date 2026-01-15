@@ -19,8 +19,8 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {SearchProductsResponseType} from '../../../../assets/types/responses/search-products-response.type';
 import {ProductType} from '../../../../assets/types/product.type';
 import {environment} from '../../../../environments/environment';
-import {LanguageService} from '../../../core/language.service';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {Config} from '../../config';
 
 @Component({
   selector: 'app-header',
@@ -30,27 +30,21 @@ import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('searchBox') private searchBox: ElementRef<HTMLInputElement>|null = null;
   @Input() categories: CategoryWithTypesType[] = [];
+  @Input() appLanguage: AppLanguages = Config.defaultLanguage;
   imagesPath:string=environment.images;
   authService: AuthService = inject(AuthService);
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private cartService:CartService = inject(CartService);
   private productService:ProductService = inject(ProductService);
-  private languageService:LanguageService = inject(LanguageService);
   router:Router=inject(Router);
   activatedRoute:ActivatedRoute = inject(ActivatedRoute);
   private subscriptions$: Subscription = new Subscription();
   isLogged: boolean=false;
-  appLanguage:AppLanguages;
   currentFragment:string|null=null;
   count:number=0;
 
   searchProducts:ProductType[]=[];
   showSearchResult:boolean=false;
-
-
-  constructor() {
-    this.appLanguage = this.languageService.appLang;
-  }
 
   protected isRootPage(): boolean {
     return this.router.url.split('#')[0] === '/' + this.appLanguage;
@@ -60,7 +54,7 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openProduct(productUrl:string):void {
-    this.router.navigate(['/product/'+ productUrl]);
+    this.router.navigate(['/',this.appLanguage,'product', productUrl]);
     this.searchProducts=[];
     if (this.searchBox) this.searchBox.nativeElement.value = '';
   }
@@ -72,7 +66,6 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     },100);//Откладывание закрытия бокса для срабатывания навигации
   }
   logout(): void {
-
     this.cartService.resetCartCount();
     this.subscriptions$.add(
       this.authService.logout()
@@ -86,12 +79,9 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authService.removeTokens();
     this.authService.userId=null;
     this.showSnackService.success(`You have successfully logged out.`);
-    this.router.navigate(['/']);
+    this.router.navigate(['/',this.appLanguage]);
   }
   ngOnInit() {
-    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (language !== this.appLanguage) this.appLanguage = language;
-    }));
     this.subscriptions$.add(this.activatedRoute.fragment.subscribe((fragment:string|null)=>{
       this.currentFragment = fragment;
     }));

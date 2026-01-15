@@ -34,7 +34,7 @@
         </div>
         <div class="offer-inner-content">
           <div class="offer-button">
-            <a routerLink="/catalog" target="_blank" class="button">В каталог</a>
+            <a [routerLink]="['/',appLanguage,'catalog']" class="button">В каталог</a>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@
 </section>
 <section class="best-products" *ngIf="bestProducts.length">
   <div class="container">
-    <products-carousel [products]="bestProducts" [title]="'Лучшие предложения месяца'"></products-carousel>
+    <products-carousel [products]="bestProducts" [title]="'Лучшие предложения месяца'" [appLanguage]="appLanguage"></products-carousel>
   </div>
 </section>
 <section class="info" id="info">

@@ -12,7 +12,6 @@ import {AddToFavoritesResponseType} from '../../../../assets/types/responses/add
 import {AuthService} from '../../../core/auth/auth.service';
 import {FavoriteService} from '../../services/favorite.service';
 import {environment} from '../../../../environments/environment';
-import {LanguageService} from '../../../core/language.service';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 
 @Component({
@@ -23,28 +22,21 @@ import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 export class ProductCardComponent implements OnInit, OnDestroy{
   @Input() product!:ProductType;
   @Input() isLight:boolean=false;
+  @Input() appLanguage:AppLanguages=Config.defaultLanguage;
+
   //countInCart:number = 0;
   cartService:CartService=inject(CartService);
   showSnackService:ShowSnackService=inject(ShowSnackService);
   authService:AuthService=inject(AuthService);
   favoriteService:FavoriteService=inject(FavoriteService);
-  languageService:LanguageService=inject(LanguageService);
 
   subscriptions$:Subscription=new Subscription();
-  appLanguage:AppLanguages;
 
   images:string = environment.images;
   count:number=1;
 
-  constructor() {
-    this.appLanguage = this.languageService.appLang;
-  }
 
   ngOnInit():void{
-    this.subscriptions$.add(
-      this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-        if (this.appLanguage !== language)this.appLanguage = language;
-      }));
     if (this.product.countInCart) this.count=this.product.countInCart;
   }
 
