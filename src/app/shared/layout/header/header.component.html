@@ -1,5 +1,5 @@
 <header class="header">
-  <div class="container">
+  <div class="container" *ngIf="translations">
     <div class="logo">
       <a [routerLink]="['/',appLanguage]" class="logo-link">
         <img ngSrc="/images/logo.png" priority width="396" height="240" alt="Logo">
@@ -10,47 +10,61 @@
         <div class="header-top-menu">
           <nav>
             <ul>
-              <li><a [routerLink]="['/',appLanguage]" [class.active]="!currentFragment && isRootPage()">Главная</a></li>
-              <li><a routerLink="catalog" [routerLinkActive]="'active'">Каталог</a></li>
-              <li><a [routerLink]="['/',appLanguage]" fragment="reviews" [class.active]="currentFragment==='reviews'">Отзывы</a></li>
-              <li><a [routerLink]="['/',appLanguage]" fragment="info" [class.active]="currentFragment==='info'">Доставка и оплата</a></li>
+              <li><a [routerLink]="['/',appLanguage]" [class.active]="!currentFragment && isRootPage()">{{ translations.home }}</a></li>
+              <li><a routerLink="catalog" [routerLinkActive]="'active'">{{ translations.catalog }}</a></li>
+              <li><a [routerLink]="['/',appLanguage]" fragment="reviews" [class.active]="currentFragment==='reviews'">{{ translations.reviews }}</a></li>
+              <li><a [routerLink]="['/',appLanguage]" fragment="info" [class.active]="currentFragment==='info'">{{ translations.deliveryAndPay }}</a></li>
             </ul>
           </nav>
         </div>
-        <div class="header-top-phone">
-          <a href="tel:+4915510632981">+49 (1551) 063-29-81</a>
+        <div class="right-side">
+          <div class="header-top-phone">
+            <a href="tel:+4915510632981">+49 (1551) 063-29-81</a>
+          </div>
+          <div class="header-top-actions">
+            <svg class="svg-icon language-selector" [matMenuTriggerFor]="lngMenu"
+                 [matTooltip]="translations.tooltipLanguages" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above" matTooltipShowDelay="200" matTooltipHideDelay="0"
+                 xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-155.5t86-127Q252-817 325-848.5T480-880q83 0 155.5 31.5t127 86q54.5 54.5 86 127T880-480q0 82-31.5 155t-86 127.5q-54.5 54.5-127 86T480-80Zm0-82q26-36 45-75t31-83H404q12 44 31 83t45 75Zm-104-16q-18-33-31.5-68.5T322-320H204q29 50 72.5 87t99.5 55Zm208 0q56-18 99.5-55t72.5-87H638q-9 38-22.5 73.5T584-178ZM170-400h136q-3-20-4.5-39.5T300-480q0-21 1.5-40.5T306-560H170q-5 20-7.5 39.5T160-480q0 21 2.5 40.5T170-400Zm216 0h188q3-20 4.5-39.5T580-480q0-21-1.5-40.5T574-560H386q-3 20-4.5 39.5T380-480q0 21 1.5 40.5T386-400Zm268 0h136q5-20 7.5-39.5T800-480q0-21-2.5-40.5T790-560H654q3 20 4.5 39.5T660-480q0 21-1.5 40.5T654-400Zm-16-240h118q-29-50-72.5-87T584-782q18 33 31.5 68.5T638-640Zm-234 0h152q-12-44-31-83t-45-75q-26 36-45 75t-31 83Zm-200 0h118q9-38 22.5-73.5T376-782q-56 18-99.5 55T204-640Z"/></svg>
+            <mat-menu #lngMenu="matMenu" xPosition="before">
+              <button mat-menu-item *ngFor="let appLng of appLanguageList" (click)="changeAppLanguage(appLng.code)">
+                <div class="lang-menu-item" [class.active] = "appLng.code === appLanguage">
+                  <span >{{ appLng.label }}</span>
+                  <span class="svg-wrapper" *ngIf="appLng.code === appLanguage"><svg class="lang-menu-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg></span>
+                </div>
+              </button>
+            </mat-menu>
+            <a routerLink="login" *ngIf="!isLogged" [matTooltip]="translations.tooltipLogin" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+               matTooltipShowDelay="200" matTooltipHideDelay="200">
+              <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/></svg>
+            </a>
+            <a *ngIf="isLogged" [matMenuTriggerFor]="menu" [class.active-svg] = "isProfilePage()" [matTooltip]="translations.tooltipUser" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+               matTooltipShowDelay="200" matTooltipHideDelay="0">
+              <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z"/></svg>
+            </a>
+            <mat-menu #menu="matMenu" xPosition="after">
+              <button mat-menu-item routerLink="profile">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+                <span>{{translations.menuProfile}}</span>
+              </button>
+              <button mat-menu-item (click)="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+                <span>{{translations.menuLogout}}</span>
+              </button>
+            </mat-menu>
+            <a routerLink="favorite" routerLinkActive="active-svg" [matTooltip]="translations.tooltipFavorite" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+               matTooltipShowDelay="200" matTooltipHideDelay="200">
+              <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" ><path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/></svg>
+            </a>
+            <a routerLink="cart" routerLinkActive="active-svg">
+              <svg [matTooltip]="translations.tooltipCart" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+                   matTooltipShowDelay="200" matTooltipHideDelay="200"
+                   class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/></svg>
+              <span *ngIf="count" [matTooltip]="translations.tooltipProductsInCart" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+                    matTooltipShowDelay="200" matTooltipHideDelay="200">{{count}}</span>
+            </a>
+          </div>
         </div>
-        <div class="header-top-actions">
-          <a routerLink="login" *ngIf="!isLogged" matTooltip='Вход в систему' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
-             matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/></svg>
-          </a>
-          <a *ngIf="isLogged" [matMenuTriggerFor]="menu" [class.active-svg] = "isProfilePage()" matTooltip='Меню пользователя' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
-             matTooltipShowDelay="200" matTooltipHideDelay="0">
-            <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z"/></svg>
-          </a>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item routerLink="profile">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
-              <span>Профиль</span>
-            </button>
-            <button mat-menu-item (click)="logout()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
-              <span>Выйти</span>
-            </button>
-          </mat-menu>
-          <a routerLink="favorite" routerLinkActive="active-svg" matTooltip='Избранное' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
-             matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" ><path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/></svg>
-          </a>
-          <a routerLink="cart" routerLinkActive="active-svg">
-            <svg  matTooltip='Корзина' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
-                  matTooltipShowDelay="200" matTooltipHideDelay="200"
-              class="svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/></svg>
-            <span *ngIf="count" matTooltip='Товаров в корзине' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
-                  matTooltipShowDelay="200" matTooltipHideDelay="200">{{count}}</span>
-          </a>
-        </div>
+
       </div>
       <div class="header-bottom">
         <div class="header-bottom-menu">
@@ -63,8 +77,8 @@
           </nav>
         </div>
         <div  class="header-bottom-search">
-          <input  #searchBox type="text" placeholder="Начните искать" (blur)="openSearchResult(false)" (focus)="openSearchResult(true)"
-                  matTooltip='Поиск товаров (от 3 символов)' matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+          <input  #searchBox type="text" [placeholder]="translations.searchPlaceholder" (blur)="openSearchResult(false)" (focus)="openSearchResult(true)"
+                  [matTooltip]="translations.tooltipSearch" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                   matTooltipShowDelay="200" matTooltipHideDelay="200">
           <span class="icon">
             <svg width="16" height="16" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">

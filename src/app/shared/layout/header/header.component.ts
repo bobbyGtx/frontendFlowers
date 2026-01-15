@@ -3,9 +3,9 @@ import {
   Component,
   ElementRef,
   inject,
-  Input,
+  Input, OnChanges,
   OnDestroy,
-  OnInit,
+  OnInit, SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {debounceTime, distinctUntilChanged, fromEvent, map, Subscription} from 'rxjs';
@@ -21,27 +21,34 @@ import {ProductType} from '../../../../assets/types/product.type';
 import {environment} from '../../../../environments/environment';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 import {Config} from '../../config';
+import {LanguageService} from '../../../core/language.service';
+import {headerTranslations} from './header.translations';
+import {HeaderTranslationType} from '../../../../assets/types/translations/header-translation.type';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
+export class HeaderComponent implements OnInit, AfterViewInit,OnChanges, OnDestroy {
   @ViewChild('searchBox') private searchBox: ElementRef<HTMLInputElement>|null = null;
   @Input() categories: CategoryWithTypesType[] = [];
-  @Input() appLanguage: AppLanguages = Config.defaultLanguage;
-  imagesPath:string=environment.images;
-  authService: AuthService = inject(AuthService);
+  @Input() appLanguage!: AppLanguages;
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private languageService: LanguageService=inject(LanguageService);
+  private authService: AuthService = inject(AuthService);
   private cartService:CartService = inject(CartService);
   private productService:ProductService = inject(ProductService);
-  router:Router=inject(Router);
-  activatedRoute:ActivatedRoute = inject(ActivatedRoute);
+  private router:Router=inject(Router);
+  private activatedRoute:ActivatedRoute = inject(ActivatedRoute);
   private subscriptions$: Subscription = new Subscription();
   isLogged: boolean=false;
+  imagesPath:string=environment.images;
+  appLanguageList:{code:AppLanguages,label:string}[]=Config.languageList;
   currentFragment:string|null=null;
   count:number=0;
+
+  translations: HeaderTranslationType|null = null;
 
   searchProducts:ProductType[]=[];
   showSearchResult:boolean=false;
@@ -81,6 +88,13 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showSnackService.success(`You have successfully logged out.`);
     this.router.navigate(['/',this.appLanguage]);
   }
+
+  changeAppLanguage(newLanguage:AppLanguages):void {
+    if(newLanguage !== this.appLanguage){
+      this.languageService.changeAppLanguage(newLanguage);
+    }
+  }
+
   ngOnInit() {
     this.subscriptions$.add(this.activatedRoute.fragment.subscribe((fragment:string|null)=>{
       this.currentFragment = fragment;
@@ -129,6 +143,13 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         })
       );
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['appLanguage']) {
+      this.translations = headerTranslations[this.appLanguage];
+      console.log(this.appLanguage);
     }
   }
 

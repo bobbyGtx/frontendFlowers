@@ -1,8 +1,12 @@
 import {AppLanguages} from '../../assets/enums/app-languages.enum';
 
 export class Config {
-  static defaultLanguage:AppLanguages = AppLanguages.ru;
-  static languageList:AppLanguages[] = [AppLanguages.de, AppLanguages.en, AppLanguages.ru];
+  static defaultLanguage:AppLanguages = AppLanguages.en;
+  static languageList:{code:AppLanguages,label:string}[] = [
+    { code: AppLanguages.de, label: 'Deutsch' },
+    { code: AppLanguages.en, label: 'English' },
+    { code: AppLanguages.ru, label: 'Русский' },
+  ];
   static confirmMsgFromServer:string= 'Request success!';//Необходимо для игнорирования или изменения, для использования в качестве заголовка диалогового окна
   static authorisationRequired:string= 'Authorisation error.';//ответ от сервера при ошибке авторизации
   static accessTokenHeader:string = 'x-access-token';

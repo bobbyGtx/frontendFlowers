@@ -8,6 +8,7 @@ header.header{
       display: flex;
       //align-items: center;
       justify-content: center;
+      margin-right: 37px;
 
       .logo-link{
         display: flex;
@@ -24,10 +25,13 @@ header.header{
       }
     }
     .header-content{
+      width: 100%;
       .header-top{
         padding-top: 32px;
         padding-bottom: 25px;
         display: flex;
+        gap: 20px;
+        justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #C5C5C5;
         font-family: 'Montserrat', sans-serif;
@@ -35,14 +39,13 @@ header.header{
 
         .header-top-menu{
           margin-left: 26px;
-          margin-right: 191px;//+40 от последнего элемента меню
 
           nav ul{
             margin: 0;
             padding: 0;
             display: flex;
+            gap:40px;
             li{
-              margin-right: 40px;
               list-style: none;
 
               a {
@@ -51,7 +54,6 @@ header.header{
                 line-height: 1;
                 cursor: pointer;
                 &.active{
-                  //text-shadow: 0 2px 4px rgba($green-text-color, 0.30);
                   font-weight: 500;
                   color: $header-icon-color-h;
                 }
@@ -59,49 +61,53 @@ header.header{
             }
           }
         }
-        .header-top-phone{
-          height: 14px;
-          a{
-            color: $header-icon-color;
-            font-size: 16px;
-            line-height: 1;
-            text-decoration: none;
-            margin-right: 59px;
-            &:hover{
-              color: $header-icon-color-h;
-            }
-          }
-        }
-        .header-top-actions{
+        .right-side{
           display: flex;
           align-items: center;
-          margin-right: 22px;
-          gap: 8px;
-          a{
-            position: relative;
+          .header-top-phone{
+            height: 14px;
+            margin-right: 59px;
+            a{
+              color: $header-icon-color;
+              font-size: 16px;
+              line-height: 1;
+              text-decoration: none;
+              &:hover{
+                color: $header-icon-color-h;
+              }
+            }
+          }
+          .header-top-actions{
             display: flex;
             align-items: center;
-            justify-content: center;
-            span{
-              position: absolute;
-              top: 10px;
-              right: -18px;
-              width: 18px;
-              height: 18px;
+            margin-right: 22px;
+            gap: 8px;
+            a{
+              position: relative;
               display: flex;
               align-items: center;
               justify-content: center;
-              color: $green-text-color;
-              font-family: 'Montserrat', sans-serif;
-              font-size: 9px;
-              font-weight: 400;
-              line-height: 1;
-              border-radius: 50%;
-              background-color: #B6D5B9;
-            }
-            &.active-svg{
-              svg{
-                fill:$header-icon-color-h;
+              span{
+                position: absolute;
+                top: 10px;
+                right: -18px;
+                width: 18px;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: $green-text-color;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 9px;
+                font-weight: 400;
+                line-height: 1;
+                border-radius: 50%;
+                background-color: #B6D5B9;
+              }
+              &.active-svg{
+                svg{
+                  fill:$header-icon-color-h;
+                }
               }
             }
           }
