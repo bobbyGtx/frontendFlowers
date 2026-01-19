@@ -28,16 +28,12 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language){
         this.appLanguage = language;
-        //тут будет смена языка текстов в html
-        this.langRequests();//Язык автоматически подтягивается в интерцепторе
-      }
+        this.doRequests();//Язык автоматически подтягивается в интерцепторе
     }));
-    this.langRequests();
   }
 
-  langRequests(){
+  doRequests(){
     this.subscriptions$.add(
       this.categoryService.getCategoriesWithTypes().subscribe({
         next: (data: CategoriesWithTypesResponseType) => {

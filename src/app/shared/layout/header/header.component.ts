@@ -33,7 +33,7 @@ import {HeaderTranslationType} from '../../../../assets/types/translations/heade
 export class HeaderComponent implements OnInit, AfterViewInit,OnChanges, OnDestroy {
   @ViewChild('searchBox') private searchBox: ElementRef<HTMLInputElement>|null = null;
   @Input() categories: CategoryWithTypesType[] = [];
-  @Input() appLanguage!: AppLanguages;
+  @Input() appLanguage: AppLanguages = Config.defaultLanguage;
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private languageService: LanguageService=inject(LanguageService);
   private authService: AuthService = inject(AuthService);
@@ -48,7 +48,7 @@ export class HeaderComponent implements OnInit, AfterViewInit,OnChanges, OnDestr
   currentFragment:string|null=null;
   count:number=0;
 
-  translations: HeaderTranslationType|null = null;
+  translations: HeaderTranslationType = headerTranslations[this.appLanguage];
 
   searchProducts:ProductType[]=[];
   showSearchResult:boolean=false;
@@ -147,10 +147,7 @@ export class HeaderComponent implements OnInit, AfterViewInit,OnChanges, OnDestr
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['appLanguage']) {
-      this.translations = headerTranslations[this.appLanguage];
-      console.log(this.appLanguage);
-    }
+    if (changes['appLanguage']) this.translations = headerTranslations[this.appLanguage];
   }
 
   ngOnDestroy() {

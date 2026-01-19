@@ -15,12 +15,12 @@ import {FavoriteService} from '../../shared/services/favorite.service';
 import {FavoriteProductType} from '../../../assets/types/favorite-product.type';
 import {LanguageService} from '../../core/language.service';
 import {AppLanguages} from '../../../assets/enums/app-languages.enum';
+import {MainTranslationType} from '../../../assets/types/translations/main-translation.type';
+import {mainTranslations, reviewsTranslations} from './main.translations';
+import {ReviewType} from '../../../assets/types/review.type';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
-type ReviewType={
-  name: string,
-  image: string,
-  text: string,
-}
+
 
 @Component({
   selector: 'app-main',
@@ -34,9 +34,17 @@ export class MainComponent implements OnInit, OnDestroy {
   private cartService: CartService=inject(CartService);
   private authService: AuthService=inject(AuthService);
   private favoriteService:FavoriteService=inject(FavoriteService);
+  private sanitizer: DomSanitizer=inject(DomSanitizer);
 
   private subscriptions$: Subscription=new Subscription();
-  appLanguage:AppLanguages;
+  protected appLanguage:AppLanguages;
+  protected translations:MainTranslationType;
+  private mapUrlLanguageList:{[key in AppLanguages]: string}={
+    [AppLanguages.ru]:"https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1302.4906195725962!2d6.9920544!3d49.2388449!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795b6a960ac17fd%3A0xb9be345dd31096e!2sEuropa%20Galerie!5e0!3m2!1sru!2sde!4v1768850908936!5m2!1sru!2sde",
+    [AppLanguages.en]:"https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1302.4906195725962!2d6.9920544!3d49.2388449!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795b6a960ac17fd%3A0xb9be345dd31096e!2sEuropa%20Galerie!5e0!3m2!1sen!2sde!4v1768850865047!5m2!1sen!2sde",
+    [AppLanguages.de]:"https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1302.4906195725962!2d6.9920544!3d49.2388449!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795b6a960ac17fd%3A0xb9be345dd31096e!2sEUROPA-Galerie%20Saarbr%C3%BCcken!5e0!3m2!1sde!2sde!4v1768850543965!5m2!1sde!2sde",
+  };
+  protected mapUrl!:SafeResourceUrl;
 
   protected bestProducts:ProductType[]=[];
   protected customOptionsReviews: OwlOptions = {
@@ -61,53 +69,16 @@ export class MainComponent implements OnInit, OnDestroy {
     },
     nav: false
   };
-  protected reviews:Array<ReviewType> = [
-    {
-      name:'Ирина',
-      image:'review1.png',
-      text:'В ассортименте я встретила все комнатные растения, которые меня интересовали. Цены - лучшие в городе. Доставка - очень быстрая и с заботой о растениях.',
-    },
-    {
-      name:'Анастасия',
-      image:'review2.png',
-      text:'Спасибо огромное! Цветок арека невероятно красив - просто бомба! От него все в восторге! Спасибо за сервис - все удобно сделано, доставили быстро. И милая открыточка приятным бонусом.',
-    },
-    {
-      name:'Илья',
-      image:'review3.png',
-      text:'Магазин супер! Второй раз заказываю курьером, доставлено в лучшем виде. Ваш ассортимент комнатных растений впечатляет! Спасибо вам за хорошую работу!',
-    },
-    {
-      name:'Аделина',
-      image:'review4.jpg',
-      text:'Хочу поблагодарить всю команду за помощь в подборе подарка для моей мамы! Все просто в восторге от мини-сада! А самое главное, что за ним удобно ухаживать, ведь в комплекте мне дали целую инструкцию.',
-    },
-    {
-      name:'Яника',
-      image:'review5.jpg',
-      text:'Спасибо большое за мою обновлённую коллекцию суккулентов! Сервис просто на 5+: быстро, удобно, недорого. Что ещё нужно клиенту для счастья?',
-    },
-    {
-      name:'Марина',
-      image:'review6.jpg',
-      text:'Для меня всегда важным аспектом было наличие не только физического магазина, но и онлайн-маркета, ведь не всегда есть возможность прийти на место. Ещё нигде не встречала такого огромного ассортимента!',
-    },
-    {
-      name:'Станислав',
-      image:'review7.jpg',
-      text:'Хочу поблагодарить консультанта Ирину за помощь в выборе цветка для моей жены. Я ещё никогда не видел такого трепетного отношения к весьма непростому клиенту, которому сложно угодить! Сервис – огонь!',
-    },
-  ];
+  protected reviews:Array<ReviewType>;
   private favoriteProducts:FavoriteProductType[]=[];
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = mainTranslations[this.appLanguage];
+    this.reviews = reviewsTranslations[this.appLanguage];
   }
 
-  ngOnInit() {
-    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language)this.appLanguage = language;
-    }));
+  doRequests(): void {
     const bestProducts$ = this.productService.getBestProducts()
       .pipe(catchError((err: HttpErrorResponse) => of({ __error: true, err } as any)));
     const cart$ = this.cartService.getCart()
@@ -176,8 +147,25 @@ export class MainComponent implements OnInit, OnDestroy {
       })
     );
   }
+  updateMapUrl(){
+    this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.mapUrlLanguageList[this.appLanguage]);
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = mainTranslations[this.appLanguage];
+        this.reviews = reviewsTranslations[this.appLanguage];
+      }
+      this.updateMapUrl();
+      this.doRequests();
+    }));
+  }
 
   ngOnDestroy() {
     this.subscriptions$.unsubscribe();
   }
+
+  protected readonly reviewsTranslations = reviewsTranslations;
 }
