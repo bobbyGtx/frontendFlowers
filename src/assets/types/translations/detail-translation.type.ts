@@ -1,0 +1,23 @@
+export type DetailTranslationType = {
+  lightningTitle: string,
+  humidityTitle: string,
+  temperatureTitle: string,
+  heightTitle: string,
+  heightUnits: string,
+  diameterTitle: string,
+  diameterUnits: string,
+  availableTitle: string,
+  availableUnits: string,
+  productNotAllowed: string,
+  countTitle: string,
+  favAddButtonHint:string,
+  favDelButtonHint:string,
+  favAddButton:string,
+  favDelButton:string,
+  addInCartBtnHint:string,
+  addInCartBtn:string,
+  delFromCartBtnHint:string,
+  delFromCartBtn:string,
+  delFromCartBtnHover:string,
+  recommendedProductsTitle:string
+}

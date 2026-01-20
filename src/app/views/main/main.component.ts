@@ -21,7 +21,6 @@ import {ReviewType} from '../../../assets/types/review.type';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 
-
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -44,6 +43,7 @@ export class MainComponent implements OnInit, OnDestroy {
     [AppLanguages.en]:"https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1302.4906195725962!2d6.9920544!3d49.2388449!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795b6a960ac17fd%3A0xb9be345dd31096e!2sEuropa%20Galerie!5e0!3m2!1sen!2sde!4v1768850865047!5m2!1sen!2sde",
     [AppLanguages.de]:"https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1302.4906195725962!2d6.9920544!3d49.2388449!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795b6a960ac17fd%3A0xb9be345dd31096e!2sEUROPA-Galerie%20Saarbr%C3%BCcken!5e0!3m2!1sde!2sde!4v1768850543965!5m2!1sde!2sde",
   };
+
   protected mapUrl!:SafeResourceUrl;
 
   protected bestProducts:ProductType[]=[];
@@ -147,9 +147,6 @@ export class MainComponent implements OnInit, OnDestroy {
       })
     );
   }
-  updateMapUrl(){
-    this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.mapUrlLanguageList[this.appLanguage]);
-  }
 
   ngOnInit() {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
@@ -158,7 +155,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.translations = mainTranslations[this.appLanguage];
         this.reviews = reviewsTranslations[this.appLanguage];
       }
-      this.updateMapUrl();
+      this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.mapUrlLanguageList[this.appLanguage]);//Обновление карты
       this.doRequests();
     }));
   }

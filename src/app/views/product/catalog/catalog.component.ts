@@ -26,6 +26,8 @@ import {AuthService} from '../../../core/auth/auth.service';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {LanguageService} from '../../../core/language.service';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {CatalogTranslationType} from '../../../../assets/types/translations/catalog-translation.type';
+import {catalogTranslations, sortingOptionsTranslations} from './catalog.translations';
 
 @Component({
   selector: 'app-catalog',
@@ -45,6 +47,9 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   private subscriptions$: Subscription = new Subscription();
   protected appLanguage:AppLanguages;
+  protected translations:CatalogTranslationType;
+  protected sortingOptions: SortingOptionsType[];
+
 
   protected activeParams: ActiveParamsType = {types: []};
   protected appliedFilters: Array<AppliedFilterType> = [];
@@ -59,19 +64,20 @@ export class CatalogComponent implements OnInit, OnDestroy {
   protected totalProducts: number = 0;
   protected sortingOpened: boolean = false;
   private debounce: boolean = false;
-  protected sortingOptions: Array<SortingOptionsType> = [
-    {name: 'От А до Я', value: 'name-asc'},
-    {name: 'От Я до А', value: 'name-desc'},
-    {name: 'По возрастанию цены', value: 'price-asc'},
-    {name: 'По убыванию цены', value: 'price-desc'},
-  ];
+
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = catalogTranslations[this.appLanguage];
+    this.sortingOptions = sortingOptionsTranslations[this.appLanguage];
   }
 
   ngOnInit() {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
-      if (this.appLanguage !== language) this.appLanguage = language;
+      if (this.appLanguage !== language) {
+        this.appLanguage = language;
+        this.translations = catalogTranslations[this.appLanguage];
+        this.sortingOptions = sortingOptionsTranslations[this.appLanguage];
+      }
     }));
     const clicks:Observable<Event> = fromEvent(document, 'click');
     this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
@@ -144,37 +150,37 @@ export class CatalogComponent implements OnInit, OnDestroy {
     });
     if (this.activeParams.diameterFrom) {
       this.appliedFilters.push({
-        name: 'Диаметр от: ' + this.activeParams.diameterFrom + 'см',
+        name: this.translations.filterDiameterFrom + this.activeParams.diameterFrom + this.translations.filterDiameterUnits,
         urlParam: UrlParamsEnum.diameterFrom,
       });
     }
     if (this.activeParams.diameterTo) {
       this.appliedFilters.push({
-        name: 'Диаметр до: ' + this.activeParams.diameterTo + 'см',
+        name: this.translations.filterDiameterTo + this.activeParams.diameterTo + this.translations.filterDiameterUnits,
         urlParam: UrlParamsEnum.diameterTo,
       });
     }
     if (this.activeParams.heightFrom) {
       this.appliedFilters.push({
-        name: 'Высота от: ' + this.activeParams.heightFrom + 'см',
+        name: this.translations.filterHeightFrom + this.activeParams.heightFrom + this.translations.filterHeightUnits,
         urlParam: UrlParamsEnum.heightFrom,
       });
     }
     if (this.activeParams.heightTo) {
       this.appliedFilters.push({
-        name: 'Высота до: ' + this.activeParams.heightTo + 'см',
+        name: this.translations.filterHeightTo + this.activeParams.heightTo + this.translations.filterHeightUnits,
         urlParam: UrlParamsEnum.heightTo,
       });
     }
     if (this.activeParams.priceFrom) {
       this.appliedFilters.push({
-        name: 'Цена от: ' + this.activeParams.priceFrom,
+        name: this.translations.filterPriceFrom + this.activeParams.priceFrom,
         urlParam: UrlParamsEnum.priceFrom,
       });
     }
     if (this.activeParams.priceTo) {
       this.appliedFilters.push({
-        name: 'Цена до: ' + this.activeParams.priceTo,
+        name: this.translations.filterPriceTo + this.activeParams.priceTo,
         urlParam: UrlParamsEnum.priceTo,
       });
     }

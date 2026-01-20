@@ -1,4 +1,3 @@
-
 export type MainTranslationType = {
   mainTitle: string,
   mainText: string,

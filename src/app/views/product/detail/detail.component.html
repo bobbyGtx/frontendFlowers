@@ -18,7 +18,7 @@
               </svg>
             </div>
             <div class="detail-info-item-text">
-              <div class="detail-info-item-title">Освещение</div>
+              <div class="detail-info-item-title">{{translations.lightningTitle}}</div>
               <div class="detail-info-item-description">{{product.lightning}}</div>
             </div>
           </div>
@@ -35,7 +35,7 @@
               </svg>
             </div>
             <div class="detail-info-item-text">
-              <div class="detail-info-item-title">Влажность</div>
+              <div class="detail-info-item-title">{{translations.humidityTitle}}</div>
               <div class="detail-info-item-description">{{product.humidity}}</div>
             </div>
           </div>
@@ -49,34 +49,34 @@
               </svg>
             </div>
             <div class="detail-info-item-text">
-              <div class="detail-info-item-title">Температура</div>
+              <div class="detail-info-item-title">{{translations.temperatureTitle}}</div>
               <div class="detail-info-item-description">{{product.temperature}}</div>
             </div>
           </div>
         </div>
         <div class="detail-info-param" *ngIf="product.height">
-          <div class="detail-info-param-name">Высота:</div>
-          <div class="detail-info-param-data">{{product.height}}см</div>
+          <div class="detail-info-param-name">{{translations.heightTitle}}:</div>
+          <div class="detail-info-param-data">{{product.height+translations.heightUnits}}</div>
         </div>
         <div class="detail-info-param" *ngIf="product.diameter">
-          <div class="detail-info-param-name">Диаметр (горшка):</div>
-          <div class="detail-info-param-data">{{product.diameter}}см</div>
+          <div class="detail-info-param-name">{{translations.diameterTitle}}:</div>
+          <div class="detail-info-param-data">{{product.diameter+translations.diameterUnits}}</div>
         </div>
         <div class="detail-info-param" *ngIf="!product.disabled && product.count >0">
-          <div class="detail-info-param-name">Доступно:</div>
-          <div class="detail-info-param-data">{{product.count}} единиц</div>
+          <div class="detail-info-param-name">{{translations.availableTitle}}:</div>
+          <div class="detail-info-param-data">{{product.count+translations.availableUnits}}</div>
         </div>
         <div class="detail-info-params">
           <div class="detail-info-params-count" *ngIf="!product.disabled && product.count>0">
-            <span>Количество: </span>
+            <span>{{translations.countTitle}}: </span>
             <count-selector (onCountChange)="updateCount($event)" [count]="product.countInCart?product.countInCart:count" [maxCount]="product.count" [disabled]="product.disabled" [filterOn]="!!product.countInCart"></count-selector>
           </div>
-          <div class="product-not-allowed" *ngIf="product.disabled || product.count===0">Товар не доступен!</div>
-          <div class="detail-info-params-price" [style.opacity]="product.disabled || product.count==0?0.4:1">{{product.price}} EUR</div>
+          <div class="product-not-allowed" *ngIf="product.disabled">{{translations.productNotAllowed}}</div>
+          <div class="detail-info-params-price" [style.opacity]="product.disabled?0.4:1">{{product.price}} EUR</div>
         </div>
         <div class="detail-info-actions">
           <button class="button button-transparent button-icon"
-                  [matTooltip]="product.isInFavorite?'Удалить из избранного':'Добавить в избранное'"
+                  [matTooltip]="product.isInFavorite?translations.favDelButtonHint:translations.favAddButtonHint"
                   matTooltipClass="mat-tooltip"
                   [matTooltipPosition]="'below'" [matTooltipShowDelay]="200" [matTooltipHideDelay]="200"
                   (click)="toggleFavorite()">
@@ -84,25 +84,24 @@
               <svg *ngIf="product?.isInFavorite" viewBox="0 0 16 15"  xmlns="http://www.w3.org/2000/svg">
               <path d="M8 14.3628C7.7693 14.3628 7.54605 14.333 7.36 14.266C4.51721 13.2912 0 9.8307 0 4.71814C0 2.11349 2.10605 0 4.69581 0C5.95349 0 7.1293 0.491163 8 1.3693C8.8707 0.491163 10.0465 0 11.3042 0C13.894 0 16 2.12093 16 4.71814C16 9.83814 11.4828 13.2912 8.64 14.266C8.45395 14.333 8.2307 14.3628 8 14.3628Z" fill="#6CAC72"/>
               </svg>
-            <span *ngIf="!product?.isInFavorite">В избранное</span>
-            <span *ngIf="product?.isInFavorite">В избранном</span>
+            <span>{{product?.isInFavorite?translations.favDelButton:translations.favAddButton}}</span>
             </button>
           <button class="button" *ngIf="!product?.countInCart" [disabled]="product.disabled" (click)="addToCart()"
-                  matTooltip="Добавить в корзину" matTooltipClass="mat-tooltip-compact" matTooltipPosition="below"
+                  [matTooltip]="translations.addInCartBtnHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="below"
                   matTooltipShowDelay="200" matTooltipHideDelay="200"
-          >В корзину</button>
-          <button class="button button-transparent button-in-cart"
-                  matTooltip="Удалить из корзины" matTooltipClass="mat-tooltip-compact" matTooltipPosition="below"
+          >{{translations.addInCartBtn}}</button>
+          <button class="button button-in-cart"
+                  [matTooltip]="translations.delFromCartBtnHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="below"
                   matTooltipShowDelay="200" matTooltipHideDelay="200"
                   *ngIf="product.countInCart" [disabled]="product.disabled" (click)="removeFromCart()">
-            <span>В корзине</span>
-            <span>Удалить</span>
+            <span>{{translations.delFromCartBtn}}</span>
+            <span>{{translations.delFromCartBtnHover}}</span>
           </button>
         </div>
       </div>
     </div>
     <div class="recommended-products" *ngIf="recommendedProducts.length">
-      <products-carousel [products]="recommendedProducts" [title]="'Рекомендуемые товары'" [appLanguage]="appLanguage"></products-carousel>
+      <products-carousel [products]="recommendedProducts" [title]="translations.recommendedProductsTitle" [appLanguage]="appLanguage"></products-carousel>
     </div>
   </div>
 </section>

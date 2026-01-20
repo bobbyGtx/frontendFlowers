@@ -1,0 +1,16 @@
+export type CatalogTranslationType = {
+  pageHeader: string,
+  sortButton:string,
+  prodNotFoundTitle:string,
+  prodNotFoundText:string,
+  prodNotFoundClearFilterLink:string,
+  filterDiameterUnits:string,
+  filterDiameterFrom:string,
+  filterDiameterTo:string,
+  filterHeightUnits:string,
+  filterHeightFrom:string,
+  filterHeightTo:string,
+  filterPriceFrom:string,
+  filterPriceTo:string,
+  filterDelHint:string,
+}
