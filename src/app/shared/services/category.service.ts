@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {distinctUntilChanged, finalize, map, Observable, of, shareReplay, tap} from 'rxjs';
+import {distinctUntilChanged, finalize, map, Observable, of, shareReplay, Subscription, tap} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
 import {LanguageService} from '../../core/language.service';
@@ -21,7 +21,7 @@ export type userErrorsType = {
 export class CategoryService {
   http: HttpClient = inject(HttpClient);
   languageService:LanguageService = inject(LanguageService);
-  private changeLanguage = this.languageService.currentLanguage$.pipe(
+  private changeLanguage:Subscription = this.languageService.currentLanguage$.pipe(
     distinctUntilChanged(),
     tap(()=>{
       this.clearCache();

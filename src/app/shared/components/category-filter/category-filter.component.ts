@@ -1,4 +1,4 @@
-import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -9,6 +9,8 @@ import {ActiveParamsType} from '../../../../assets/types/active-params.type';
 import {TypeType} from '../../../../assets/types/type.type';
 import {UrlParamsEnum} from '../../../../assets/enums/url-params.enum';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {CategoryFilterTranslationType} from '../../../../assets/types/translations/category-filtter-translation.type';
+import {categoryFilterTranslations} from './category-filter.translations';
 
 
 @Component({
@@ -41,12 +43,14 @@ import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
     ])
   ]
 })
-export class CategoryFilterComponent implements OnInit, OnDestroy {
+export class CategoryFilterComponent implements OnInit, OnChanges, OnDestroy {
   router: Router = inject(Router);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   @Input() categoryWithTypes: CategoryWithTypesType | null = null;
   @Input() type: CategoryFilters | null = null;
   @Input() appLanguage:AppLanguages | null = null;
+
+  translations:CategoryFilterTranslationType|null = null;
 
   subscriptions$: Subscription = new Subscription();
 
@@ -63,43 +67,26 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
       return this.categoryWithTypes.name;
     } else if (this.type) {
       if (this.type === CategoryFilters.height) {
-        return 'Высота';
+        return this.translations?this.translations.heightTitle:'Height';
       } else if (this.type === CategoryFilters.diameter) {
-        return 'Диаметр';
+        return this.translations?this.translations.diameterTitle:'Diameter';
       } else if (this.type === CategoryFilters.price) {
-        return 'Цена';
+        return this.translations?this.translations.priceTitle:'Price';
       }
     }
-    return 'Нет заголовка!';
+    return this.translations?this.translations.noTitle:'No title';
   }
 
   get units(): string {
-    return this.type === CategoryFilters.price ? 'евро' : 'см'
-  }
-
-  ngOnInit() {
-    this.subscriptions$.add(
-      this.activatedRoute.queryParams.subscribe((params) => {
-        this.activeParams = ActiveParamsUtil.processParams(params);
-        if (this.type) {
-          if (params.hasOwnProperty(this.type + 'From') || params.hasOwnProperty(this.type + 'To')) this.open = !this.manualClosed;//только отображает если есть данные
-          //this.open = (params.hasOwnProperty(this.type + 'From') || params.hasOwnProperty(this.type + 'To'));//скрывает компонент при очистке
-          this.from = params.hasOwnProperty(this.type + 'From')?params[this.type + 'From']:null;
-          this.to = params.hasOwnProperty(this.type + 'To')?params[this.type + 'To']:null;
-        }else{
-          if(this.categoryWithTypes && this.categoryWithTypes.types && this.categoryWithTypes.types.length > 0) {
-            this.categoryWithTypes.types.some((typeItem:TypeType) => {
-              if (this.activeParams.types.indexOf(typeItem.url)!==-1){
-                this.open = !this.manualClosed;
-                return true;
-              }else {
-                return false;
-              }
-            });
-          }
-        }
-      })
-    );
+    if (this.translations) {
+      if (this.type === CategoryFilters.price ){
+        return this.translations.priceUnits;
+      }else if (this.type === CategoryFilters.height){
+        return this.translations.heightUnits;
+      }else{
+        return this.translations.diameterUnits;
+      }
+    } else return 'units';
   }
 
   toggle(): void {
@@ -136,6 +123,36 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
       this.router.navigate(['/',this.appLanguage,'catalog'], {
         queryParams: this.activeParams
       });
+  }
+
+  ngOnInit() {
+    if (this.type && this.appLanguage) this.translations = categoryFilterTranslations[this.appLanguage];
+    this.subscriptions$.add(
+      this.activatedRoute.queryParams.subscribe((params) => {
+        this.activeParams = ActiveParamsUtil.processParams(params);
+        if (this.type) {
+          if (params.hasOwnProperty(this.type + 'From') || params.hasOwnProperty(this.type + 'To')) this.open = !this.manualClosed;//только отображает если есть данные
+          //this.open = (params.hasOwnProperty(this.type + 'From') || params.hasOwnProperty(this.type + 'To'));//скрывает компонент при очистке
+          this.from = params.hasOwnProperty(this.type + 'From')?params[this.type + 'From']:null;
+          this.to = params.hasOwnProperty(this.type + 'To')?params[this.type + 'To']:null;
+        }else{
+          if(this.categoryWithTypes && this.categoryWithTypes.types && this.categoryWithTypes.types.length > 0) {
+            this.categoryWithTypes.types.some((typeItem:TypeType) => {
+              if (this.activeParams.types.indexOf(typeItem.url)!==-1){
+                this.open = !this.manualClosed;
+                return true;
+              }else {
+                return false;
+              }
+            });
+          }
+        }
+      })
+    );
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ( this.type && changes['appLanguage'] && this.appLanguage) this.translations=categoryFilterTranslations[this.appLanguage];
   }
 
   ngOnDestroy(): void {

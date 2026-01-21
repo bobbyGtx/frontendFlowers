@@ -46,10 +46,10 @@ export class CatalogComponent implements OnInit, OnDestroy {
   protected router: Router = inject(Router);
 
   private subscriptions$: Subscription = new Subscription();
+  private activatedParamsSubscription: Subscription|null=null;
   protected appLanguage:AppLanguages;
   protected translations:CatalogTranslationType;
   protected sortingOptions: SortingOptionsType[];
-
 
   protected activeParams: ActiveParamsType = {types: []};
   protected appliedFilters: Array<AppliedFilterType> = [];
@@ -69,48 +69,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.appLanguage = this.languageService.appLang;
     this.translations = catalogTranslations[this.appLanguage];
     this.sortingOptions = sortingOptionsTranslations[this.appLanguage];
-  }
-
-  ngOnInit() {
-    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
-      if (this.appLanguage !== language) {
-        this.appLanguage = language;
-        this.translations = catalogTranslations[this.appLanguage];
-        this.sortingOptions = sortingOptionsTranslations[this.appLanguage];
-      }
-    }));
-    const clicks:Observable<Event> = fromEvent(document, 'click');
-    this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
-
-    this.subscriptions$.add(this.categoryService.getCategoriesWithTypes().subscribe({
-        next: (data: CategoriesWithTypesResponseType) => {
-          if (data.error) {
-            this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
-            throw new Error(data.message);
-          }
-          if (data.categories) this.categoriesWithTypes = data.categories;
-          this.subscriptions$.add(
-            this.activatedRoute.queryParams
-              .pipe(
-                debounce(() => {
-                  if (this.debounce) return timer(500);
-                  this.debounce = true;
-                  return timer(0);
-                })
-              )
-              .subscribe(params => {
-                this.activeParams = ActiveParamsUtil.processParams(params);
-                this.fillAppliedFilters();
-                this.debounce = true;
-                this.requestProducts();
-              })
-          );
-        },
-        error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
-          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (get Categories)! Code:${errorResponse.status}`);
-        }
-      }));
   }
 
   toggleSorting(event: MouseEvent) {
@@ -174,13 +132,13 @@ export class CatalogComponent implements OnInit, OnDestroy {
     }
     if (this.activeParams.priceFrom) {
       this.appliedFilters.push({
-        name: this.translations.filterPriceFrom + this.activeParams.priceFrom,
+        name: this.translations.filterPriceFrom + this.activeParams.priceFrom + this.translations.filterPriceUnits,
         urlParam: UrlParamsEnum.priceFrom,
       });
     }
     if (this.activeParams.priceTo) {
       this.appliedFilters.push({
-        name: this.translations.filterPriceTo + this.activeParams.priceTo,
+        name: this.translations.filterPriceTo + this.activeParams.priceTo + this.translations.filterPriceUnits,
         urlParam: UrlParamsEnum.priceTo,
       });
     }
@@ -200,9 +158,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   openNextPage() {
-    if ((this.activePage + 1) <= this.pages.length) {
-      this.openPage(this.activePage + 1);
-    }
+    if ((this.activePage + 1) <= this.pages.length) this.openPage(this.activePage + 1);
   }
 
   openPrevPage() {
@@ -304,6 +260,53 @@ export class CatalogComponent implements OnInit, OnDestroy {
         return productItem;
       });
     }
+  }
+
+  private doRequests():void{
+    this.subscriptions$.add(this.categoryService.getCategoriesWithTypes().subscribe({
+      next: (data: CategoriesWithTypesResponseType) => {
+        if (data.error) {
+          this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
+          throw new Error(data.message);
+        }
+        if (data.categories) this.categoriesWithTypes = data.categories;
+
+        if (!this.activatedParamsSubscription){
+          this.activatedParamsSubscription = this.activatedRoute.queryParams
+            .pipe(
+              debounce(() => {
+                if (this.debounce) return timer(500);
+                this.debounce = true;
+                return timer(0);
+              })
+            )
+            .subscribe(params => {
+              this.activeParams = ActiveParamsUtil.processParams(params);
+              this.fillAppliedFilters();
+              this.debounce = true;
+              this.requestProducts();
+            });
+        }else {
+          this.fillAppliedFilters();
+          this.requestProducts();
+        }
+      },
+      error: (errorResponse: HttpErrorResponse) => {
+        this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
+        console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (get Categories)! Code:${errorResponse.status}`);
+      }
+    }));
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
+      this.appLanguage = language;
+      this.translations = catalogTranslations[this.appLanguage];
+      this.sortingOptions = sortingOptionsTranslations[this.appLanguage];
+      this.doRequests();
+    }));
+    const clicks:Observable<Event> = fromEvent(document, 'click');
+    this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
   }
 
   ngOnDestroy() {

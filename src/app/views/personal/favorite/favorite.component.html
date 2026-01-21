@@ -1,9 +1,9 @@
 <div class="favorite">
   <div class="container">
-    <div class="favorite-title">Избранное</div>
+    <div class="favorite-title">{{translations.pageHeader}}</div>
     <div class="favorite-empty" *ngIf="!favoriteProducts.length">
-      <div class="cart-empty-message">В избранном нет товаров</div>
-      <button class="button" [routerLink]="['/',appLanguage,'catalog']">В каталог</button>
+      <div class="favorite-empty-message">{{translations.favEmptyText}}</div>
+      <button class="button" [routerLink]="['/',appLanguage,'catalog']">{{translations.toCatalogButton}}</button>
     </div>
 
     <div class="favorite-products" *ngIf="favoriteProducts.length">
@@ -18,7 +18,7 @@
           <div class="favorite-product-name">
             <a [routerLink]="['/',appLanguage,'product', favProduct.url]">{{ favProduct.name }}</a>
           </div>
-          <div class="favorite-product-attention" [matTooltip]="'Товар заканчивается! Доступно '+favProduct.count + ' единиц'"
+          <div class="favorite-product-attention" [matTooltip]="translations.productEndsTooltip+favProduct.count + translations.productEndsTooltipUnits"
                matTooltipClass="mat-tooltip-compact"
                matTooltipPosition="above"
                matTooltipHideDelay="200"
@@ -30,17 +30,18 @@
           <div class="favorite-product-price">{{ favProduct.price }} EUR</div>
           <count-selector (onCountChange)="updateCount($event,arrIndex)" [count]="favProduct.countInCart?favProduct.countInCart:1" [maxCount]="favProduct.count" [disabled]="favProduct.disabled" [filterOn]="favProduct.isInCart"></count-selector>
           <div class="favorite-product-action">
-            <button class="button" matTooltip='Добавить в корзину' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
-                    matTooltipShowDelay="200" matTooltipHideDelay="200" *ngIf="!favProduct.isInCart" [disabled]="favProduct.disabled" (click)="updateCart(favProduct.id,favProduct.countInCart?favProduct.countInCart:1)">В корзину</button>
-            <button class="button button-transparent button-in-cart" matTooltip='Удалить из корзины' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+            <button class="button" [matTooltip]="translations.addInCartBtnHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+                    matTooltipShowDelay="200" matTooltipHideDelay="200" *ngIf="!favProduct.isInCart" [disabled]="favProduct.disabled" (click)="updateCart(favProduct.id,favProduct.countInCart?favProduct.countInCart:1)"
+            >{{translations.addInCartBtn}}</button>
+            <button class="button button-transparent button-in-cart" [matTooltip]="translations.delFromCartBtnHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
                     matTooltipShowDelay="200" matTooltipHideDelay="200"
                     *ngIf="favProduct.isInCart" [disabled]="favProduct.disabled" (click)="removeFromCart(arrIndex)">
-              <span>В корзине</span>
-              <span>Удалить</span>
+              <span>{{translations.delFromCartBtn}}</span>
+              <span>{{translations.delFromCartBtnHover}}</span>
             </button>
           </div>
           <div class="favorite-product-remove">
-            <a matTooltip='Удалить из избранного' matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+            <a [matTooltip]="translations.favDelButtonHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
                matTooltipShowDelay="200" matTooltipHideDelay="200" (click)="removeFromFavorites(favProduct.id)">
               <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                 <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>

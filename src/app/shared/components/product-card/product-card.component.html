@@ -2,7 +2,7 @@
   <div class="product-card-favorite" *ngIf="!isLight" (click)="toggleFavorite()">
         <span [class.in-favorites]="product.isInFavorite">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-               [matTooltip]="product.isInFavorite?'Удалить из избранного':'Добавить в избранное'" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+               [matTooltip]="product.isInFavorite?translations.favDelButtonHint:translations.favAddButtonHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                matTooltipShowDelay="200" matTooltipHideDelay="200">
             <path d="M11.9997 20.846C11.7155 20.846 11.4405 20.8093 11.2113 20.7268C7.70967 19.526 2.14551 15.2635 2.14551 8.96596C2.14551 5.75763 4.73967 3.1543 7.92967 3.1543C9.47884 3.1543 10.9272 3.7593 11.9997 4.84096C13.0722 3.7593 14.5205 3.1543 16.0697 3.1543C19.2597 3.1543 21.8538 5.7668 21.8538 8.96596C21.8538 15.2726 16.2897 19.526 12.788 20.7268C12.5588 20.8093 12.2838 20.846 11.9997 20.846ZM7.92967 4.5293C5.50051 4.5293 3.52051 6.51846 3.52051 8.96596C3.52051 15.2268 9.54301 18.7101 11.6605 19.4343C11.8255 19.4893 12.183 19.4893 12.348 19.4343C14.4563 18.7101 20.488 15.236 20.488 8.96596C20.488 6.51846 18.508 4.5293 16.0788 4.5293C14.6855 4.5293 13.393 5.18013 12.5588 6.30763C12.3022 6.65596 11.7155 6.65596 11.4588 6.30763C10.6063 5.17096 9.32301 4.5293 7.92967 4.5293Z"/>
             <path d="M7.92967 4.5293C5.50051 4.5293 3.52051 6.51846 3.52051 8.96596C3.52051 15.2268 9.54301 18.7101 11.6605 19.4343C11.8255 19.4893 12.183 19.4893 12.348 19.4343C14.4563 18.7101 20.488 15.236 20.488 8.96596C20.488 6.51846 18.508 4.5293 16.0788 4.5293C14.6855 4.5293 13.393 5.18013 12.5588 6.30763C12.3022 6.65596 11.7155 6.65596 11.4588 6.30763C10.6063 5.17096 9.32301 4.5293 7.92967 4.5293Z" />
@@ -20,28 +20,28 @@
     <div class="product-card-price">{{product.price}} EUR</div>
     <div class="product-card-action">
       <button class="button" *ngIf="!product.countInCart" [disabled]="product.disabled" (click)="updateCart(count)"
-              matTooltip="Добавить в корзину" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+              [matTooltip]="translations.addInCartBtnHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
               matTooltipShowDelay="200" matTooltipHideDelay="200"
-      >В корзину</button>
+      >{{translations.addInCartBtn}}</button>
       <button class="button button-transparent button-in-cart" *ngIf="product.countInCart" [disabled]="product.disabled" (click)="removeFromCart()"
-              matTooltip="Удалить из корзины" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+              [matTooltip]="translations.delFromCartBtnHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
               matTooltipShowDelay="200" matTooltipHideDelay="200">
-        <span>В корзине</span>
-        <span>Удалить</span>
+        <span>{{translations.delFromCartBtn}}</span>
+        <span>{{translations.delFromCartBtnHover}}</span>
       </button>
     </div>
   </div>
   <div class="product-card-extra" *ngIf="!isLight">
     <count-selector (onCountChange)="updateCount($event)" [count]="product.countInCart?product.countInCart:count" [maxCount]="product.count" [disabled]="product.disabled" [filterOn]="!!product.countInCart"></count-selector>
     <a [routerLink]="['/',appLanguage,'product',product.url]" class="product-card-detail"
-       matTooltip="Открыть описание" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
+       [matTooltip]="translations.detailsHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="above"
        matTooltipShowDelay="200" matTooltipHideDelay="200">
       <svg width="18" height="4" viewBox="0 0 18 4" xmlns="http://www.w3.org/2000/svg">
         <circle cx="2" cy="2" r="2"/>
         <circle cx="8.66699" cy="2" r="2"/>
         <circle cx="15.333" cy="2" r="2"/>
       </svg>
-      <span>Подробнее</span>
+      <span>{{translations.details}}</span>
     </a>
   </div>
 </div>

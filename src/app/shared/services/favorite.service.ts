@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {map, Observable, of, tap} from 'rxjs';
+import {distinctUntilChanged, map, Observable, of, Subscription, tap} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {FavoritesResponseType} from '../../../assets/types/responses/favorites-response.type';
@@ -43,6 +43,14 @@ enum CacheOperations{
 export class FavoriteService {
   private http:HttpClient=inject(HttpClient);
   private languageService:LanguageService=inject(LanguageService);
+
+  private changeLanguage:Subscription = this.languageService.currentLanguage$.pipe(
+    distinctUntilChanged(),
+    tap(()=>{
+      this.cacheOperation(CacheOperations.clear);
+    })
+  ).subscribe();//Очистка кэша при смене языка
+
   private cache:FavoritesResponseType|null=null;
   private cacheTimeout: ReturnType<typeof setTimeout> | null = null;//таймер для чистки кэша корзины
   private cacheLifetime:number = 120000;
@@ -58,7 +66,7 @@ export class FavoriteService {
     ends:false,
   };
 
-  userErrors:userErrorsType = {
+  private userErrors:userErrorsType = {
     getFavorites: {
       [AppLanguages.ru]:'Ошибка получения избранных продуктов.',
       [AppLanguages.en]:'Error retrieving selected products.',

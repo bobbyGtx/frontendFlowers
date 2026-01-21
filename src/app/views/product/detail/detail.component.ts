@@ -156,10 +156,8 @@ export class DetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language){
         this.appLanguage = language;
         this.translations = detailTranslations[this.appLanguage];
-      }
     }));
     let initialized:boolean = false;
     this.subscriptions$.add(

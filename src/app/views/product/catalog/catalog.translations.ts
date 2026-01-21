@@ -17,6 +17,7 @@ export const catalogTranslations: { [key in AppLanguages]:  CatalogTranslationTy
     filterHeightTo:'Выс. до: ',
     filterPriceFrom:'Цена от: ',
     filterPriceTo:'Цена до: ',
+    filterPriceUnits:'€',
     filterDelHint:'Удалить'
   },
   [AppLanguages.en]: {
@@ -33,6 +34,7 @@ export const catalogTranslations: { [key in AppLanguages]:  CatalogTranslationTy
     filterHeightTo: 'Height to: ',
     filterPriceFrom: 'Price from: ',
     filterPriceTo: 'Price to: ',
+    filterPriceUnits:'€',
     filterDelHint:'Remove'
   },
   [AppLanguages.de]: {
@@ -49,6 +51,7 @@ export const catalogTranslations: { [key in AppLanguages]:  CatalogTranslationTy
     filterHeightTo: 'Höhe bis: ',
     filterPriceFrom: 'Preis von: ',
     filterPriceTo: 'Preis bis: ',
+    filterPriceUnits:'€',
     filterDelHint:'Entfernen'
   }
 };

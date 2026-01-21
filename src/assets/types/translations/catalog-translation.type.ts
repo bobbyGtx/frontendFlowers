@@ -12,5 +12,6 @@ export type CatalogTranslationType = {
   filterHeightTo:string,
   filterPriceFrom:string,
   filterPriceTo:string,
+  filterPriceUnits:string,
   filterDelHint:string,
 }

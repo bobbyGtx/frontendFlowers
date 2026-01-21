@@ -150,11 +150,9 @@ export class MainComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language){
-        this.appLanguage = language;
-        this.translations = mainTranslations[this.appLanguage];
-        this.reviews = reviewsTranslations[this.appLanguage];
-      }
+      this.appLanguage = language;
+      this.translations = mainTranslations[this.appLanguage];
+      this.reviews = reviewsTranslations[this.appLanguage];
       this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.mapUrlLanguageList[this.appLanguage]);//Обновление карты
       this.doRequests();
     }));
