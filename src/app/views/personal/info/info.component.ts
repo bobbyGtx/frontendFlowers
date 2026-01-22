@@ -21,6 +21,8 @@ import {DeliveryInfoType, UserDataType, UserPatchDataType} from '../../../../ass
 import {emailExistsValidator} from '../../../shared/validators/email-exists.validator';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 import {LanguageService} from '../../../core/language.service';
+import {InfoTranslationType} from '../../../../assets/types/translations/info-translation.type';
+import {infoTranslations} from './info.translations';
 
 @Component({
   selector: 'app-info',
@@ -37,6 +39,7 @@ export class InfoComponent implements OnInit, OnDestroy {
 
   private subscriptions$: Subscription = new Subscription();
   protected appLanguage:AppLanguages;
+  protected translations:InfoTranslationType;
 
   protected deliveryTypes: DeliveryTypeType[] = [];
   protected paymentTypes: PaymentTypeType[] = [];
@@ -49,6 +52,7 @@ export class InfoComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = infoTranslations[this.appLanguage];
   }
 
   get firstName() {return this.infoForm.get('firstName');}
@@ -232,17 +236,14 @@ export class InfoComponent implements OnInit, OnDestroy {
     this.infoForm.markAsPristine();
   }
 
-  ngOnInit() {
-    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
-      if (this.appLanguage !== language) this.appLanguage = language;
-    }));
+  private doRequests(changeLanguage:boolean=true):void{
     const getDeliveryTypes$: Observable<DeliveryTypesResponseType | HttpErrorResponse> = this.deliveryService.getDeliveryTypes().pipe(
       catchError((error: HttpErrorResponse): Observable<HttpErrorResponse> => of(error)));//Ошибка не ломает combineLatest и перенаправляет ошибочный ответ в next
 
     const getPaymentTypes$: Observable<PaymentTypesResponseType | HttpErrorResponse> = this.paymentService.getPaymentTypes().pipe(
       catchError((error: HttpErrorResponse): Observable<HttpErrorResponse> => of(error)));//Ошибка не ломает combineLatest и перенаправляет ошибочный ответ в next
 
-    const getUserData$:Observable<UserDataResponseType> = this.userService.getUserData().pipe(
+    const getUserData$:Observable<UserDataResponseType|null> = changeLanguage?of(null):this.userService.getUserData().pipe(
       catchError((error:HttpErrorResponse):Observable<ExtErrorResponseType> => {
         return throwError(():ExtErrorResponseType=>{
           return {
@@ -252,11 +253,11 @@ export class InfoComponent implements OnInit, OnDestroy {
         });
       }));//обязательный запрос, без которого летим в error при подписке
 
-    const combinedRequest$: Observable<[DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse,UserDataResponseType]> =
+    const combinedRequest$: Observable<[DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse,UserDataResponseType|null]> =
       combineLatest([getDeliveryTypes$, getPaymentTypes$, getUserData$]);
 
     this.subscriptions$.add(combinedRequest$.subscribe({
-      next: ([deliveryTypesResp, paymentTypesResp, userDataResp]: [DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse, UserDataResponseType]) => {
+      next: ([deliveryTypesResp, paymentTypesResp, userDataResp]: [DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse, UserDataResponseType|null]) => {
         if ((deliveryTypesResp as HttpErrorResponse).hasOwnProperty('ok') && !(paymentTypesResp as HttpErrorResponse).ok) {
           console.error(deliveryTypesResp);
         } else {
@@ -273,18 +274,34 @@ export class InfoComponent implements OnInit, OnDestroy {
             this.paymentTypes = paymentTypesResponse.paymentTypes;
           }
         }
-        if (userDataResp.error || !userDataResp.user || !userDataResp.userData) {
-          this.showSnackService.error(this.userService.getUserDataError);
-          throw new Error(userDataResp.message);
+        if (userDataResp){
+          if (userDataResp.error || !userDataResp.user || !userDataResp.userData) {
+            this.showSnackService.error(this.userService.getUserDataError);
+            throw new Error(userDataResp.message);
+          }
+          this.userData = userDataResp.userData;
+          if (userDataResp.user.deliveryInfo) this.stockUserDeliveryInfo = userDataResp.user.deliveryInfo;
+          this.infoForm.patchValue(this.userData);
         }
-        this.userData = userDataResp.userData;
-        if (userDataResp.user.deliveryInfo) this.stockUserDeliveryInfo = userDataResp.user.deliveryInfo;
-        this.infoForm.patchValue(this.userData);
-
       },
       error: (extError: ExtErrorResponseType) => {
         this.showSnackService.error(this.userService.getUserDataError);
         console.error(extError.error.message ? extError.error.message : `Unexpected error (getUserData)! Code:${extError.status}`);
+      }
+    }));
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
+      if (this.appLanguage !== language) {
+        this.appLanguage = language;
+        this.translations = infoTranslations[language];
+        this.doRequests(true);
+      }else{
+        //первая загрузка
+        this.appLanguage = language;
+        this.translations = infoTranslations[language];
+        this.doRequests(false);
       }
     }));
     this.subscriptions$.add(

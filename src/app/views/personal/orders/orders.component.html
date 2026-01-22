@@ -1,35 +1,35 @@
 <div class="orders">
   <div class="container">
-    <div class="personal-title">Личный кабинет</div>
+    <div class="personal-title">{{translations.pageHeader}}</div>
     <div class="personal-pages-selector">
-      <div class="personal-page" [routerLink]="['/',appLanguage,'profile']">Личные данные</div>
-      <div class="personal-page active">Ваши заказы</div>
+      <div class="personal-page" [routerLink]="['/',appLanguage,'profile']">{{translations.menuProfileButton}}</div>
+      <div class="personal-page active">{{translations.menuOrdersButton}}</div>
     </div>
 
-    <div class="orders-title" *ngIf="orders.length">Ваши заказы</div>
-    <div class="orders-title-additional" *ngIf="orders.length">Здесь отображается история ваших заказов.</div>
+    <div class="orders-title" *ngIf="orders.length">{{translations.menuOrdersButton}}</div>
+    <div class="orders-title-additional" *ngIf="orders.length">{{translations.orderListText}}</div>
     <div class="orders-empty" *ngIf="!orders.length">
-      <div class="orders-empty-message">У Вас ещё нет заказов</div>
-      <button class="button" [routerLink]="['/',appLanguage,'catalog']">В каталог</button>
+      <div class="orders-empty-message">{{ translations.orderListEmptyText }}</div>
+      <button class="button" [routerLink]="['/',appLanguage,'catalog']">{{translations.orderListEmptyButton}}</button>
     </div>
     <div class="orders-list" *ngIf="orders.length">
       <div class="orders-list-item" *ngFor="let order of orders">
         <div class="orders-list-item-number-group">
-          <div class="orders-list-item-number">Заказ №{{order.id}}</div>
-          <div class="orders-list-item-date" *ngIf="order.createdAt">от {{order.createdAt}}</div>
+          <div class="orders-list-item-number">{{translations.orderNumber+order.id}}</div>
+          <div class="orders-list-item-date" *ngIf="order.createdAt">{{translations.orderDate+order.createdAt}}</div>
         </div>
         <div class="orders-list-item-products" *ngIf="order.items && order.items.length">
-          <div class="orders-list-item-products-count">Кол-во товаров: {{order.items.length}}</div>
+          <div class="orders-list-item-products-count">{{translations.orderProductCount+order.items.length}}</div>
           <table class="orders-list-item-products-list">
             <tr *ngFor="let item of order.items">
               <td><a class="product-link" [routerLink]="['/',appLanguage,'product',item.url]">&#183; {{item.name}}</a></td>
-              <td>{{item.quantity}} шт.</td>
+              <td>{{item.quantity+translations.orderProductCount}}</td>
             </tr>
           </table>
         </div>
         <div class="orders-list-group">
           <div class="orders-list-item-status" [class]="order.class"
-               [matTooltip]="order.updatedAt?'Изменение статуса от '+(order.updatedAt):''"
+               [matTooltip]="order.updatedAt?translations.orderStatusHint+(order.updatedAt):''"
                matTooltipClass="mat-tooltip-compact" matTooltipPosition="below"
                matTooltipShowDelay="200" matTooltipHideDelay="200">
             {{order.statusName}}

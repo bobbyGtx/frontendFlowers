@@ -1,66 +1,65 @@
 <div class="info">
   <div class="container">
-    <div class="personal-title">Личный кабинет</div>
+    <div class="personal-title">{{translations.pageHeader}}</div>
     <div class="personal-pages-selector">
-      <div class="personal-page active">Личные данные</div>
-      <div class="personal-page" [routerLink]="['/',appLanguage,'orders']">Ваши заказы</div>
+      <div class="personal-page active">{{translations.menuProfileButton}}</div>
+      <div class="personal-page" [routerLink]="['/',appLanguage,'orders']">{{translations.menuOrdersButton}}</div>
     </div>
 
     <div class="data-form" [formGroup]="infoForm">
       <div class="data-form-block">
-        <div class="data-form-label">Личные данные</div>
-        <div class="data-form-label-additional">Введённые данные автоматически подставятся при оформлении заказа.</div>
+        <div class="data-form-label">{{translations.menuProfileButton}}</div>
+        <div class="data-form-label-additional">{{translations.infoListText}}</div>
         <div class="data-form-inputs personal-data-inputs">
-          <input type="text" class="input" placeholder="Имя" formControlName="firstName"
+          <input type="text" class="input" [placeholder]="translations.firstNamePlaceholder" formControlName="firstName"
                  (blur)="changeFirstLetter(firstName)"
-                 matTooltip="Введите имя получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+                  [matTooltip]="translations.firstNameHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
-          <input type="text" class="input" placeholder="Фамилия" formControlName="lastName"
+          <input type="text" class="input" [placeholder]="translations.lastNamePlaceholder" formControlName="lastName"
                  (blur)="changeFirstLetter(lastName)"
-                 matTooltip="Введите фамилию получателя" matTooltipClass="mat-tooltip-compact"
+                  [matTooltip]="translations.lastNameHint" matTooltipClass="mat-tooltip-compact"
                  matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
-          <input type="text" class="input" placeholder="Телефон" formControlName="phone"
-                 matTooltip="Введите телефон получателя. +4912345678901" matTooltipClass="mat-tooltip-compact"
+          <input type="text" class="input" [placeholder]="translations.phonePlaceholder" formControlName="phone"
+                  [matTooltip]="translations.phoneHint" matTooltipClass="mat-tooltip-compact"
                  matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
-          <input type="text" class="input" placeholder="E-Mail" formControlName="email"
-                 matTooltip="Ваш E-Mail. Для изменения необходимо ввести пароль." matTooltipClass="mat-tooltip-compact"
+          <input type="text" class="input" [placeholder]="translations.emailPlaceholder" formControlName="email"
+                  [matTooltip]="translations.emailHint" matTooltipClass="mat-tooltip-compact"
                  matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
         </div>
       </div><!--Личные данные-->
 
       <div class="data-form-block">
-        <div class="data-form-label">Пароль</div>
+        <div class="data-form-label">{{translations.passwordTitle}}</div>
         <div class="data-form-inputs password-data-inputs">
           <div class="input-wrapper old-pass">
           <input type="password" #oldPwd showPassword class="input" [class.inValid]="oldPassFalse && oldPassword?.value"
-                 placeholder="Действующий пароль" formControlName="oldPassword"
-                 matTooltip="Введите действующий пароль" matTooltipClass="mat-tooltip-compact"
+                 [placeholder]="translations.actualPasswordPlaceholder" formControlName="oldPassword"
+                  [matTooltip]="translations.actualPasswordHint" matTooltipClass="mat-tooltip-compact"
                  matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200"
-                 (keydown.enter) = "checkOldPassword(oldPwd)"
-          >
+                 (keydown.enter) = "checkOldPassword(oldPwd)">
           </div>
           <button type="button" class="button small-btn old-pass-check"
                   [disabled]="oldPassword?.invalid || !oldPassword?.value" [class.checked]="oldPassChecked"
                   (click)="checkOldPassword(oldPwd)"
-                  [matTooltip]="oldPassChecked?'Пароль подтвержден. Доступно изменение E-Mail и пароля':'Проверить пароль'"
+                  [matTooltip]="oldPassChecked?translations.actualPasswordCheckedBtnHint:translations.actualPasswordCheckBtnHint"
                   matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200"
                   matTooltipHideDelay="200">
             <svg *ngIf="oldPassChecked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
               <path
                 d="M530.8 134.1C545.1 144.5 548.3 164.5 537.9 178.8L281.9 530.8C276.4 538.4 267.9 543.1 258.5 543.9C249.1 544.7 240 541.2 233.4 534.6L105.4 406.6C92.9 394.1 92.9 373.8 105.4 361.3C117.9 348.8 138.2 348.8 150.7 361.3L252.2 462.8L486.2 141.1C496.6 126.8 516.6 123.6 530.9 134z"/>
             </svg>
-            <span *ngIf="!oldPassChecked">Проверить</span>
+            <span *ngIf="!oldPassChecked">{{translations.actualPasswordCheckBtn}}</span>
           </button>
           <div class="input-wrapper new-pass">
-            <input type="password" class="input" placeholder="Новый пароль" formControlName="newPassword" showPassword
-                   [matTooltip]="oldPassChecked?'Введите новый пароль. (Минимум 6 символов)':'Для изменения пароля, необходимо ввести текущий пароль. (Минимум 6 символов)'"
+            <input type="password" class="input" [placeholder]="translations.newPasswordPlaceholder" formControlName="newPassword" showPassword
+                   [matTooltip]="oldPassChecked?translations.newPasswordHint:translations.newPasswordDisabledHint"
                    matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200"
                    matTooltipHideDelay="200"></div>
           <div class="input-wrapper new-pass-repeat">
-          <input type="password" class="input" placeholder="Повтор пароля" showPassword
+          <input type="password" class="input" [placeholder]="translations.newPasswordRepeatPlaceholder" showPassword
                  formControlName="newPasswordRepeat"
                  [class.inValid]="infoForm.hasError('passwordMismatch')"
-                 [matTooltip]="infoForm.hasError('passwordMismatch')?'Пароли не совпадают':'Повторите новый пароль'"
+                 [matTooltip]="infoForm.hasError('passwordMismatch')?translations.newPasswordRepeatErrorHint:translations.newPasswordRepeatHint"
                  matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200"
                  matTooltipHideDelay="200">
           </div>
@@ -68,39 +67,39 @@
       </div><!--Пароль-->
 
       <div class="data-form-block">
-        <div class="data-form-label">Адрес доставки</div>
+        <div class="data-form-label">{{translations.addressTitle}}</div>
         <div class="data-form-inputs address-data-inputs">
           <mat-form-field class="select-input region"
-                          matTooltip="Регион доставки" matTooltipClass="mat-tooltip-compact"
+                           [matTooltip]="translations.regionHint" matTooltipClass="mat-tooltip-compact"
                           matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <mat-label class="select-label">Выберите регион</mat-label>
+            <mat-label class="select-label">{{translations.regionLabel}}</mat-label>
             <mat-select formControlName="region">
               <mat-option value="-">None</mat-option>
               <mat-option [value]="region" *ngFor="let region of regionList">{{ region }}</mat-option>
             </mat-select>
           </mat-form-field>
-          <input type="text" class="input town" placeholder="Город" formControlName="city"
-                 matTooltip="Укажите город доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+          <input type="text" class="input town" [placeholder]="translations.townPlaceholder" formControlName="city"
+                  [matTooltip]="translations.townHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
-          <input type="text" class="input zip" placeholder="Индекс" formControlName="zip"
-                 matTooltip="Введите почтовый индекс" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after"
+          <input type="text" class="input zip" [placeholder]="translations.indexPlaceholder" formControlName="zip"
+                  [matTooltip]="translations.indexHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
-          <input type="text" class="input street" placeholder="Улица" formControlName="street"
-                 matTooltip="Введите улицу" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+          <input type="text" class="input street" [placeholder]="translations.streetPlaceholder" formControlName="street"
+                  [matTooltip]="translations.streetHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
-          <input type="text" class="input house" placeholder="№ дома" formControlName="house"
-                 matTooltip="Введите номер дома (10a)" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after"
+          <input type="text" class="input house" [placeholder]="translations.housePlaceholder" formControlName="house"
+                  [matTooltip]="translations.houseHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
         </div>
       </div>
 
       <div class="data-form-block" *ngIf="deliveryTypes.length">
-        <div class="data-form-label">Предпочитаемый способ доставки</div>
+        <div class="data-form-label">{{translations.shipmentTypeTitle}}</div>
         <div class="data-form-types">
           <div class="data-form-type-item" *ngFor="let deliveryType of deliveryTypes"
                [class.active]="deliveryTypeField?.value == deliveryType.id"
                [class.disabled]="deliveryType.disabled"
-               [matTooltip]="deliveryType.disabled?'Метод доставки не доступен':''"
+               [matTooltip]="deliveryType.disabled?translations.shipmentTypeDisabledTitle:''"
                matTooltipClass="mat-tooltip-compact"
                matTooltipPosition="below"
                matTooltipHideDelay="200"
@@ -110,7 +109,7 @@
       </div> <!--Способ доставки-->
 
       <div class="data-form-block" *ngIf="paymentTypes.length">
-        <div class="data-form-label">Предпочитаемый способ оплаты</div>
+        <div class="data-form-label">{{translations.paymentTypeTitle}}</div>
         <div class="data-form-radio">
           <div class="data-form-radio-block" *ngFor="let paymentType of paymentTypes">
             <input type="radio"
@@ -122,8 +121,7 @@
         </div>
       </div> <!--Способ оплаты-->
 
-      <button class="button" [disabled]="!(infoForm.dirty && infoForm.valid)" (click)="updateUserInfo()">Сохранить
-      </button>
+      <button class="button" [disabled]="!(infoForm.dirty && infoForm.valid)" (click)="updateUserInfo()">{{translations.saveButton}}</button>
     </div>
 
     <div class="page-image">
