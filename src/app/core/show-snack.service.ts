@@ -118,15 +118,15 @@ export class ShowSnackService {
         [AppLanguages.en]:'Reset password request limit exceeded!',
         [AppLanguages.de]:'Limit für Passwortzurücksetzungsanfragen überschritten!',
       },{
-        error: 'default',
-        [AppLanguages.ru]:'Ошибка авторизации. Попробуйте войти ещё раз.',
-        [AppLanguages.en]:'Authorization error. Please try again.',
-        [AppLanguages.de]:'Autorisierungsfehler. Bitte versuchen Sie, sich erneut anzumelden.',
+        error: 'Email address already confirmed!',
+        [AppLanguages.ru]:'Адрес электронной почты уже подтвержден!',
+        [AppLanguages.en]:'Email address already confirmed!',
+        [AppLanguages.de]:'E-Mail-Adresse bereits bestätigt!',
       },{
-        error: 'default',
-        [AppLanguages.ru]:'Ошибка авторизации. Попробуйте войти ещё раз.',
-        [AppLanguages.en]:'Authorization error. Please try again.',
-        [AppLanguages.de]:'Autorisierungsfehler. Bitte versuchen Sie, sich erneut anzumelden.',
+        error: 'E-Mail not recognized!',
+        [AppLanguages.ru]:'E-Mail не найден!',
+        [AppLanguages.en]:'E-Mail not found!',
+        [AppLanguages.de]:'E-Mail nicht gefunden!',
       },{
         error: 'default',
         [AppLanguages.ru]:'Ошибка авторизации. Попробуйте войти ещё раз.',
@@ -521,6 +521,11 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Пароль успешно изменен!',
       [AppLanguages.en]:'Password changed successfully!',
       [AppLanguages.de]:'Passwort erfolgreich geändert!',
+    },{
+      success:'Email has been sent!',
+      [AppLanguages.ru]:'Письмо успешно отправлено!',
+      [AppLanguages.en]:'Email sent successfully!',
+      [AppLanguages.de]:'E-Mail erfolgreich versendet!',
     }
   ];//Подтверждения
   private userInfos:Array<UserInfoMsgType> = [
@@ -544,8 +549,7 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Нераспознанные продукты были удалены из корзины.',
       [AppLanguages.en]:'Unrecognized products have been removed from cart.',
       [AppLanguages.de]:'Nicht erkannte Produkte wurden aus Ihrem Warenkorb entfernt.',
-    },
-    {
+    }, {
       info:'Cart has been cleared by the system.',
       [AppLanguages.ru]:'Корзина очищена системой.',
       [AppLanguages.en]:'Cart has been cleared by the system.',
@@ -560,6 +564,11 @@ export class ShowSnackService {
       [AppLanguages.ru]:'Один или несколько товаров в корзине не доступен!',
       [AppLanguages.en]:'One or more items in your cart are not available!',
       [AppLanguages.de]:'Mindestens ein Artikel in Ihrem Warenkorb ist nicht verfügbar!',
+    },{
+      info: 'Email address already confirmed!',
+      [AppLanguages.ru]:'E-Mail уже подтвержден!',
+      [AppLanguages.en]:'E-mail has been already confirmed!',
+      [AppLanguages.de]:'E-Mail bereits bestätigt!',
     },{
       info: Config.authorisationRequired,
       [AppLanguages.ru]:'Необходимо авторизоваться!',

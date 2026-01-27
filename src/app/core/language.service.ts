@@ -3,12 +3,14 @@ import {AppLanguages} from '../../assets/enums/app-languages.enum';
 import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {Config} from '../shared/config';
 import {Router, UrlSegment, UrlTree} from '@angular/router';
+import {DOCUMENT} from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LanguageService {
   private appLanguage: AppLanguages=Config.defaultLanguage;
+  private document = inject(DOCUMENT);
   private appLanguage$:BehaviorSubject<AppLanguages> = new BehaviorSubject(this.appLanguage);
   private router:Router = inject(Router);
 
@@ -22,12 +24,14 @@ export class LanguageService {
   setAppLanguage(appLanguage:AppLanguages):void {
     if (appLanguage !== this.appLanguage$.value) {
       this.appLanguage = appLanguage;
+      this.document.documentElement.lang = appLanguage;
       this.appLanguage$.next(appLanguage);
     }
   }
   changeAppLanguage(appLanguage:AppLanguages):void {
     if (appLanguage !== this.appLanguage) {
       this.appLanguage = appLanguage;
+      this.document.documentElement.lang = appLanguage;
       this.appLanguage$.next(appLanguage);
 
       const urlTree:UrlTree = this.router.parseUrl(this.router.url);

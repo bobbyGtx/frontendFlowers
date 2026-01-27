@@ -10,6 +10,9 @@ import {UserRequestService} from '../../../core/user-request.service';
 import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 import {LanguageService} from '../../../core/language.service';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {ChangePasswordTranslationType} from '../../../../assets/types/translations/change-password-translation.type';
+import {changePasswordDialogTranslations, changePasswordTranslations} from './change-password.translations';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
 
 @Component({
   selector: 'app-change-password',
@@ -26,15 +29,12 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   private dlgWindowService: DlgWindowService=inject(DlgWindowService);
 
   private subscriptions$: Subscription = new Subscription();
-  appLanguage:AppLanguages;
+  protected appLanguage:AppLanguages;
+  protected translations:ChangePasswordTranslationType;
 
   protected rToken: string | null = null;
   protected requestSuccessful: boolean = false;
-  private dialogContents={
-      title:'Пароль изменен',
-      content:'<div class="additional-title">Новый пароль успешно сохранен.</div>' +
-        '<div class="message-string">Вы можете использовать новый пароль для входа в свою учетную запись.</div>\n',
-  }
+  private dialogContents:DialogBoxType;
 
   changePassForm = this.fb.group({
     password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
@@ -43,6 +43,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = changePasswordTranslations[this.appLanguage];
+    this.dialogContents = changePasswordDialogTranslations[this.appLanguage];
   }
 
   get password() {
@@ -65,7 +67,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
           this.showSnackService.success(data.message);
           this.requestSuccessful = true;
           this.changePassForm.reset();
-          this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,['/',this.appLanguage,'login']);
+          this.showDialog();
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(errorResponse.error.message, ReqErrorTypes.saveNewPassword);
@@ -75,9 +77,17 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   }
 
+  showDialog(redirect:boolean=true) {
+    this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,redirect?['/',this.appLanguage,'login']:null);
+  }
+
   ngOnInit() {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language)this.appLanguage = language;
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = changePasswordTranslations[this.appLanguage];
+        this.dialogContents = changePasswordDialogTranslations[this.appLanguage];
+      }
     }));
     const rToken:string|null = this.activatedRoute.snapshot.queryParams['rToken']?this.activatedRoute.snapshot.queryParams['rToken']:null;
 

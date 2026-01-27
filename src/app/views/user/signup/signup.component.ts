@@ -10,6 +10,10 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
 import {emailExistsValidator} from '../../../shared/validators/email-exists.validator';
 import {LanguageService} from '../../../core/language.service';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {SignupTranslationType} from '../../../../assets/types/translations/signup-translation.type';
+import {signupDialogTranslations, signupTranslations} from './signup.translations';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
+import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 
 @Component({
   selector: 'app-signup',
@@ -22,9 +26,12 @@ export class SignupComponent implements OnInit, OnDestroy {
   private router:Router = inject(Router);
   private fb:FormBuilder = inject(FormBuilder);
   private authService:AuthService=inject(AuthService);
+  private dlgWindowService: DlgWindowService = inject(DlgWindowService);
 
-  subscriptions$:Subscription=new Subscription();
-  appLanguage:AppLanguages;
+  private subscriptions$:Subscription=new Subscription();
+  protected appLanguage:AppLanguages;
+  protected translations:SignupTranslationType;
+  private dialogContents: DialogBoxType;
 
   signUpForm: FormGroup=this.fb.group({
     email: ['', {
@@ -42,6 +49,8 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = signupTranslations[this.appLanguage];
+    this.dialogContents = signupDialogTranslations[this.appLanguage];
   }
 
   get email() {
@@ -68,7 +77,7 @@ export class SignupComponent implements OnInit, OnDestroy {
                 throw new Error(data.message);
               }
               this.showSnackService.success(data.message);
-              this.router.navigate(['/',this.appLanguage,'login']);
+              this.showDialog();
             },
             error: (errorResponse:HttpErrorResponse)=> {
               console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected Sign Up error! Code:${errorResponse.status}`);
@@ -79,9 +88,18 @@ export class SignupComponent implements OnInit, OnDestroy {
     }
   }
 
+  showDialog(redirect:boolean=true) {
+    this.dlgWindowService.openDialog(this.dialogContents.title, this.dialogContents.content,redirect?['/',this.appLanguage,'login']:null);
+  }
+
   ngOnInit() {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language)this.appLanguage = language;
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = signupTranslations[language];
+        this.dialogContents = signupDialogTranslations[this.appLanguage];
+        //this.showDialog(false);
+      }
     }));
   }
 

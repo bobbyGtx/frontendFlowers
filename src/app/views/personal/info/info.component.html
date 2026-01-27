@@ -129,4 +129,25 @@
     </div>
 
   </div>
+
+  <div class="email-not-verified-message" *ngIf="emailVerifyNotification">
+    <div class="close-btn" (click)="closeVerifyNotification()"
+         [matTooltip]="translations.closeButton" matTooltipClass="mat-tooltip-compact"
+         matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+      <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <line x1="1.93562" y1="2.6499" x2="13.9564" y2="14.6707" stroke-linecap="round"/>
+        <line x1="13.9238" y1="2.62971" x2="1.90301" y2="14.6505" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="dialog-content">
+      <div class="dialog-header">{{ translations.verificationNotifyHeader }}</div>
+        <div class="dialog-content-message">{{translations.verificationNotifyMessage}}</div>
+        <div class="dialog-content-action">
+          <button class="button notify-btn" [disabled]="emailTimer" (click)="sendVerificationEmail()"
+                  [matTooltip]="emailTimer?translations.sentEmailButtonDisabledHint:translations.sentEmailButtonActiveHint" matTooltipClass="mat-tooltip-compact"
+                  matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200"
+          >{{translations.sentEmailButtonCaption}}<span class="monospace">{{emailTimer?emailTimer:''}}</span></button>
+        </div>
+    </div>
+  </div>
 </div>

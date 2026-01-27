@@ -27,6 +27,7 @@
         max-width: 422px;
         display: flex;
         align-items: center;
+        user-select: none;
         .chk-svg{
           width: 14px;
           height: 14px;
@@ -112,15 +113,17 @@ input[type=checkbox]{
   }
 
   &~.chk-svg-checked{
+    stroke: $checkbox-checked-color;
     display: none;
   }
   &~.chk-svg-unchecked{
     display: inline;
+    stroke: $gray-text-color;
   }
   &:checked{
     &~.chk-title {
       &:not(.no-color-change){
-        color: #519157;
+        color: $checkbox-checked-color;
       }
     }
     &~.chk-svg-checked{

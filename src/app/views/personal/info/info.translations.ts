@@ -42,6 +42,12 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     shipmentTypeDisabledTitle:'Метод доставки не доступен',
     paymentTypeTitle:'Предпочитаемый способ оплаты',
     saveButton:'Сохранить',
+    closeButton:'Закрыть',
+    verificationNotifyHeader:'E-Mail не подтвержден!',
+    verificationNotifyMessage:'Вы не подтвердили ваш E-Mail. Для повторной отправки ссылки верификации, нажмите на кнопку ниже!',
+    sentEmailButtonCaption:'Отправить',
+    sentEmailButtonActiveHint:'Отправить ссылку',
+    sentEmailButtonDisabledHint:'Подождите',
   },
   [AppLanguages.en]: {
     pageHeader: 'Account',
@@ -83,6 +89,12 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     shipmentTypeDisabledTitle: 'Delivery method not available',
     paymentTypeTitle: 'Preferred payment method',
     saveButton: 'Save',
+    closeButton: 'Close',
+    verificationNotifyHeader: 'E-mail not verified!',
+    verificationNotifyMessage: 'You have not verified your e-mail address. To resend the verification link, please click the button below.',
+    sentEmailButtonCaption: 'Send',
+    sentEmailButtonActiveHint: 'Send verification link',
+    sentEmailButtonDisabledHint: 'Please wait',
   },
   [AppLanguages.de]: {
     pageHeader: 'Mein Konto',
@@ -124,5 +136,11 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     shipmentTypeDisabledTitle: 'Versandart nicht verfügbar',
     paymentTypeTitle: 'Bevorzugte Zahlungsart',
     saveButton: 'Speichern',
+    closeButton: 'Schließen',
+    verificationNotifyHeader: 'E-Mail nicht bestätigt!',
+    verificationNotifyMessage: 'Sie haben Ihre E-Mail-Adresse noch nicht bestätigt. Klicken Sie auf die Schaltfläche unten, um den Bestätigungslink erneut zu senden.',
+    sentEmailButtonCaption: 'Senden',
+    sentEmailButtonActiveHint: 'Bestätigungslink senden',
+    sentEmailButtonDisabledHint: 'Bitte warten',
   }
 };

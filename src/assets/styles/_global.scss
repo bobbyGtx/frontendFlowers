@@ -253,6 +253,9 @@ input::-webkit-inner-spin-button {
       }
     }
   }
+  &.notify-btn{
+    padding: 6px 8px 4px 8px;
+  }
 
   &:disabled{
     background-color: gray;
@@ -376,10 +379,10 @@ a.button{
 
 .additional-title{
   font-size: 22px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   font-weight: 600;
 }
 .message-string{
   font-size: 18px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }

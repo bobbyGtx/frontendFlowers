@@ -22,6 +22,7 @@ export type userErrorsType = {
   resetPassword: { [key in AppLanguages]: string; },
   checkChangePassToken: { [key in AppLanguages]: string; },
   changeUserPassword: { [key in AppLanguages]: string; },
+  sendVerificationEmail: { [key in AppLanguages]: string; },
 }
 
 @Injectable({
@@ -82,6 +83,11 @@ export class UserRequestService implements OnDestroy {
       [AppLanguages.en]: 'Error saving password! Please contact support.',
       [AppLanguages.de]: 'Fehler beim Speichern des Passworts! Bitte wenden Sie sich an den Support.',
     },
+    sendVerificationEmail: {
+      [AppLanguages.ru]: 'Ошибка отправки письма! Обратитесь в поддержку.',
+      [AppLanguages.en]: 'Error sending email! Please contact support.',
+      [AppLanguages.de]: 'Fehler beim Senden der E-Mail! Bitte wenden Sie sich an den Support.',
+    },
   };
 
   get resetPasswordError():string{
@@ -92,6 +98,9 @@ export class UserRequestService implements OnDestroy {
   }
   get changeUserPasswordError():string{
     return this.userErrors.changeUserPassword[this.languageService.appLang];
+  }
+  get sendVerificationEmailError():string{
+    return this.userErrors.sendVerificationEmail[this.languageService.appLang];
   }
 
   constructor() {
@@ -116,6 +125,28 @@ export class UserRequestService implements OnDestroy {
           this.resetPassCounter = errorResponse.error.timer;
           this.timerActive$.next(true);
         }else this.resetPasswordCooldown$.next(null);
+        return throwError(()=>errorResponse);
+      })
+    );
+  }
+
+  sendVerificationEmail(email:string):Observable<UserActionsResponseType> {
+    return this.http.post<UserActionsResponseType>(environment.api + 'authActions.php', {
+      operation:UserOperationsEnum.verifyEmail,
+      email: email
+    }).pipe(
+      tap((data: UserActionsResponseType) => {
+        if (data.timer){
+          this.verifyEmailCounter=data.timer;
+          this.timerActive$.next(true);
+        }else this.verifyEmailCooldown$.next(null);
+      }),
+      catchError((errorResponse:HttpErrorResponse)=>{
+        if (errorResponse.error.timer){
+          ConverterUtils.secondsToMinutes(errorResponse.error.timer);
+          this.verifyEmailCounter = errorResponse.error.timer;
+          this.timerActive$.next(true);
+        }else this.verifyEmailCooldown$.next(null);
         return throwError(()=>errorResponse);
       })
     );

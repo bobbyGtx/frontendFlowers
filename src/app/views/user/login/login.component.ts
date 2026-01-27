@@ -11,6 +11,8 @@ import {CartService} from '../../../shared/services/cart.service';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 import {LanguageService} from '../../../core/language.service';
+import {LoginTranslationType} from '../../../../assets/types/translations/login-translation.type';
+import {loginTranslations} from './login.translations';
 
 @Component({
   selector: 'app-login',
@@ -20,13 +22,14 @@ import {LanguageService} from '../../../core/language.service';
 export class LoginComponent implements OnInit, OnDestroy {
   private showSnackService:ShowSnackService = inject(ShowSnackService);
   private languageService:LanguageService=inject(LanguageService);
-  router:Router = inject(Router);
+  private router:Router = inject(Router);
   fb:FormBuilder = inject(FormBuilder);
   authService:AuthService=inject(AuthService);
   cartService:CartService=inject(CartService);
 
   subscriptions$:Subscription=new Subscription();
   appLanguage:AppLanguages;
+  translations:LoginTranslationType;
 
   loginForm: FormGroup=this.fb.group({
     email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
@@ -36,6 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = loginTranslations[this.appLanguage];
   }
 
   get email() {
@@ -88,7 +92,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language)this.appLanguage = language;
+      if ( this.appLanguage !== language) {
+        this.appLanguage = language;
+        this.translations = loginTranslations[language];
+      }
     }));
   }
 

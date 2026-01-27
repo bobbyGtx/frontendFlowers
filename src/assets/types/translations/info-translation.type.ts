@@ -1,5 +1,4 @@
 export type InfoTranslationType = {
-  [key:string]:string,
   pageHeader:string,
   menuProfileButton:string,
   menuOrdersButton:string,
@@ -39,4 +38,10 @@ export type InfoTranslationType = {
   shipmentTypeDisabledTitle:string,
   paymentTypeTitle:string,
   saveButton:string,
+  closeButton: string,
+  verificationNotifyHeader: string,
+  verificationNotifyMessage: string,
+  sentEmailButtonCaption: string,
+  sentEmailButtonActiveHint: string,
+  sentEmailButtonDisabledHint: string,
 }

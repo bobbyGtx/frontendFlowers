@@ -23,6 +23,9 @@ import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 import {LanguageService} from '../../../core/language.service';
 import {InfoTranslationType} from '../../../../assets/types/translations/info-translation.type';
 import {infoTranslations} from './info.translations';
+import {UserRequestService} from '../../../core/user-request.service';
+import {UserActionsResponseType} from '../../../../assets/types/responses/user-actions-response.type';
+import {ConverterUtils} from '../../../shared/utils/converter.utils';
 
 @Component({
   selector: 'app-info',
@@ -32,6 +35,7 @@ import {infoTranslations} from './info.translations';
 export class InfoComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private userService: UserService = inject(UserService);
+  private userRequestService: UserRequestService = inject(UserRequestService);
   private deliveryService: DeliveryService = inject(DeliveryService);
   private paymentService: PaymentService = inject(PaymentService);
   private fb: FormBuilder = inject(FormBuilder);
@@ -49,6 +53,9 @@ export class InfoComponent implements OnInit, OnDestroy {
 
   protected userData:UserDataType|null=null;
   private stockUserDeliveryInfo: DeliveryInfoType|null=null;//переменная для быстрого сравнения.
+
+  protected emailVerifyNotification:boolean=false;
+  protected emailTimer:string|null=null;
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
@@ -282,6 +289,8 @@ export class InfoComponent implements OnInit, OnDestroy {
           this.userData = userDataResp.userData;
           if (userDataResp.user.deliveryInfo) this.stockUserDeliveryInfo = userDataResp.user.deliveryInfo;
           this.infoForm.patchValue(this.userData);
+          if (!Config.verificationEmailClosed) this.emailVerifyNotification=!this.userData.emailVerification;
+
         }
       },
       error: (extError: ExtErrorResponseType) => {
@@ -289,6 +298,50 @@ export class InfoComponent implements OnInit, OnDestroy {
         console.error(extError.error.message ? extError.error.message : `Unexpected error (getUserData)! Code:${extError.status}`);
       }
     }));
+  }
+
+  protected sendVerificationEmail():void{
+    if (!this.userData) return;
+    this.emailTimer = '';
+
+    this.subscriptions$.add(
+      this.userRequestService.verifyEmailCooldown$.subscribe((timer:string|null)=>{
+        this.emailTimer = timer ? `(${timer})` : null;
+      }));//Подписка на таймер спама
+
+    this.subscriptions$.add(
+      this.userRequestService.sendVerificationEmail(this.userData.email).subscribe({
+        next:(data:UserActionsResponseType)=>{
+          if (data.error){
+            this.showSnackService.error(this.userRequestService.sendVerificationEmailError);
+            throw new Error(data.timer? `${data.message}, ${data.timer}`:data.message);
+          }
+          this.closeVerifyNotification();
+          this.showSnackService.success(data.message);
+          this.emailTimer = null;
+        },
+        error:(errorResponse:HttpErrorResponse)=>{
+          this.emailTimer=null;
+          if (errorResponse.status===409) {
+              this.showSnackService.infoObj(errorResponse.error.message);
+              this.closeVerifyNotification();
+              return;
+            }//обработка ответа, когда email уде активирован
+          if (errorResponse.status === 400 || errorResponse.status === 403 || errorResponse.status === 406 || errorResponse.status === 429) {
+            if (errorResponse.error.timer) this.emailTimer = '('+ConverterUtils.secondsToMinutes(errorResponse.error.timer)+')';
+            this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.authLogin);
+          }else {
+            this.showSnackService.error(this.userRequestService.sendVerificationEmailError);
+          }
+          console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (reset password)! Code:${errorResponse.status}`);
+        }
+      }));
+  }
+
+  protected closeVerifyNotification(){
+    this.emailTimer = null;
+    this.emailVerifyNotification=false;
+    Config.verificationEmailClosed=true;
   }
 
   ngOnInit() {
