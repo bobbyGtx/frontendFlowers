@@ -1,5 +1,4 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../core/auth/auth.service';
 import {Subscription} from 'rxjs';
@@ -23,7 +22,6 @@ import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 export class SignupComponent implements OnInit, OnDestroy {
   private showSnackService:ShowSnackService = inject(ShowSnackService);
   private languageService:LanguageService=inject(LanguageService);
-  private router:Router = inject(Router);
   private fb:FormBuilder = inject(FormBuilder);
   private authService:AuthService=inject(AuthService);
   private dlgWindowService: DlgWindowService = inject(DlgWindowService);
