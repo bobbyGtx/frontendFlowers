@@ -201,7 +201,10 @@ export class InfoComponent implements OnInit, OnDestroy {
     if (this.oldPassChecked){
       if (this.email && this.email.value && this.userData.email !== this.email.value ){
         userPatchData.email = this.email.value;
-        this.changeEmailDialogTranslation = this.insertNewEmail(emailChangeDialogTranslations[this.appLanguage],this.email.value);
+        this.changeEmailDialogTranslation = {
+          title:emailChangeDialogTranslations[this.appLanguage].title,
+          content:this.insertNewEmail(emailChangeDialogTranslations[this.appLanguage].content,this.email.value),
+        };
       }
       if (this.newPassword && this.newPasswordRepeat && this.oldPassword){
         if (this.newPassword.value && this.newPassword.value === this.newPasswordRepeat.value && this.oldPassword.value){
@@ -354,11 +357,13 @@ export class InfoComponent implements OnInit, OnDestroy {
     Config.verificationEmailClosed=true;
   }
 
-  private insertNewEmail(dialogBox:DialogBoxType, email:string):DialogBoxType{
-    const originalContent:string = dialogBox.content;
-    const interpolationIndex:number =  originalContent.indexOf('{}');
-    if (interpolationIndex>=0) dialogBox.content = dialogBox.content.slice(0,interpolationIndex)+email+dialogBox.content.slice(interpolationIndex+2);
-    return dialogBox;
+  private insertNewEmail(content:string, email:string):string{
+    const interpolationIndex:number =  content.indexOf('{}');
+    if (interpolationIndex>=0) {
+      return content.slice(0,interpolationIndex)+email+content.slice(interpolationIndex+2);
+    }else{
+      return content;
+    }
   }
 
   ngOnInit() {

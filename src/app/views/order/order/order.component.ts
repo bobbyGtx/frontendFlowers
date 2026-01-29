@@ -224,8 +224,8 @@ export class OrderComponent implements OnInit, OnDestroy {
           }
           this.cartService.resetCartCache();
           this.dialogContents = orderCreatedDialogTranslations[this.appLanguage];
-          if (this.activeDeliveryType?.addressNeed) this.dialogContents.content+=courierExtContentDialogTranslations[this.appLanguage];
-          this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,['/',this.appLanguage]);
+          let dialogContent:string = this.activeDeliveryType?.addressNeed?this.dialogContents.content + courierExtContentDialogTranslations[this.appLanguage]:this.dialogContents.content;
+          this.dlgWindowService.openDialog(this.dialogContents.title,dialogContent,['/',this.appLanguage]);
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.errorObj(errorResponse.error, ReqErrorTypes.createOrder);
