@@ -23,7 +23,7 @@
                   [matTooltip]="translations.phoneHint" matTooltipClass="mat-tooltip-compact"
                  matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
           <input type="text" class="input" [placeholder]="translations.emailPlaceholder" formControlName="email"
-                  [matTooltip]="translations.emailHint" matTooltipClass="mat-tooltip-compact"
+                  [matTooltip]="email?.errors?.['emailProblem']?translations.emailBusyErrorHint:translations.emailHint" matTooltipClass="mat-tooltip-compact"
                  matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
         </div>
       </div><!--Личные данные-->
@@ -125,7 +125,7 @@
     </div>
 
     <div class="page-image">
-      <img ngSrc="/images/page/main.png" priority width="1025" height="587" alt="flower">
+      <img ngSrc="/images/page/private.png" priority width="700" height="1171" alt="flower">
     </div>
 
   </div>

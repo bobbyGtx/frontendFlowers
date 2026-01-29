@@ -46,10 +46,10 @@
     }
     .page-image{
       position: absolute;
-      width: 1025px;
-      height: 587px;
+      width: 700px;
+      height: 1171px;
       bottom: 0;
-      right: calc(50% - 700px);
+      right: calc(50% - 600px);
       z-index: -1;
       @include image-wrapper();
       img{

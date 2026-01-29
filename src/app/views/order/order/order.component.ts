@@ -25,6 +25,13 @@ import {UserDataType} from '../../../../assets/types/user-data.type';
 import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 import {LanguageService} from '../../../core/language.service';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {OrderTranslationType} from '../../../../assets/types/translations/order-translation.type';
+import {
+  courierExtContentDialogTranslations,
+  orderCreatedDialogTranslations,
+  orderTranslations
+} from './order.translations';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
 
 @Component({
   selector: 'app-order',
@@ -47,6 +54,7 @@ export class OrderComponent implements OnInit, OnDestroy {
 
   private subscriptions$: Subscription = new Subscription();
   appLanguage:AppLanguages;
+  protected translations:OrderTranslationType;
 
   protected cart: CartType | null = null;
   protected deliveryTypes: DeliveryTypeType[] = [];
@@ -57,15 +65,11 @@ export class OrderComponent implements OnInit, OnDestroy {
   protected lowDeliveryPrice: boolean = false;//Если активна, то цена доставки снижена согласно условия
   private userDataFromServer:UserDataType|null = null;
 
-  private dialogContents={
-      title:'Благодарим за заказ!',
-      content:'<div class="additional-title">Ваш заказ оформлен.</div>'+
-        '<div class="message-string">Вся информация о заказе была выслана вам на почту.</div>'+
-        '<div class="message-string">Курьер свяжется с вами за два часа до доставки товара.</div>',
-  }
+  private dialogContents:DialogBoxType|null = null;
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = orderTranslations[this.appLanguage];
   }
 
 
@@ -219,6 +223,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             throw new Error(data.message);
           }
           this.cartService.resetCartCache();
+          this.dialogContents = orderCreatedDialogTranslations[this.appLanguage];
+          if (this.activeDeliveryType?.addressNeed) this.dialogContents.content+=courierExtContentDialogTranslations[this.appLanguage];
           this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,['/',this.appLanguage]);
         },
         error: (errorResponse: HttpErrorResponse) => {
@@ -268,16 +274,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     }//Если нет активных методов доставки
   }
 
-  ngOnInit() {
-    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language)this.appLanguage = language;
-    }));
+  doRequests(changeLanguage:boolean=false){
     const getDeliveryTypes$: Observable<DeliveryTypesResponseType> = this.deliveryService.getDeliveryTypes()
       .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any)));
     const getPaymentTypes$: Observable<PaymentTypesResponseType> = this.paymentService.getPaymentTypes()
       .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any)));
-    const getCart$: Observable<CartResponseType> = this.cartService.getCart(true)
-      .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any)));
+    const getCart$: Observable<CartResponseType|null> = !changeLanguage? this.cartService.getCart(true)
+      .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any))):of(null);
 
     const combinedRequests$: Observable<[DeliveryTypesResponseType | any, PaymentTypesResponseType | any, CartResponseType | any]> = combineLatest([getDeliveryTypes$, getPaymentTypes$, getCart$]);
 
@@ -299,17 +302,8 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.router.navigate(['/',this.appLanguage,'cart']);
             return;
           }//код не 200
-          if (cartResponse.__error) {
-            const httpCartError: HttpErrorResponse = cartResponse.err;
-            if (httpCartError.status !== 401 && httpCartError.status !== 403) this.showSnackService.error(httpCartError.error.message, ReqErrorTypes.cartGetCart);
-            console.error(httpCartError.error.message ? httpCartError.error.message : `Unexpected error (getCart)! Code:${httpCartError.status}`);
-            this.router.navigate(['/',this.appLanguage]);
-            return;
-          }//код не 200
-          //обработка ответов
           const deliveryTypesResp: DeliveryTypesResponseType = deliveryTypesResponse as DeliveryTypesResponseType;
           const paymentTypesResp: PaymentTypesResponseType = paymentTypesResponse as PaymentTypesResponseType;
-          const cartResp: CartResponseType = cartResponse as CartResponseType;
           if (deliveryTypesResp.error || !deliveryTypesResp.deliveryTypes || deliveryTypesResp.deliveryTypes.length === 0) {
             this.showSnackService.error(this.deliveryService.getDeliveryError);
             console.log(deliveryTypesResp.message ? deliveryTypesResp.message : `Unexpected error (getDeliveryTypes)!`);
@@ -325,76 +319,86 @@ export class OrderComponent implements OnInit, OnDestroy {
           }
           this.paymentTypes = paymentTypesResp.paymentTypes;
 
+          if (cartResponse){
+            if (cartResponse.__error) {
+              const httpCartError: HttpErrorResponse = cartResponse.err;
+              if (httpCartError.status !== 401 && httpCartError.status !== 403) this.showSnackService.error(httpCartError.error.message, ReqErrorTypes.cartGetCart);
+              console.error(httpCartError.error.message ? httpCartError.error.message : `Unexpected error (getCart)! Code:${httpCartError.status}`);
+              this.router.navigate(['/',this.appLanguage]);
+              return;
+            }//код не 200
+            //обработка ответов
+            const cartResp: CartResponseType = cartResponse as CartResponseType;
 
-          //Может быть error с нормальным ответом при проблемах с товарами
-          if (cartResp.error || !cartResp.cart) {
-            this.showSnackService.error(this.cartService.getCartError);
-            this.router.navigate(['/',this.appLanguage]);
-            throw new Error(cartResp.message);
-          }
-          if (cartResp.messages && cartResp.messages.length > 0) this.router.navigate(['/',this.appLanguage,'cart']);//Условие при котором есть сообщения об ошибках в корзине и она не пуста.
-          if (cartResp.cart && cartResp.cart.count === 0) {
-            this.showSnackService.infoObj(this.cartService.cartEmptyError);
-            this.router.navigate(['/',this.appLanguage,'catalog']);//Условие при котором корзина пустая и необходим редирект на каталог
-            return;
-          }
-          this.cart = cartResp.cart;
+            //Может быть error с нормальным ответом при проблемах с товарами
+            if (cartResp.error || !cartResp.cart) {
+              this.showSnackService.error(this.cartService.getCartError);
+              this.router.navigate(['/',this.appLanguage]);
+              throw new Error(cartResp.message);
+            }
+            if (cartResp.messages && cartResp.messages.length > 0) this.router.navigate(['/',this.appLanguage,'cart']);//Условие при котором есть сообщения об ошибках в корзине и она не пуста.
+            if (cartResp.cart && cartResp.cart.count === 0) {
+              this.showSnackService.infoObj(this.cartService.cartEmptyError);
+              this.router.navigate(['/',this.appLanguage,'catalog']);//Условие при котором корзина пустая и необходим редирект на каталог
+              return;
+            }
+            this.cart = cartResp.cart;
+            if (this.authService.getIsLoggedIn()){
+              this.subscriptions$.add(
+                this.userService.getUserData().subscribe({
+                  next: (data:UserDataResponseType) => {
+                    if (data.error || !data.userData || !data.user){
+                      this.showSnackService.error(this.userService.getUserDataError);
+                      throw new Error(data.message);
+                    }
+                    this.userDataFromServer=data.userData;
+                    if (data.userData.deliveryType_id){
+                      const deliveryTypeIndex:number = this.deliveryTypes.findIndex((deliveryItem:DeliveryTypeType)=>deliveryItem.id===data.userData?.deliveryType_id);
+                      if (deliveryTypeIndex>-1 && !this.deliveryTypes[deliveryTypeIndex].disabled) {
+                        this.changeDeliveryType(this.deliveryTypes[deliveryTypeIndex]);
+                      }else {
+                        this.setDefaultDelivery();
+                        this.showSnackService.infoObj('Saved delivery type unavailable');
+                      }
+                    }else this.setDefaultDelivery();
 
-          if (this.authService.getIsLoggedIn()){
-            this.subscriptions$.add(
-              this.userService.getUserData().subscribe({
-                next: (data:UserDataResponseType) => {
-                  if (data.error || !data.userData || !data.user){
+                    if (data.userData.paymentType_id) {
+                      const paymentTypeIndex:number = this.paymentTypes.findIndex((paymentItem:PaymentTypeType)=>paymentItem.id === data.userData!.paymentType_id);
+                      if (paymentTypeIndex>-1 && !this.paymentTypes[paymentTypeIndex].disabled) {
+                        this.paymentType?.setValue(this.paymentTypes[paymentTypeIndex].id);
+                      }else{
+                        this.setDefaultPayment();
+                        this.showSnackService.infoObj('Saved payment type unavailable');
+                      }
+                    }else this.setDefaultPayment();
+
+                    const paramsToUpdate = {
+                      email:data.userData.email,
+                      firstName: data.userData.firstName,
+                      lastName: data.userData.lastName,
+                      phone:data.userData.phone,
+                      region:data.userData.region,
+                      zip:data.userData.zip,
+                      city:data.userData.city,
+                      street:data.userData.street,
+                      house:data.userData.house,
+                    }
+                    this.orderForm.patchValue(paramsToUpdate);
+                    this.email?.disable();
+                  },
+                  error: (errorResponse:HttpErrorResponse) => {
                     this.showSnackService.error(this.userService.getUserDataError);
-                    throw new Error(data.message);
-                  }
-                  this.userDataFromServer=data.userData;
-                  if (data.userData.deliveryType_id){
-                    const deliveryTypeIndex:number = this.deliveryTypes.findIndex((deliveryItem:DeliveryTypeType)=>deliveryItem.id===data.userData?.deliveryType_id);
-                    if (deliveryTypeIndex>-1 && !this.deliveryTypes[deliveryTypeIndex].disabled) {
-                      this.changeDeliveryType(this.deliveryTypes[deliveryTypeIndex]);
-                    }else {
-                      this.setDefaultDelivery();
-                      this.showSnackService.infoObj('Saved delivery type unavailable');
-                    }
-                  }else this.setDefaultDelivery();
+                    console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getUserData)! Code:${errorResponse.status}`);
+                  },
+                })
+              );//Подписка на данные из профиля пользователя, если он залогинен
+            }else{
+              this.setDefaultPayment();
+              this.setDefaultDelivery();
+            }
 
-                  if (data.userData.paymentType_id) {
-                    const paymentTypeIndex:number = this.paymentTypes.findIndex((paymentItem:PaymentTypeType)=>paymentItem.id === data.userData!.paymentType_id);
-                    if (paymentTypeIndex>-1 && !this.paymentTypes[paymentTypeIndex].disabled) {
-                      this.paymentType?.setValue(this.paymentTypes[paymentTypeIndex].id);
-                    }else{
-                      this.setDefaultPayment();
-                      this.showSnackService.infoObj('Saved payment type unavailable');
-                    }
-                  }else this.setDefaultPayment();
-
-                  const paramsToUpdate = {
-                    email:data.userData.email,
-                    firstName: data.userData.firstName,
-                    lastName: data.userData.lastName,
-                    phone:data.userData.phone,
-                    region:data.userData.region,
-                    zip:data.userData.zip,
-                    city:data.userData.city,
-                    street:data.userData.street,
-                    house:data.userData.house,
-                  }
-                  this.orderForm.patchValue(paramsToUpdate);
-                  this.email?.disable();
-                },
-                error: (errorResponse:HttpErrorResponse) => {
-                  this.showSnackService.error(this.userService.getUserDataError);
-                  console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getUserData)! Code:${errorResponse.status}`);
-                },
-              })
-            );//Подписка на данные из профиля пользователя, если он залогинен
-          }else{
-            this.setDefaultPayment();
-            this.setDefaultDelivery();
+            this.deliveryAndTotalAmountCalculate();
           }
-
-          this.deliveryAndTotalAmountCalculate();
 
         },
         error: () => {
@@ -402,6 +406,21 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = orderTranslations[this.appLanguage];
+        this.doRequests(true);
+      }else{
+        this.appLanguage = language;
+        this.translations = orderTranslations[this.appLanguage];
+        this.doRequests();
+      }
+
+    }));
   }
 
   ngOnDestroy() {

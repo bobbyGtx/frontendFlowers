@@ -13,6 +13,8 @@ import {CartProductType} from '../../../../assets/types/cart-product.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {LanguageService} from '../../../core/language.service';
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {CartTranslationType} from '../../../../assets/types/translations/cart-translation.type';
+import {cartTranslations} from './cart.translations';
 
 @Component({
   selector: 'app-cart',
@@ -27,6 +29,7 @@ export class CartComponent implements OnInit , OnDestroy {
 
   subscriptions$:Subscription = new Subscription();
   appLanguage:AppLanguages;
+  protected translations:CartTranslationType;
 
   serverImagesPath: string = environment.images;
   extraProducts:ProductType[]=[];
@@ -39,6 +42,7 @@ export class CartComponent implements OnInit , OnDestroy {
 
   constructor() {
     this.appLanguage = this.languageService.appLang;
+    this.translations = cartTranslations[this.appLanguage];
   }
 
   editCount(cartProduct:CartProductType, count:number){
@@ -97,10 +101,7 @@ export class CartComponent implements OnInit , OnDestroy {
     this.editCount(cartProduct,value);
   }
 
-  ngOnInit() {
-    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
-      if (this.appLanguage!==language)this.appLanguage = language;
-    }));
+  doRequest(){
     this.subscriptions$.add(
       this.cartService.getCart(true).subscribe({
         next: (data: CartResponseType) => {
@@ -140,6 +141,17 @@ export class CartComponent implements OnInit , OnDestroy {
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
         }
       }));
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = cartTranslations[this.appLanguage];
+      }
+      this.doRequest();
+    }));
+
   }
 
   ngOnDestroy() {

@@ -22,10 +22,12 @@ import {emailExistsValidator} from '../../../shared/validators/email-exists.vali
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 import {LanguageService} from '../../../core/language.service';
 import {InfoTranslationType} from '../../../../assets/types/translations/info-translation.type';
-import {infoTranslations} from './info.translations';
+import {emailChangeDialogTranslations, infoTranslations} from './info.translations';
 import {UserRequestService} from '../../../core/user-request.service';
 import {UserActionsResponseType} from '../../../../assets/types/responses/user-actions-response.type';
 import {ConverterUtils} from '../../../shared/utils/converter.utils';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
+import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 
 @Component({
   selector: 'app-info',
@@ -40,10 +42,12 @@ export class InfoComponent implements OnInit, OnDestroy {
   private paymentService: PaymentService = inject(PaymentService);
   private fb: FormBuilder = inject(FormBuilder);
   private languageService:LanguageService=inject(LanguageService);
+  private dlgWindowService: DlgWindowService=inject(DlgWindowService);
 
   private subscriptions$: Subscription = new Subscription();
   protected appLanguage:AppLanguages;
   protected translations:InfoTranslationType;
+  protected changeEmailDialogTranslation:DialogBoxType|null=null;
 
   protected deliveryTypes: DeliveryTypeType[] = [];
   protected paymentTypes: PaymentTypeType[] = [];
@@ -195,7 +199,10 @@ export class InfoComponent implements OnInit, OnDestroy {
       if(this.userData.region || this.userData.zip || this.userData.city || this.userData.street || this.userData.house) userPatchData.deliveryInfo=null;
     }
     if (this.oldPassChecked){
-      if (this.email && this.email.value && this.userData.email !== this.email.value ) userPatchData.email = this.email.value;
+      if (this.email && this.email.value && this.userData.email !== this.email.value ){
+        userPatchData.email = this.email.value;
+        this.changeEmailDialogTranslation = this.insertNewEmail(emailChangeDialogTranslations[this.appLanguage],this.email.value);
+      }
       if (this.newPassword && this.newPasswordRepeat && this.oldPassword){
         if (this.newPassword.value && this.newPassword.value === this.newPasswordRepeat.value && this.oldPassword.value){
           userPatchData.newPassword = this.newPassword.value;
@@ -218,7 +225,10 @@ export class InfoComponent implements OnInit, OnDestroy {
               this.showSnackService.success(response.message);
               this.resetForm();
               this.infoForm.patchValue(this.userData);
-
+              if (this.changeEmailDialogTranslation){
+                this.dlgWindowService.openDialog(this.changeEmailDialogTranslation.title, this.changeEmailDialogTranslation.content);
+                this.changeEmailDialogTranslation = null;
+              }
             }
           },
           error: (errorResponse:HttpErrorResponse) => {
@@ -342,6 +352,13 @@ export class InfoComponent implements OnInit, OnDestroy {
     this.emailTimer = null;
     this.emailVerifyNotification=false;
     Config.verificationEmailClosed=true;
+  }
+
+  private insertNewEmail(dialogBox:DialogBoxType, email:string):DialogBoxType{
+    const originalContent:string = dialogBox.content;
+    const interpolationIndex:number =  originalContent.indexOf('{}');
+    if (interpolationIndex>=0) dialogBox.content = dialogBox.content.slice(0,interpolationIndex)+email+dialogBox.content.slice(interpolationIndex+2);
+    return dialogBox;
   }
 
   ngOnInit() {

@@ -1,6 +1,6 @@
 <div class="cart">
   <div class="container">
-    <div class="cart-title">Корзина</div>
+    <div class="cart-title">{{translations.pageHeader}}</div>
     <div class="cart-info" *ngIf="cartItems.length">
       <div class="cart-products">
         <div class="cart-product" *ngFor="let cartProduct of cartItems">
@@ -15,7 +15,7 @@
           <count-selector (onCountChange)="updateCount(cartProduct.product,$event)" [count]="cartProduct.quantity" [maxCount]="cartProduct.product.count" [disabled]="cartProduct.product.disabled" [filterOn]="true"></count-selector>
           <div class="cart-product-price">{{cartProduct.product.price}} EUR</div>
           <div class="cart-product-remove" (click)="editCount(cartProduct.product,0)">
-            <svg matTooltip="Удалить из корзины"
+            <svg [matTooltip]="translations.removeFromCartBtnHint"
             matTooltipClass="mat-tooltip-compact"
             matTooltipPosition="above"
             matTooltipHideDelay="200"
@@ -28,30 +28,30 @@
       </div>
       <div class="cart-details">
         <div class="cart-details-info">
-          <div class="cart-details-info-title">Ваш заказ</div>
+          <div class="cart-details-info-title">{{translations.cartDetailsTitle}}</div>
           <div class="cart-details-info-item first">
-            <div class="cart-details-info-item-caption">Товаров:</div>
+            <div class="cart-details-info-item-caption">{{translations.cartProductsTitle}}:</div>
             <div class="cart-details-info-item-data">{{totalCount}}</div>
           </div>
           <div class="cart-details-info-item">
-            <div class="cart-details-info-item-caption">Общая стоимость:</div>
+            <div class="cart-details-info-item-caption">{{translations.cartTotalAmountTitle}}:</div>
             <div class="cart-details-info-item-data">{{totalAmount}} EUR</div>
           </div>
-          <div class="cart-details-info-delivery">* без учета доставки</div>
+          <div class="cart-details-info-delivery">* {{translations.cartDeliveryInfoText}}</div>
         </div>
         <div class="cart-details-actions">
-          <button class="button button-transparent" [routerLink]="['/',appLanguage,'catalog']">Продолжить покупки</button>
-          <button class="button" [routerLink]="['/',appLanguage,'order']">Оформить заказ</button>
+          <button class="button button-transparent" [routerLink]="['/',appLanguage,'catalog']">{{translations.continueShoppingBtnCaption}}</button>
+          <button class="button" [routerLink]="['/',appLanguage,'order']">{{translations.placeOrderBtnCaption}}</button>
         </div>
       </div>
     </div>
     <div class="cart-empty" *ngIf="!cartItems.length">
-      <div class="cart-empty-message">В корзине нет товаров</div>
-      <button class="button" [routerLink]="['/',appLanguage,'catalog']">В каталог</button>
+      <div class="cart-empty-message">{{translations.cartEmptyMessage}}</div>
+      <button class="button" [routerLink]="['/',appLanguage,'catalog']">{{translations.goToCatalogBtnCaption}}</button>
     </div>
 
     <div class="extra-products" *ngIf="extraProducts.length">
-      <products-carousel [products]="extraProducts" [title]="'С этими товарами также покупают'" [lightMode]="true" [appLanguage]="appLanguage"></products-carousel>
+      <products-carousel [products]="extraProducts" [title]="translations.recommendedProductsTitle" [lightMode]="true" [appLanguage]="appLanguage"></products-carousel>
     </div>
   </div>
 </div>

@@ -11,6 +11,7 @@ export type InfoTranslationType = {
   phoneHint:string,
   emailPlaceholder:string,
   emailHint:string,
+  emailBusyErrorHint:string,
   passwordTitle:string,
   actualPasswordPlaceholder:string,
   actualPasswordHint:string,

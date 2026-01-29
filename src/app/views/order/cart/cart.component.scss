@@ -117,6 +117,7 @@
           border-radius: 5px;
           background: $details-info-bg;
           margin-bottom: 14px;
+
           .cart-details-info-title{
             @include head-lora(26px);
             margin-bottom: 22px;
@@ -124,21 +125,20 @@
           .cart-details-info-item{
             display: flex;
             align-items: center;
+            font-size: 20px;
             &.first{
               margin-bottom: 10px;
             }
 
             .cart-details-info-item-caption{
-              font-size: 16px;
               margin-right: 12px;
             }
             .cart-details-info-item-data{
-              font-size: 20px;
               font-weight: 500;
             }
           }
           .cart-details-info-delivery{
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 300;
             margin-top: 5px;
           }

@@ -16,8 +16,6 @@
       display: flex;
       justify-content: space-between;
 
-
-
       .order-details {
         width: 422px;
 
@@ -36,15 +34,13 @@
             display: flex;
             align-items: center;
             margin-bottom: 10px;
-
+            font-size: 20px;
 
             .order-details-info-item-caption {
-              font-size: 16px;
               margin-right: 12px;
             }
 
             .order-details-info-item-data {
-              font-size: 20px;
               font-weight: 500;
               position: relative;
               .attention-icon {

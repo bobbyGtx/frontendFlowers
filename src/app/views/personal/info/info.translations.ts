@@ -1,5 +1,6 @@
 import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
 import {InfoTranslationType} from '../../../../assets/types/translations/info-translation.type';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
 
 export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } = {
   [AppLanguages.ru]: {
@@ -15,6 +16,7 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     phoneHint:'Введите телефон получателя. +4912345678901',
     emailPlaceholder:'E-Mail',
     emailHint:'Ваш E-Mail. (Для изменения необходимо ввести пароль.)',
+    emailBusyErrorHint:'Этот E-Mail занят!',
     passwordTitle:'Пароль',
     actualPasswordPlaceholder:'Действующий пароль',
     actualPasswordHint:'Введите действующий пароль',
@@ -28,7 +30,7 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     newPasswordRepeatHint:'Повторите новый пароль',
     newPasswordRepeatErrorHint:'Повторите новый пароль',
     addressTitle:'Адрес доставки',
-    regionLabel:'Выберите регион',
+    regionLabel:'Регион',
     regionHint:'Регион доставки',
     townPlaceholder:'Город',
     townHint:'Укажите город доставки',
@@ -60,6 +62,7 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     lastNameHint: 'Enter the recipient’s last name',
     phonePlaceholder: 'Phone',
     phoneHint: 'Enter the recipient’s phone number. +4912345678901',
+    emailBusyErrorHint:'This e-mail address is already in use!',
     emailPlaceholder: 'E-mail',
     emailHint: 'Your e-mail address. (Password is required to change it.)',
     passwordTitle: 'Password',
@@ -75,7 +78,7 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     newPasswordRepeatHint: 'Repeat the new password',
     newPasswordRepeatErrorHint: 'Please repeat the new password',
     addressTitle: 'Delivery address',
-    regionLabel: 'Select region',
+    regionLabel: 'Region',
     regionHint: 'Delivery region',
     townPlaceholder: 'City',
     townHint: 'Enter the delivery city',
@@ -109,6 +112,7 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     phoneHint: 'Geben Sie die Telefonnummer des Empfängers ein. +4912345678901',
     emailPlaceholder: 'E-Mail',
     emailHint: 'Ihre E-Mail-Adresse. (Zur Änderung ist das Passwort erforderlich.)',
+    emailBusyErrorHint:'Diese E-Mail-Adresse ist bereits vergeben!',
     passwordTitle: 'Passwort',
     actualPasswordPlaceholder: 'Aktuelles Passwort',
     actualPasswordHint: 'Geben Sie Ihr aktuelles Passwort ein',
@@ -122,7 +126,7 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     newPasswordRepeatHint: 'Wiederholen Sie das neue Passwort',
     newPasswordRepeatErrorHint: 'Bitte wiederholen Sie das neue Passwort',
     addressTitle: 'Lieferadresse',
-    regionLabel: 'Region auswählen',
+    regionLabel: 'Region',
     regionHint: 'Lieferregion',
     townPlaceholder: 'Stadt',
     townHint: 'Geben Sie die Lieferstadt ein',
@@ -143,4 +147,30 @@ export const infoTranslations: { [key in AppLanguages]:  InfoTranslationType } =
     sentEmailButtonActiveHint: 'Bestätigungslink senden',
     sentEmailButtonDisabledHint: 'Bitte warten',
   }
+};
+
+export const emailChangeDialogTranslations: { [key in AppLanguages]: DialogBoxType } = {
+  [AppLanguages.ru]: {
+    title:'Изменение E-Mail адреса.',
+    content:'<div class="additional-title">Изменение E-Mail адреса требует подтверждения.</div>'+
+      '<div class="message-string">На новый E-Mail адрес <b>{}</b> было отправлено письмо со ссылкой для подтверждения смены адреса электронной почты.</div>'+
+      '<div class="message-string">E-Mail адрес будет изменен только после подтверждения.</div>'+
+      '<div class="message-string red-text small-text">Ссылка действительна в течении 24 часов!</div>',
+  },
+  [AppLanguages.en]: {
+    title: 'E-mail address change.',
+    content:
+      '<div class="additional-title">Changing the e-mail address requires confirmation.</div>' +
+      '<div class="message-string">An email with a confirmation link has been sent to the new e-mail address <b>{}</b>.</div>' +
+      '<div class="message-string">The e-mail address will be changed only after confirmation.</div>' +
+      '<div class="message-string red-text small-text">The link is valid for 24 hours!</div>',
+  },
+  [AppLanguages.de]: {
+    title: 'Änderung der E-Mail-Adresse.',
+    content:
+      '<div class="additional-title">Die Änderung der E-Mail-Adresse erfordert eine Bestätigung.</div>' +
+      '<div class="message-string">An die neue E-Mail-Adresse <b>{}</b> wurde eine Nachricht mit einem Bestätigungslink gesendet.</div>' +
+      '<div class="message-string">Die E-Mail-Adresse wird erst nach der Bestätigung geändert.</div>' +
+      '<div class="message-string red-text small-text">Der Link ist 24 Stunden gültig!</div>',
+  },
 };
