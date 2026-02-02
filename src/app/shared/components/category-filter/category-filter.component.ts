@@ -1,4 +1,4 @@
-import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -8,6 +8,9 @@ import {CategoryFilters} from '../../../../assets/enums/category-filters.enum';
 import {ActiveParamsType} from '../../../../assets/types/active-params.type';
 import {TypeType} from '../../../../assets/types/type.type';
 import {UrlParamsEnum} from '../../../../assets/enums/url-params.enum';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {CategoryFilterTranslationType} from '../../../../assets/types/translations/category-filtter-translation.type';
+import {categoryFilterTranslations} from './category-filter.translations';
 
 
 @Component({
@@ -40,11 +43,14 @@ import {UrlParamsEnum} from '../../../../assets/enums/url-params.enum';
     ])
   ]
 })
-export class CategoryFilterComponent implements OnInit, OnDestroy {
+export class CategoryFilterComponent implements OnInit, OnChanges, OnDestroy {
   router: Router = inject(Router);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   @Input() categoryWithTypes: CategoryWithTypesType | null = null;
   @Input() type: CategoryFilters | null = null;
+  @Input() appLanguage:AppLanguages | null = null;
+
+  translations:CategoryFilterTranslationType|null = null;
 
   subscriptions$: Subscription = new Subscription();
 
@@ -61,21 +67,66 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
       return this.categoryWithTypes.name;
     } else if (this.type) {
       if (this.type === CategoryFilters.height) {
-        return 'Высота';
+        return this.translations?this.translations.heightTitle:'Height';
       } else if (this.type === CategoryFilters.diameter) {
-        return 'Диаметр';
+        return this.translations?this.translations.diameterTitle:'Diameter';
       } else if (this.type === CategoryFilters.price) {
-        return 'Цена';
+        return this.translations?this.translations.priceTitle:'Price';
       }
     }
-    return 'Нет заголовка!';
+    return this.translations?this.translations.noTitle:'No title';
   }
 
   get units(): string {
-    return this.type === CategoryFilters.price ? 'евро' : 'см'
+    if (this.translations) {
+      if (this.type === CategoryFilters.price ){
+        return this.translations.priceUnits;
+      }else if (this.type === CategoryFilters.height){
+        return this.translations.heightUnits;
+      }else{
+        return this.translations.diameterUnits;
+      }
+    } else return 'units';
+  }
+
+  toggle(): void {
+    this.open = !this.open;
+    this.manualClosed = !this.open;
+  }
+
+  updateFilterParam(url: string, checked: boolean): void {
+    if (this.activeParams.types && this.activeParams.types.length > 0) {
+      const existingTypeInParams: number = this.activeParams.types.findIndex((item: string) => item === url);
+      if (existingTypeInParams > -1 && !checked) {
+        this.activeParams.types.splice(existingTypeInParams, 1);
+      } else if (existingTypeInParams == -1 && checked) {
+        this.activeParams.types=[...this.activeParams.types,url];//dont use push
+      }
+    } else if (checked) {
+      this.activeParams.types = [url];
+    }
+    if (this.activeParams.page)this.activeParams.page=1;
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
+      queryParams: this.activeParams
+    });
+  }
+
+  updateFilterFromTo(param: string, value: string): void {
+    if (param === UrlParamsEnum.diameterFrom || param === UrlParamsEnum.diameterTo || param === UrlParamsEnum.heightFrom || param === UrlParamsEnum.heightTo || param === UrlParamsEnum.priceFrom || param === UrlParamsEnum.priceTo) {
+      if (this.activeParams[param] && !value) {
+        delete this.activeParams[param];
+      } else {
+        this.activeParams[param] = value;
+      }
+    }
+      if (this.activeParams.page)this.activeParams.page=1;
+      this.router.navigate(['/',this.appLanguage,'catalog'], {
+        queryParams: this.activeParams
+      });
   }
 
   ngOnInit() {
+    if (this.type && this.appLanguage) this.translations = categoryFilterTranslations[this.appLanguage];
     this.subscriptions$.add(
       this.activatedRoute.queryParams.subscribe((params) => {
         this.activeParams = ActiveParamsUtil.processParams(params);
@@ -100,40 +151,8 @@ export class CategoryFilterComponent implements OnInit, OnDestroy {
     );
   }
 
-  toggle(): void {
-    this.open = !this.open;
-    this.manualClosed = !this.open;
-  }
-
-  updateFilterParam(url: string, checked: boolean): void {
-    if (this.activeParams.types && this.activeParams.types.length > 0) {
-      const existingTypeInParams: number = this.activeParams.types.findIndex((item: string) => item === url);
-      if (existingTypeInParams > -1 && !checked) {
-        this.activeParams.types.splice(existingTypeInParams, 1);
-      } else if (existingTypeInParams == -1 && checked) {
-        this.activeParams.types=[...this.activeParams.types,url];//dont use push
-      }
-    } else if (checked) {
-      this.activeParams.types = [url];
-    }
-    if (this.activeParams.page)this.activeParams.page=1;
-    this.router.navigate(['/catalog'], {
-      queryParams: this.activeParams
-    });
-  }
-
-  updateFilterFromTo(param: string, value: string): void {
-    if (param === UrlParamsEnum.diameterFrom || param === UrlParamsEnum.diameterTo || param === UrlParamsEnum.heightFrom || param === UrlParamsEnum.heightTo || param === UrlParamsEnum.priceFrom || param === UrlParamsEnum.priceTo) {
-      if (this.activeParams[param] && !value) {
-        delete this.activeParams[param];
-      } else {
-        this.activeParams[param] = value;
-      }
-    }
-      if (this.activeParams.page)this.activeParams.page=1;
-      this.router.navigate(['/catalog'], {
-        queryParams: this.activeParams
-      });
+  ngOnChanges(changes: SimpleChanges) {
+    if ( this.type && changes['appLanguage'] && this.appLanguage) this.translations=categoryFilterTranslations[this.appLanguage];
   }
 
   ngOnDestroy(): void {

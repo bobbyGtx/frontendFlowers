@@ -24,6 +24,10 @@ import {FavoriteProductType} from '../../../../assets/types/favorite-product.typ
 import {FavoritesResponseType} from '../../../../assets/types/responses/favorites-response.type';
 import {AuthService} from '../../../core/auth/auth.service';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {CatalogTranslationType} from '../../../../assets/types/translations/catalog-translation.type';
+import {catalogTranslations, sortingOptionsTranslations} from './catalog.translations';
 
 @Component({
   selector: 'app-catalog',
@@ -33,13 +37,19 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
 export class CatalogComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private authService: AuthService=inject(AuthService);
+  private languageService: LanguageService = inject(LanguageService);
   private productService: ProductService = inject(ProductService);
   private categoryService: CategoryService = inject(CategoryService);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private cartService: CartService = inject(CartService);
   private favoriteService: FavoriteService = inject(FavoriteService);
   protected router: Router = inject(Router);
+
   private subscriptions$: Subscription = new Subscription();
+  private activatedParamsSubscription: Subscription|null=null;
+  protected appLanguage:AppLanguages;
+  protected translations:CatalogTranslationType;
+  protected sortingOptions: SortingOptionsType[];
 
   protected activeParams: ActiveParamsType = {types: []};
   protected appliedFilters: Array<AppliedFilterType> = [];
@@ -54,46 +64,11 @@ export class CatalogComponent implements OnInit, OnDestroy {
   protected totalProducts: number = 0;
   protected sortingOpened: boolean = false;
   private debounce: boolean = false;
-  protected sortingOptions: Array<SortingOptionsType> = [
-    {name: 'От А до Я', value: 'name-asc'},
-    {name: 'От Я до А', value: 'name-desc'},
-    {name: 'По возрастанию цены', value: 'price-asc'},
-    {name: 'По убыванию цены', value: 'price-desc'},
-  ];
 
-  ngOnInit() {
-    const clicks:Observable<Event> = fromEvent(document, 'click');
-    this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
-
-    this.subscriptions$.add(this.categoryService.getCategoriesWithTypes().subscribe({
-        next: (data: CategoriesWithTypesResponseType) => {
-          if (data.error) {
-            this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
-            throw new Error(data.message);
-          }
-          if (data.categories) this.categoriesWithTypes = data.categories;
-          this.subscriptions$.add(
-            this.activatedRoute.queryParams
-              .pipe(
-                debounce(() => {
-                  if (this.debounce) return timer(500);
-                  this.debounce = true;
-                  return timer(0);
-                })
-              )
-              .subscribe(params => {
-                this.activeParams = ActiveParamsUtil.processParams(params);
-                this.fillAppliedFilters();
-                this.debounce = true;
-                this.requestProducts();
-              })
-          );
-        },
-        error: (errorResponse: HttpErrorResponse) => {
-          this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
-          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (get Categories)! Code:${errorResponse.status}`);
-        }
-      }));
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+    this.translations = catalogTranslations[this.appLanguage];
+    this.sortingOptions = sortingOptionsTranslations[this.appLanguage];
   }
 
   toggleSorting(event: MouseEvent) {
@@ -112,7 +87,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     }
     if (this.activeParams.page) this.activeParams.page = 1;
     this.debounce = false;
-    this.router.navigate(['/catalog'], {
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
       queryParams: this.activeParams
     });
   }
@@ -133,37 +108,37 @@ export class CatalogComponent implements OnInit, OnDestroy {
     });
     if (this.activeParams.diameterFrom) {
       this.appliedFilters.push({
-        name: 'Диаметр от: ' + this.activeParams.diameterFrom + 'см',
+        name: this.translations.filterDiameterFrom + this.activeParams.diameterFrom + this.translations.filterDiameterUnits,
         urlParam: UrlParamsEnum.diameterFrom,
       });
     }
     if (this.activeParams.diameterTo) {
       this.appliedFilters.push({
-        name: 'Диаметр до: ' + this.activeParams.diameterTo + 'см',
+        name: this.translations.filterDiameterTo + this.activeParams.diameterTo + this.translations.filterDiameterUnits,
         urlParam: UrlParamsEnum.diameterTo,
       });
     }
     if (this.activeParams.heightFrom) {
       this.appliedFilters.push({
-        name: 'Высота от: ' + this.activeParams.heightFrom + 'см',
+        name: this.translations.filterHeightFrom + this.activeParams.heightFrom + this.translations.filterHeightUnits,
         urlParam: UrlParamsEnum.heightFrom,
       });
     }
     if (this.activeParams.heightTo) {
       this.appliedFilters.push({
-        name: 'Высота до: ' + this.activeParams.heightTo + 'см',
+        name: this.translations.filterHeightTo + this.activeParams.heightTo + this.translations.filterHeightUnits,
         urlParam: UrlParamsEnum.heightTo,
       });
     }
     if (this.activeParams.priceFrom) {
       this.appliedFilters.push({
-        name: 'Цена от: ' + this.activeParams.priceFrom,
+        name: this.translations.filterPriceFrom + this.activeParams.priceFrom + this.translations.filterPriceUnits,
         urlParam: UrlParamsEnum.priceFrom,
       });
     }
     if (this.activeParams.priceTo) {
       this.appliedFilters.push({
-        name: 'Цена до: ' + this.activeParams.priceTo,
+        name: this.translations.filterPriceTo + this.activeParams.priceTo + this.translations.filterPriceUnits,
         urlParam: UrlParamsEnum.priceTo,
       });
     }
@@ -177,15 +152,13 @@ export class CatalogComponent implements OnInit, OnDestroy {
     }
     this.sortingOpened = false;
     this.debounce = false;
-    this.router.navigate(['/catalog'], {
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
       queryParams: this.activeParams
     });
   }
 
   openNextPage() {
-    if ((this.activePage + 1) <= this.pages.length) {
-      this.openPage(this.activePage + 1);
-    }
+    if ((this.activePage + 1) <= this.pages.length) this.openPage(this.activePage + 1);
   }
 
   openPrevPage() {
@@ -197,9 +170,11 @@ export class CatalogComponent implements OnInit, OnDestroy {
       this.activeParams.page = page;
       this.activePage = page;
       this.debounce=false;
-      this.router.navigate(['/catalog'], {
+      window.scrollTo({top: 200, behavior: 'smooth'})
+      this.router.navigate(['/',this.appLanguage,'catalog'], {
         queryParams: this.activeParams
       });
+
     }
   }
 
@@ -207,7 +182,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     let clearParams: ActiveParamsType = {types: []};
     if (this.activeParams.sort) clearParams.sort = this.activeParams.sort;
 
-    this.router.navigate(['/catalog'], {
+    this.router.navigate(['/',this.appLanguage,'catalog'], {
       queryParams: clearParams
     });
   }
@@ -285,6 +260,53 @@ export class CatalogComponent implements OnInit, OnDestroy {
         return productItem;
       });
     }
+  }
+
+  private doRequests():void{
+    this.subscriptions$.add(this.categoryService.getCategoriesWithTypes().subscribe({
+      next: (data: CategoriesWithTypesResponseType) => {
+        if (data.error) {
+          this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
+          throw new Error(data.message);
+        }
+        if (data.categories) this.categoriesWithTypes = data.categories;
+
+        if (!this.activatedParamsSubscription){
+          this.activatedParamsSubscription = this.activatedRoute.queryParams
+            .pipe(
+              debounce(() => {
+                if (this.debounce) return timer(500);
+                this.debounce = true;
+                return timer(0);
+              })
+            )
+            .subscribe(params => {
+              this.activeParams = ActiveParamsUtil.processParams(params);
+              this.fillAppliedFilters();
+              this.debounce = true;
+              this.requestProducts();
+            });
+        }else {
+          this.fillAppliedFilters();
+          this.requestProducts();
+        }
+      },
+      error: (errorResponse: HttpErrorResponse) => {
+        this.showSnackService.error(this.categoryService.getCategoriesWithTypesError);
+        console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (get Categories)! Code:${errorResponse.status}`);
+      }
+    }));
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
+      this.appLanguage = language;
+      this.translations = catalogTranslations[this.appLanguage];
+      this.sortingOptions = sortingOptionsTranslations[this.appLanguage];
+      this.doRequests();
+    }));
+    const clicks:Observable<Event> = fromEvent(document, 'click');
+    this.subscriptions$.add(clicks.subscribe(() => this.sortingOpened = false));
   }
 
   ngOnDestroy() {

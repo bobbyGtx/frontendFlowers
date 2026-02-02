@@ -1,21 +1,18 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {AppLanguages} from '../../assets/enums/app-languages.enum';
 import {BehaviorSubject, Observable, tap} from 'rxjs';
-import {ActivatedRoute} from '@angular/router';
+import {Config} from '../shared/config';
+import {Router, UrlSegment, UrlTree} from '@angular/router';
+import {DOCUMENT} from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LanguageService {
-
-  private appLanguage: AppLanguages=AppLanguages.ru;
-
+  private appLanguage: AppLanguages=Config.defaultLanguage;
+  private document = inject(DOCUMENT);
   private appLanguage$:BehaviorSubject<AppLanguages> = new BehaviorSubject(this.appLanguage);
-
-  constructor(private activatedRoute: ActivatedRoute) {
-    const language:AppLanguages|null = this.strToAppLanguage(this.activatedRoute.snapshot.params['lng']);
-    if (language && this.appLanguage !== language) this.setAppLanguage(language);
-  }
+  private router:Router = inject(Router);
 
   get currentLanguage$():Observable<AppLanguages> {
     return this.appLanguage$.asObservable()
@@ -25,15 +22,41 @@ export class LanguageService {
   }
 
   setAppLanguage(appLanguage:AppLanguages):void {
-    this.appLanguage = appLanguage;
-    if (appLanguage !== this.appLanguage$.value) this.appLanguage$.next(appLanguage);
+    if (appLanguage !== this.appLanguage$.value) {
+      this.appLanguage = appLanguage;
+      this.document.documentElement.lang = appLanguage;
+      this.appLanguage$.next(appLanguage);
+    }
+  }
+  changeAppLanguage(appLanguage:AppLanguages):void {
+    if (appLanguage !== this.appLanguage) {
+      this.appLanguage = appLanguage;
+      this.document.documentElement.lang = appLanguage;
+      this.appLanguage$.next(appLanguage);
+
+      const urlTree:UrlTree = this.router.parseUrl(this.router.url);
+      const segments = urlTree.root.children['primary']?.segments ?? [];
+
+      if (!segments.length) return;
+      segments[0] = new UrlSegment(appLanguage, {});
+      const newTree = this.router.createUrlTree(
+        segments.map(s => s.path),
+        {
+          queryParams: urlTree.queryParams,
+          fragment: urlTree.fragment?urlTree.fragment:undefined,
+        }
+      );
+
+      this.router.navigateByUrl(newTree);
+
+    }
   }
 
   get appLang():AppLanguages{
     return this.appLanguage;
   }
 
-  private strToAppLanguage(value: string): AppLanguages | null {
+  strToAppLanguage(value: string|null): AppLanguages | null {
     return Object.values(AppLanguages).includes(value as AppLanguages)
       ? value as AppLanguages
       : null;

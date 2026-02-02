@@ -19,13 +19,13 @@ export class DlgWindowComponent implements OnInit, OnDestroy {
 
   protected title:string='title';
   protected htmlContent:string='';
-  protected redirectUrl:string|null=null;
-
+  protected redirectUrl:string[]|null=null;
   private dialogRef: MatDialogRef<any> | null = null;
 
   private subscriptions$: Subscription = new Subscription();
 
   ngOnInit() {
+
     this.subscriptions$.add(
       this.dlgWindowService.dlgOpenState$.subscribe((data:DialogDataType) => {
         this.title = data.title;
@@ -36,7 +36,8 @@ export class DlgWindowComponent implements OnInit, OnDestroy {
           maxWidth: 'unset'
         });
         const closeDlgSubscription$:Subscription = this.dialogRef.afterClosed().subscribe(() => {
-          if (this.redirectUrl) this.router.navigate([this.redirectUrl]);
+          if (this.redirectUrl !== null) this.router.navigate(this.redirectUrl);
+
           closeDlgSubscription$.unsubscribe();
         });
 
@@ -47,7 +48,4 @@ export class DlgWindowComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subscriptions$.unsubscribe();
   }
-
-
-
 }

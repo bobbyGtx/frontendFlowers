@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../../core/auth/auth.service';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -9,25 +9,39 @@ import {LoginResponseType} from '../../../../assets/types/responses/login-respon
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {CartService} from '../../../shared/services/cart.service';
 import {CartResponseType} from '../../../../assets/types/responses/cart-response.type';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {LanguageService} from '../../../core/language.service';
+import {LoginTranslationType} from '../../../../assets/types/translations/login-translation.type';
+import {loginTranslations} from './login.translations';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements OnDestroy {
-  showSnackService:ShowSnackService = inject(ShowSnackService);
-  router:Router = inject(Router);
+export class LoginComponent implements OnInit, OnDestroy {
+  private showSnackService:ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
+  private router:Router = inject(Router);
   fb:FormBuilder = inject(FormBuilder);
   authService:AuthService=inject(AuthService);
   cartService:CartService=inject(CartService);
+
   subscriptions$:Subscription=new Subscription();
+  appLanguage:AppLanguages;
+  translations:LoginTranslationType;
 
   loginForm: FormGroup=this.fb.group({
     email: ['', [Validators.required, Validators.pattern(/^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/iu)]],
     password: ['', Validators.required],
     rememberMe: [false],
   });
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+    this.translations = loginTranslations[this.appLanguage];
+  }
+
   get email() {
     return this.loginForm.get('email');
   }
@@ -65,7 +79,7 @@ export class LoginComponent implements OnDestroy {
                   },
                 });
               }
-              this.router.navigate(['/']).then();
+              this.router.navigate(['/',this.appLanguage]);
             },
             error: (errorResponse: HttpErrorResponse) => {
               this.showSnackService.error(errorResponse.error.message, ReqErrorTypes.authLogin);
@@ -75,6 +89,16 @@ export class LoginComponent implements OnDestroy {
       }
     }
   }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if ( this.appLanguage !== language) {
+        this.appLanguage = language;
+        this.translations = loginTranslations[language];
+      }
+    }));
+  }
+
   ngOnDestroy() {
     this.subscriptions$.unsubscribe();
   }

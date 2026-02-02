@@ -1,50 +1,50 @@
 <section class="signup" [formGroup]="signUpForm" passwordRepeat>
   <div class="container">
     <div class="auth-form">
-      <div class="auth-title">Регистрация на сайте</div>
+      <div class="auth-title">{{translations.pageHeader}}</div>
       <div class="auth-inputs">
         <div class="auth-input">
-          <input type="text" placeholder="Электроная почта"
+          <input type="text" [placeholder]="translations.emailPlaceholder"
                  formControlName="email"
-                 [matTooltip]="email?.errors?.['emailProblem']?'Этот E-Mail адрес занят!':'Введите Ваш E-Mail адрес'" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+                 [matTooltip]="email?.errors?.['emailProblem']?translations.emailHintBusy:translations.emailHint" matTooltipClass="mat-tooltip-compact"
+                 matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+        </div>
+        <div class="auth-input">
+          <input type="password" [placeholder]="translations.passwordPlaceholder" showPassword formControlName="password"
+                 [matTooltip]="translations.passwordHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
         </div>
         <div class="auth-input">
-          <input type="password" placeholder="Пароль" showPassword formControlName="password"
-                 matTooltip="Придумайте пароль (минимум 6 символов)" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
-                 matTooltipShowDelay="200" matTooltipHideDelay="200">
-        </div>
-        <div class="auth-input">
-          <input type="password"  placeholder="Повторите пароль" showPassword formControlName="passwordRepeat"
-                 matTooltip="Введите пароль повторно" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
+          <input type="password" [placeholder]="translations.passwordRepeatPlaceholder" showPassword formControlName="passwordRepeat"
+                 [matTooltip]="translations.passwordRepeatHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before"
                  matTooltipShowDelay="200" matTooltipHideDelay="200">
         </div>
         <label class="agree-checkbox">
               <input type="checkbox" formControlName="agree">
               <span class="chk-svg-unchecked chk-svg">
-        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0.5" y="0.5" width="13" height="13" rx="2.16667" stroke="#2C2C2C"/>
-        </svg>
-      </span>
+                <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="0.5" y="0.5" width="13" height="13" rx="2.16667"/>
+                </svg>
+              </span>
               <span class="chk-svg-checked chk-svg">
-        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0.583333" y="0.583333" width="12.8333" height="12.8333" rx="2.52778" stroke="#519157" stroke-width="1.16667"/>
-        <path d="M10.8891 3.2002L6.15224 10.7002L2.59961 5.96335" stroke="#519157" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-              <span class="chk-title no-color-change">Я принимаю <a>условия пользовательского соглашения</a> и даю <a >согласие на обработку персональных данных</a> .</span>
+                <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="0.583333" y="0.583333" width="12.8333" height="12.8333" rx="2.52778" stroke-width="1.16667"/>
+                  <path d="M10.8891 3.2002L6.15224 10.7002L2.59961 5.96335" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="chk-title no-color-change">{{translations.uABeginText}} <a>{{translations.userAgreementLink}}</a> {{translations.uANextText}} <a>{{translations.processingPersonalDataLink}}</a>.</span>
             </label>
       </div>
       <div class="auth-button">
-        <button class="button" [disabled]="signUpForm.invalid" (click)="signUp()">Зарегистрироваться</button>
+        <button class="button" [disabled]="signUpForm.invalid" (click)="signUp()">{{translations.registerButtonCaption}}</button>
       </div>
       <div class="auth-link">
-        Уже есть аккаунт? <a routerLink="/login">Войдите</a>
+        {{translations.loginText}} <a [routerLink]="['/',appLanguage,'login']">{{translations.loginLink}}</a>
       </div>
 
     </div>
     <div class="page-image">
-      <img ngSrc="/images/page/signup.png" width="421" height="587" priority alt="Flower">
+      <img ngSrc="/images/page/signup.png" width="421" height="587" priority [alt]="translations.mainImageAlt">
     </div>
   </div>
 </section>

@@ -16,7 +16,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      .cart-empty-message{
+      .favorite-empty-message{
         font-size: 26px;
         margin-bottom: 20px;
       }
@@ -119,7 +119,7 @@
           }
           .favorite-product-action{
             margin-left: 20px;
-            width: 160px;
+            width: 175px;
             margin-right: 40px;
             button{
               width: 100%;

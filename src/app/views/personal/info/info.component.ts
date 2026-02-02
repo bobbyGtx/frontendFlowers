@@ -19,6 +19,15 @@ import {ErrorSources} from '../../../../assets/enums/error-sources.enum';
 import {UserDataResponseType} from '../../../../assets/types/responses/user-data-response.type';
 import {DeliveryInfoType, UserDataType, UserPatchDataType} from '../../../../assets/types/user-data.type';
 import {emailExistsValidator} from '../../../shared/validators/email-exists.validator';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {LanguageService} from '../../../core/language.service';
+import {InfoTranslationType} from '../../../../assets/types/translations/info-translation.type';
+import {emailChangeDialogTranslations, infoTranslations} from './info.translations';
+import {UserRequestService} from '../../../core/user-request.service';
+import {UserActionsResponseType} from '../../../../assets/types/responses/user-actions-response.type';
+import {ConverterUtils} from '../../../shared/utils/converter.utils';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
+import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 
 @Component({
   selector: 'app-info',
@@ -28,11 +37,17 @@ import {emailExistsValidator} from '../../../shared/validators/email-exists.vali
 export class InfoComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private userService: UserService = inject(UserService);
+  private userRequestService: UserRequestService = inject(UserRequestService);
   private deliveryService: DeliveryService = inject(DeliveryService);
   private paymentService: PaymentService = inject(PaymentService);
   private fb: FormBuilder = inject(FormBuilder);
+  private languageService:LanguageService=inject(LanguageService);
+  private dlgWindowService: DlgWindowService=inject(DlgWindowService);
 
   private subscriptions$: Subscription = new Subscription();
+  protected appLanguage:AppLanguages;
+  protected translations:InfoTranslationType;
+  protected changeEmailDialogTranslation:DialogBoxType|null=null;
 
   protected deliveryTypes: DeliveryTypeType[] = [];
   protected paymentTypes: PaymentTypeType[] = [];
@@ -42,6 +57,14 @@ export class InfoComponent implements OnInit, OnDestroy {
 
   protected userData:UserDataType|null=null;
   private stockUserDeliveryInfo: DeliveryInfoType|null=null;//переменная для быстрого сравнения.
+
+  protected emailVerifyNotification:boolean=false;
+  protected emailTimer:string|null=null;
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+    this.translations = infoTranslations[this.appLanguage];
+  }
 
   get firstName() {return this.infoForm.get('firstName');}
 
@@ -176,7 +199,13 @@ export class InfoComponent implements OnInit, OnDestroy {
       if(this.userData.region || this.userData.zip || this.userData.city || this.userData.street || this.userData.house) userPatchData.deliveryInfo=null;
     }
     if (this.oldPassChecked){
-      if (this.email && this.email.value && this.userData.email !== this.email.value ) userPatchData.email = this.email.value;
+      if (this.email && this.email.value && this.userData.email !== this.email.value ){
+        userPatchData.email = this.email.value;
+        this.changeEmailDialogTranslation = {
+          title:emailChangeDialogTranslations[this.appLanguage].title,
+          content:this.insertNewEmail(emailChangeDialogTranslations[this.appLanguage].content,this.email.value),
+        };
+      }
       if (this.newPassword && this.newPasswordRepeat && this.oldPassword){
         if (this.newPassword.value && this.newPassword.value === this.newPasswordRepeat.value && this.oldPassword.value){
           userPatchData.newPassword = this.newPassword.value;
@@ -199,7 +228,10 @@ export class InfoComponent implements OnInit, OnDestroy {
               this.showSnackService.success(response.message);
               this.resetForm();
               this.infoForm.patchValue(this.userData);
-
+              if (this.changeEmailDialogTranslation){
+                this.dlgWindowService.openDialog(this.changeEmailDialogTranslation.title, this.changeEmailDialogTranslation.content);
+                this.changeEmailDialogTranslation = null;
+              }
             }
           },
           error: (errorResponse:HttpErrorResponse) => {
@@ -224,14 +256,14 @@ export class InfoComponent implements OnInit, OnDestroy {
     this.infoForm.markAsPristine();
   }
 
-  ngOnInit() {
+  private doRequests(changeLanguage:boolean=true):void{
     const getDeliveryTypes$: Observable<DeliveryTypesResponseType | HttpErrorResponse> = this.deliveryService.getDeliveryTypes().pipe(
       catchError((error: HttpErrorResponse): Observable<HttpErrorResponse> => of(error)));//Ошибка не ломает combineLatest и перенаправляет ошибочный ответ в next
 
     const getPaymentTypes$: Observable<PaymentTypesResponseType | HttpErrorResponse> = this.paymentService.getPaymentTypes().pipe(
       catchError((error: HttpErrorResponse): Observable<HttpErrorResponse> => of(error)));//Ошибка не ломает combineLatest и перенаправляет ошибочный ответ в next
 
-    const getUserData$:Observable<UserDataResponseType> = this.userService.getUserData().pipe(
+    const getUserData$:Observable<UserDataResponseType|null> = changeLanguage?of(null):this.userService.getUserData().pipe(
       catchError((error:HttpErrorResponse):Observable<ExtErrorResponseType> => {
         return throwError(():ExtErrorResponseType=>{
           return {
@@ -241,11 +273,11 @@ export class InfoComponent implements OnInit, OnDestroy {
         });
       }));//обязательный запрос, без которого летим в error при подписке
 
-    const combinedRequest$: Observable<[DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse,UserDataResponseType]> =
+    const combinedRequest$: Observable<[DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse,UserDataResponseType|null]> =
       combineLatest([getDeliveryTypes$, getPaymentTypes$, getUserData$]);
 
     this.subscriptions$.add(combinedRequest$.subscribe({
-      next: ([deliveryTypesResp, paymentTypesResp, userDataResp]: [DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse, UserDataResponseType]) => {
+      next: ([deliveryTypesResp, paymentTypesResp, userDataResp]: [DeliveryTypesResponseType | HttpErrorResponse, PaymentTypesResponseType | HttpErrorResponse, UserDataResponseType|null]) => {
         if ((deliveryTypesResp as HttpErrorResponse).hasOwnProperty('ok') && !(paymentTypesResp as HttpErrorResponse).ok) {
           console.error(deliveryTypesResp);
         } else {
@@ -262,18 +294,89 @@ export class InfoComponent implements OnInit, OnDestroy {
             this.paymentTypes = paymentTypesResponse.paymentTypes;
           }
         }
-        if (userDataResp.error || !userDataResp.user || !userDataResp.userData) {
-          this.showSnackService.error(this.userService.getUserDataError);
-          throw new Error(userDataResp.message);
-        }
-        this.userData = userDataResp.userData;
-        if (userDataResp.user.deliveryInfo) this.stockUserDeliveryInfo = userDataResp.user.deliveryInfo;
-        this.infoForm.patchValue(this.userData);
+        if (userDataResp){
+          if (userDataResp.error || !userDataResp.user || !userDataResp.userData) {
+            this.showSnackService.error(this.userService.getUserDataError);
+            throw new Error(userDataResp.message);
+          }
+          this.userData = userDataResp.userData;
+          if (userDataResp.user.deliveryInfo) this.stockUserDeliveryInfo = userDataResp.user.deliveryInfo;
+          this.infoForm.patchValue(this.userData);
+          if (!Config.verificationEmailClosed) this.emailVerifyNotification=!this.userData.emailVerification;
 
+        }
       },
       error: (extError: ExtErrorResponseType) => {
         this.showSnackService.error(this.userService.getUserDataError);
         console.error(extError.error.message ? extError.error.message : `Unexpected error (getUserData)! Code:${extError.status}`);
+      }
+    }));
+  }
+
+  protected sendVerificationEmail():void{
+    if (!this.userData) return;
+    this.emailTimer = '';
+
+    this.subscriptions$.add(
+      this.userRequestService.verifyEmailCooldown$.subscribe((timer:string|null)=>{
+        this.emailTimer = timer ? `(${timer})` : null;
+      }));//Подписка на таймер спама
+
+    this.subscriptions$.add(
+      this.userRequestService.sendVerificationEmail(this.userData.email).subscribe({
+        next:(data:UserActionsResponseType)=>{
+          if (data.error){
+            this.showSnackService.error(this.userRequestService.sendVerificationEmailError);
+            throw new Error(data.timer? `${data.message}, ${data.timer}`:data.message);
+          }
+          this.closeVerifyNotification();
+          this.showSnackService.success(data.message);
+          this.emailTimer = null;
+        },
+        error:(errorResponse:HttpErrorResponse)=>{
+          this.emailTimer=null;
+          if (errorResponse.status===409) {
+              this.showSnackService.infoObj(errorResponse.error.message);
+              this.closeVerifyNotification();
+              return;
+            }//обработка ответа, когда email уде активирован
+          if (errorResponse.status === 400 || errorResponse.status === 403 || errorResponse.status === 406 || errorResponse.status === 429) {
+            if (errorResponse.error.timer) this.emailTimer = '('+ConverterUtils.secondsToMinutes(errorResponse.error.timer)+')';
+            this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.authLogin);
+          }else {
+            this.showSnackService.error(this.userRequestService.sendVerificationEmailError);
+          }
+          console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (reset password)! Code:${errorResponse.status}`);
+        }
+      }));
+  }
+
+  protected closeVerifyNotification(){
+    this.emailTimer = null;
+    this.emailVerifyNotification=false;
+    Config.verificationEmailClosed=true;
+  }
+
+  private insertNewEmail(content:string, email:string):string{
+    const interpolationIndex:number =  content.indexOf('{}');
+    if (interpolationIndex>=0) {
+      return content.slice(0,interpolationIndex)+email+content.slice(interpolationIndex+2);
+    }else{
+      return content;
+    }
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages) => {
+      if (this.appLanguage !== language) {
+        this.appLanguage = language;
+        this.translations = infoTranslations[language];
+        this.doRequests(true);
+      }else{
+        //первая загрузка
+        this.appLanguage = language;
+        this.translations = infoTranslations[language];
+        this.doRequests(false);
       }
     }));
     this.subscriptions$.add(

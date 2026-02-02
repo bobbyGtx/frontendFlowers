@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {map, Observable, of, shareReplay} from 'rxjs';
+import {distinctUntilChanged, finalize, map, Observable, of, shareReplay, Subscription, tap} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {ResponseDataValidator} from '../utils/response-data-validator.util';
 import {LanguageService} from '../../core/language.service';
@@ -8,7 +8,6 @@ import {CategoryWithTypesType} from '../../../assets/types/category-with-types.t
 import {AppLanguages} from '../../../assets/enums/app-languages.enum';
 import {CategoriesWithTypesResponseType} from '../../../assets/types/responses/categories-with-types-response.type';
 import {TypeType} from '../../../assets/types/type.type';
-import {CategoriesResponseType} from '../../../assets/types/responses/categories-response.type';
 
 export type userErrorsType = {
   getCategoriesWithTypes:{
@@ -22,6 +21,13 @@ export type userErrorsType = {
 export class CategoryService {
   http: HttpClient = inject(HttpClient);
   languageService:LanguageService = inject(LanguageService);
+  private changeLanguage:Subscription = this.languageService.currentLanguage$.pipe(
+    distinctUntilChanged(),
+    tap(()=>{
+      this.clearCache();
+      this.categoriesWithTypesRequest$ = undefined;
+    })
+  ).subscribe();
   categoryWithTypesTemplate: CategoryWithTypesType = {
     id: 0,
     name: '',
@@ -50,7 +56,7 @@ export class CategoryService {
     return this.userErrors.getCategoriesWithTypes[this.languageService.appLang];
   }
 
-  categoriesWithTypesCash: CategoryWithTypesType[] | null = null;
+  private categoriesWithTypesCash: CategoryWithTypesType[] | null = null;
   private categoriesWithTypesRequest$?: Observable<CategoriesWithTypesResponseType>;
 
   getCategoriesWithTypes(): Observable<CategoriesWithTypesResponseType> {
@@ -79,13 +85,16 @@ export class CategoryService {
             return response;
           }
         ),
-        shareReplay(1)// делимся результатом между всеми подписками
+        shareReplay(1),// делимся результатом между всеми подписками
+        finalize(() => {
+          this.categoriesWithTypesRequest$ = undefined;
+        })
       );
     return this.categoriesWithTypesRequest$;
   }
 
-  getCategories(): Observable<CategoriesResponseType> {
-    return this.http.get<CategoriesResponseType>(environment.api + 'categories.php');
+  clearCache(): void {
+    this.categoriesWithTypesCash = null;
   }
 
 }

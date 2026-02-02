@@ -23,6 +23,15 @@ import {AuthService} from '../../../core/auth/auth.service';
 import {UserDataResponseType} from '../../../../assets/types/responses/user-data-response.type';
 import {UserDataType} from '../../../../assets/types/user-data.type';
 import {DlgWindowService} from '../../../shared/services/dlg-window.service';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {OrderTranslationType} from '../../../../assets/types/translations/order-translation.type';
+import {
+  courierExtContentDialogTranslations,
+  orderCreatedDialogTranslations,
+  orderTranslations
+} from './order.translations';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
 
 @Component({
   selector: 'app-order',
@@ -32,6 +41,7 @@ import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 export class OrderComponent implements OnInit, OnDestroy {
 
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
   private cartService: CartService = inject(CartService);
   private deliveryService: DeliveryService = inject(DeliveryService);
   private paymentService: PaymentService = inject(PaymentService);
@@ -43,6 +53,8 @@ export class OrderComponent implements OnInit, OnDestroy {
   private dlgWindowService: DlgWindowService=inject(DlgWindowService);
 
   private subscriptions$: Subscription = new Subscription();
+  appLanguage:AppLanguages;
+  protected translations:OrderTranslationType;
 
   protected cart: CartType | null = null;
   protected deliveryTypes: DeliveryTypeType[] = [];
@@ -53,12 +65,13 @@ export class OrderComponent implements OnInit, OnDestroy {
   protected lowDeliveryPrice: boolean = false;//Если активна, то цена доставки снижена согласно условия
   private userDataFromServer:UserDataType|null = null;
 
-  private dialogContents={
-      title:'Благодарим за заказ!',
-      content:'<div class="additional-title">Ваш заказ оформлен.</div>'+
-        '<div class="message-string">Вся информация о заказе была выслана вам на почту.</div>'+
-        '<div class="message-string">Курьер свяжется с вами за два часа до доставки товара.</div>',
+  private dialogContents:DialogBoxType|null = null;
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+    this.translations = orderTranslations[this.appLanguage];
   }
+
 
   get firstName() {
     return this.orderForm.get('firstName');
@@ -206,16 +219,18 @@ export class OrderComponent implements OnInit, OnDestroy {
         next: (data: OrderResponseType) => {
           if (data.error) {
             this.showSnackService.error(this.orderService.createOrderError);
-            this.router.navigate(['/cart']);
+            this.router.navigate(['/',this.appLanguage,'cart']);
             throw new Error(data.message);
           }
           this.cartService.resetCartCache();
-          this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,'/');
+          this.dialogContents = orderCreatedDialogTranslations[this.appLanguage];
+          let dialogContent:string = this.activeDeliveryType?.addressNeed?this.dialogContents.content + courierExtContentDialogTranslations[this.appLanguage]:this.dialogContents.content;
+          this.dlgWindowService.openDialog(this.dialogContents.title,dialogContent,['/',this.appLanguage]);
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.errorObj(errorResponse.error, ReqErrorTypes.createOrder);
           console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getProducts)! Code:${errorResponse.status}`);
-          if (errorResponse.status === 409) this.router.navigate(['/cart']);//ошибка товаров. редирект на корзину для проверки
+          if (errorResponse.status === 409) this.router.navigate(['/',this.appLanguage,'cart']);//ошибка товаров. редирект на корзину для проверки
         }
       }));
     }else{
@@ -240,7 +255,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     }//Установка активного paymentType
     if (!this.orderForm.value.paymentType) {
       this.showSnackService.error(this.paymentService.notAvailableError);
-      this.router.navigate(['/cart']);
+      this.router.navigate(['/',this.appLanguage,'cart']);
       return;
     }//Проверка наличия хоть одного доступного метода
   }
@@ -254,18 +269,18 @@ export class OrderComponent implements OnInit, OnDestroy {
     if (!this.activeDeliveryType) {
       this.showSnackService.error(this.deliveryService.notAvailableError);
       console.error(this.deliveryService.notAvailableError);
-      this.router.navigate(['/cart']);
+      this.router.navigate(['/',this.appLanguage,'cart']);
       return;
     }//Если нет активных методов доставки
   }
 
-  ngOnInit() {
+  doRequests(changeLanguage:boolean=false){
     const getDeliveryTypes$: Observable<DeliveryTypesResponseType> = this.deliveryService.getDeliveryTypes()
       .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any)));
     const getPaymentTypes$: Observable<PaymentTypesResponseType> = this.paymentService.getPaymentTypes()
       .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any)));
-    const getCart$: Observable<CartResponseType> = this.cartService.getCart(true)
-      .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any)));
+    const getCart$: Observable<CartResponseType|null> = !changeLanguage? this.cartService.getCart(true)
+      .pipe(catchError((err: HttpErrorResponse) => of({__error: true, err} as any))):of(null);
 
     const combinedRequests$: Observable<[DeliveryTypesResponseType | any, PaymentTypesResponseType | any, CartResponseType | any]> = combineLatest([getDeliveryTypes$, getPaymentTypes$, getCart$]);
 
@@ -277,112 +292,113 @@ export class OrderComponent implements OnInit, OnDestroy {
             const httpDeliveryErr: HttpErrorResponse = deliveryTypesResponse.err;
             this.showSnackService.error(this.deliveryService.getDeliveryError);
             console.error(httpDeliveryErr.error.message ? httpDeliveryErr.error.message : `Unexpected error (getDeliveryTypes)! Code:${httpDeliveryErr.status}`);
-            this.router.navigate(['/cart']);
+            this.router.navigate(['/',this.appLanguage,'cart']);
             return;
           }//код не 200
           if (paymentTypesResponse.__error) {
             const httpPaymentErr: HttpErrorResponse = paymentTypesResponse.err;
             this.showSnackService.error(this.paymentService.getPaymentError);
             console.error(httpPaymentErr.error.message ? httpPaymentErr.error.message : `Unexpected error (getPaymentTypes)! Code:${httpPaymentErr.status}`);
-            this.router.navigate(['/cart']);
+            this.router.navigate(['/',this.appLanguage,'cart']);
             return;
           }//код не 200
-          if (cartResponse.__error) {
-            const httpCartError: HttpErrorResponse = cartResponse.err;
-            if (httpCartError.status !== 401 && httpCartError.status !== 403) this.showSnackService.error(httpCartError.error.message, ReqErrorTypes.cartGetCart);
-            console.error(httpCartError.error.message ? httpCartError.error.message : `Unexpected error (getCart)! Code:${httpCartError.status}`);
-            this.router.navigate(['/']);
-            return;
-          }//код не 200
-          //обработка ответов
           const deliveryTypesResp: DeliveryTypesResponseType = deliveryTypesResponse as DeliveryTypesResponseType;
           const paymentTypesResp: PaymentTypesResponseType = paymentTypesResponse as PaymentTypesResponseType;
-          const cartResp: CartResponseType = cartResponse as CartResponseType;
           if (deliveryTypesResp.error || !deliveryTypesResp.deliveryTypes || deliveryTypesResp.deliveryTypes.length === 0) {
             this.showSnackService.error(this.deliveryService.getDeliveryError);
             console.log(deliveryTypesResp.message ? deliveryTypesResp.message : `Unexpected error (getDeliveryTypes)!`);
-            this.router.navigate(['/cart']);
+            this.router.navigate(['/',this.appLanguage,'cart']);
             return;
           }
           this.deliveryTypes = deliveryTypesResp.deliveryTypes;
           if (paymentTypesResp.error || !paymentTypesResp.paymentTypes || paymentTypesResp.paymentTypes.length === 0) {
             this.showSnackService.error(this.paymentService.getPaymentError);
             console.log(paymentTypesResp.message ? paymentTypesResp.message : `Unexpected error (getPaymentTypes)!`);
-            this.router.navigate(['/cart']);
+            this.router.navigate(['/',this.appLanguage,'cart']);
             return;
           }
           this.paymentTypes = paymentTypesResp.paymentTypes;
 
+          if (cartResponse){
+            if (cartResponse.__error) {
+              const httpCartError: HttpErrorResponse = cartResponse.err;
+              if (httpCartError.status !== 401 && httpCartError.status !== 403) this.showSnackService.error(httpCartError.error.message, ReqErrorTypes.cartGetCart);
+              console.error(httpCartError.error.message ? httpCartError.error.message : `Unexpected error (getCart)! Code:${httpCartError.status}`);
+              this.router.navigate(['/',this.appLanguage]);
+              return;
+            }//код не 200
+            //обработка ответов
+            const cartResp: CartResponseType = cartResponse as CartResponseType;
 
-          //Может быть error с нормальным ответом при проблемах с товарами
-          if (cartResp.error || !cartResp.cart) {
-            this.showSnackService.error(this.cartService.getCartError);
-            this.router.navigate(['/']);
-            throw new Error(cartResp.message);
-          }
-          if (cartResp.messages && cartResp.messages.length > 0) this.router.navigate(['/cart']);//Условие при котором есть сообщения об ошибках в корзине и она не пуста.
-          if (cartResp.cart && cartResp.cart.count === 0) {
-            this.showSnackService.infoObj(this.cartService.cartEmptyError);
-            this.router.navigate(['/catalog']);//Условие при котором корзина пустая и необходим редирект на каталог
-            return;
-          }
-          this.cart = cartResp.cart;
+            //Может быть error с нормальным ответом при проблемах с товарами
+            if (cartResp.error || !cartResp.cart) {
+              this.showSnackService.error(this.cartService.getCartError);
+              this.router.navigate(['/',this.appLanguage]);
+              throw new Error(cartResp.message);
+            }
+            if (cartResp.messages && cartResp.messages.length > 0) this.router.navigate(['/',this.appLanguage,'cart']);//Условие при котором есть сообщения об ошибках в корзине и она не пуста.
+            if (cartResp.cart && cartResp.cart.count === 0) {
+              this.showSnackService.infoObj(this.cartService.cartEmptyError);
+              this.router.navigate(['/',this.appLanguage,'catalog']);//Условие при котором корзина пустая и необходим редирект на каталог
+              return;
+            }
+            this.cart = cartResp.cart;
+            if (this.authService.getIsLoggedIn()){
+              this.subscriptions$.add(
+                this.userService.getUserData().subscribe({
+                  next: (data:UserDataResponseType) => {
+                    if (data.error || !data.userData || !data.user){
+                      this.showSnackService.error(this.userService.getUserDataError);
+                      throw new Error(data.message);
+                    }
+                    this.userDataFromServer=data.userData;
+                    if (data.userData.deliveryType_id){
+                      const deliveryTypeIndex:number = this.deliveryTypes.findIndex((deliveryItem:DeliveryTypeType)=>deliveryItem.id===data.userData?.deliveryType_id);
+                      if (deliveryTypeIndex>-1 && !this.deliveryTypes[deliveryTypeIndex].disabled) {
+                        this.changeDeliveryType(this.deliveryTypes[deliveryTypeIndex]);
+                      }else {
+                        this.setDefaultDelivery();
+                        this.showSnackService.infoObj('Saved delivery type unavailable');
+                      }
+                    }else this.setDefaultDelivery();
 
-          if (this.authService.getIsLoggedIn()){
-            this.subscriptions$.add(
-              this.userService.getUserData().subscribe({
-                next: (data:UserDataResponseType) => {
-                  if (data.error || !data.userData || !data.user){
+                    if (data.userData.paymentType_id) {
+                      const paymentTypeIndex:number = this.paymentTypes.findIndex((paymentItem:PaymentTypeType)=>paymentItem.id === data.userData!.paymentType_id);
+                      if (paymentTypeIndex>-1 && !this.paymentTypes[paymentTypeIndex].disabled) {
+                        this.paymentType?.setValue(this.paymentTypes[paymentTypeIndex].id);
+                      }else{
+                        this.setDefaultPayment();
+                        this.showSnackService.infoObj('Saved payment type unavailable');
+                      }
+                    }else this.setDefaultPayment();
+
+                    const paramsToUpdate = {
+                      email:data.userData.email,
+                      firstName: data.userData.firstName,
+                      lastName: data.userData.lastName,
+                      phone:data.userData.phone,
+                      region:data.userData.region,
+                      zip:data.userData.zip,
+                      city:data.userData.city,
+                      street:data.userData.street,
+                      house:data.userData.house,
+                    }
+                    this.orderForm.patchValue(paramsToUpdate);
+                    this.email?.disable();
+                  },
+                  error: (errorResponse:HttpErrorResponse) => {
                     this.showSnackService.error(this.userService.getUserDataError);
-                    throw new Error(data.message);
-                  }
-                  this.userDataFromServer=data.userData;
-                  if (data.userData.deliveryType_id){
-                    const deliveryTypeIndex:number = this.deliveryTypes.findIndex((deliveryItem:DeliveryTypeType)=>deliveryItem.id===data.userData?.deliveryType_id);
-                    if (deliveryTypeIndex>-1 && !this.deliveryTypes[deliveryTypeIndex].disabled) {
-                      this.changeDeliveryType(this.deliveryTypes[deliveryTypeIndex]);
-                    }else {
-                      this.setDefaultDelivery();
-                      this.showSnackService.infoObj('Saved delivery type unavailable');
-                    }
-                  }else this.setDefaultDelivery();
+                    console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getUserData)! Code:${errorResponse.status}`);
+                  },
+                })
+              );//Подписка на данные из профиля пользователя, если он залогинен
+            }else{
+              this.setDefaultPayment();
+              this.setDefaultDelivery();
+            }
 
-                  if (data.userData.paymentType_id) {
-                    const paymentTypeIndex:number = this.paymentTypes.findIndex((paymentItem:PaymentTypeType)=>paymentItem.id === data.userData!.paymentType_id);
-                    if (paymentTypeIndex>-1 && !this.paymentTypes[paymentTypeIndex].disabled) {
-                      this.paymentType?.setValue(this.paymentTypes[paymentTypeIndex].id);
-                    }else{
-                      this.setDefaultPayment();
-                      this.showSnackService.infoObj('Saved payment type unavailable');
-                    }
-                  }else this.setDefaultPayment();
-
-                  const paramsToUpdate = {
-                    email:data.userData.email,
-                    firstName: data.userData.firstName,
-                    lastName: data.userData.lastName,
-                    phone:data.userData.phone,
-                    region:data.userData.region,
-                    zip:data.userData.zip,
-                    city:data.userData.city,
-                    street:data.userData.street,
-                    house:data.userData.house,
-                  }
-                  this.orderForm.patchValue(paramsToUpdate);
-                  this.email?.disable();
-                },
-                error: (errorResponse:HttpErrorResponse) => {
-                  this.showSnackService.error(this.userService.getUserDataError);
-                  console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getUserData)! Code:${errorResponse.status}`);
-                },
-              })
-            );//Подписка на данные из профиля пользователя, если он залогинен
-          }else{
-            this.setDefaultPayment();
-            this.setDefaultDelivery();
+            this.deliveryAndTotalAmountCalculate();
           }
-
-          this.deliveryAndTotalAmountCalculate();
 
         },
         error: () => {
@@ -390,6 +406,21 @@ export class OrderComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = orderTranslations[this.appLanguage];
+        this.doRequests(true);
+      }else{
+        this.appLanguage = language;
+        this.translations = orderTranslations[this.appLanguage];
+        this.doRequests();
+      }
+
+    }));
   }
 
   ngOnDestroy() {

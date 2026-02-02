@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {DeliveryTypeType} from '../../../assets/types/delivery-type.type';
 import {HttpClient} from '@angular/common/http';
-import {Observable, of, tap} from 'rxjs';
+import {distinctUntilChanged, Observable, of, Subscription, tap} from 'rxjs';
 import {DeliveryTypesResponseType} from '../../../assets/types/responses/delivery-types-response.type';
 import {environment} from '../../../environments/environment';
 import {Config} from '../config';
@@ -24,6 +24,13 @@ export class DeliveryService {
   private languageService: LanguageService = inject(LanguageService);
   private deliveryTypes: DeliveryTypeType[] | null = null;
 
+  private changeLanguage:Subscription = this.languageService.currentLanguage$.pipe(
+    distinctUntilChanged(),
+    tap(()=>{
+      this.clearCache();
+    })
+  ).subscribe();
+
   private userErrors:userErrorsType= {
     getDeliveryTypes:{
       [AppLanguages.ru]: 'Ошибка получения типов доставки. Обновите страницу',
@@ -36,6 +43,10 @@ export class DeliveryService {
       [AppLanguages.de]: 'Blumenlieferung ist nicht möglich! Bitte versuchen Sie es später.',
     }
   };
+
+  private clearCache():void{
+    this.deliveryTypes = null;
+  }
 
   get getDeliveryError():string {
     return this.userErrors.getDeliveryTypes[this.languageService.appLang];

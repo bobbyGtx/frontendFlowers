@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {LanguageService} from '../../core/language.service';
-import {Observable, of, tap} from 'rxjs';
+import {distinctUntilChanged, Observable, of, Subscription, tap} from 'rxjs';
 import {PaymentTypesResponseType} from '../../../assets/types/responses/payment-types-response.type';
 import {PaymentTypeType} from '../../../assets/types/payment-type.type';
 import {Config} from '../config';
@@ -25,6 +25,12 @@ export class PaymentService {
   private http: HttpClient = inject(HttpClient);
   private languageService: LanguageService = inject(LanguageService);
   private paymentTypes:PaymentTypeType[]|null=null;
+  private changeLanguage:Subscription = this.languageService.currentLanguage$.pipe(
+    distinctUntilChanged(),
+    tap(()=>{
+      this.clearCache();
+    })
+  ).subscribe();
 
   private userErrors:userErrorsType= {
     getPaymentTypes:{
@@ -44,6 +50,10 @@ export class PaymentService {
   }
   get notAvailableError():string {
     return this.userErrors.paymentNotAvailable[this.languageService.appLang];
+  }
+
+  private clearCache():void{
+    this.paymentTypes=null;
   }
 
   getPaymentTypes():Observable<PaymentTypesResponseType>{

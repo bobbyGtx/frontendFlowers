@@ -1,40 +1,34 @@
 <section class="main">
   <div class="container">
-    <div class="main-title">
-      Создадим сад <br>
-      в вашем доме и офисе
-    </div>
-    <div class="main-text">
-      Если в большом городе вы скучаете по природе, ничто не мешает вам превратить в оазис квартиру или офис. И мы
-      поможем вам это сделать!
-    </div>
+    <div class="main-title">{{translations.mainTitle}}</div>
+    <div class="main-text">{{translations.mainText}}</div>
   </div>
 </section>
 <section class="offers">
   <div class="container">
     <div class="offer offer-instagram">
-      <div class="offer-title">Получи скидку 10% в нашем инстаграме!</div>
+      <div class="offer-title">{{translations.discountOfferTitle}}</div>
       <div class="offer-content">
         <div class="offer-image">
           <img ngSrc="/images/page/offer1.png" width="134" height="155" alt="flower">
         </div>
         <div class="offer-inner-content">
-          <div class="offer-text">Подпишись на наш аккаунт и напиши в direct “хочу промокод”</div>
+          <div class="offer-text">{{translations.discountOfferText}}</div>
           <div class="offer-button">
-            <a href="https://www.instagram.com/" target="_blank" class="button">Получить промокод</a>
+            <a href="https://www.instagram.com/" target="_blank" class="button">{{translations.discountOfferButton}}</a>
           </div>
         </div>
       </div>
     </div>
     <div class="offer offer-collection">
-      <div class="offer-title">Новая коллекция керамических кашпо в наличии</div>
+      <div class="offer-title">{{translations.potOfferTitle}}</div>
       <div class="offer-content">
         <div class="offer-image">
           <img ngSrc="/images/page/offer2.png" width="227" height="127" alt="flower">
         </div>
         <div class="offer-inner-content">
           <div class="offer-button">
-            <a routerLink="/catalog" target="_blank" class="button">В каталог</a>
+            <a [routerLink]="['/',appLanguage,'catalog']" class="button">{{translations.potOfferButton}}</a>
           </div>
         </div>
       </div>
@@ -43,37 +37,37 @@
 </section>
 <section class="best-products" *ngIf="bestProducts.length">
   <div class="container">
-    <products-carousel [products]="bestProducts" [title]="'Лучшие предложения месяца'"></products-carousel>
+    <products-carousel [products]="bestProducts" [title]="translations.topPurposesTitle" [appLanguage]="appLanguage"></products-carousel>
   </div>
 </section>
 <section class="info" id="info">
   <div class="container">
-    <div class="info-title">Доставка и оплата</div>
+    <div class="info-title">{{ translations.infoTitle }}</div>
     <div class="info-item info-delivery">
       <div class="info-image">
         <img ngSrc="/images/page/delivery-circle.png" width="140" height="140" alt="Delivery">
       </div>
       <div class="info-text">
-        <div class="info-text-main">1. Доставка курьером (по г. Саарбрюккен) - 10 EUR</div>
-        <div class="info-text-extra">На следующий день после оформления заказа</div>
+        <div class="info-text-main">1. {{translations.infoDeliveryMain}} - 10 EUR</div>
+        <div class="info-text-extra">{{translations.infoDeliveryExtra}}</div>
       </div>
       <div class="info-text">
-        <div class="info-text-main">2. Самовывоз - 0 EUR</div>
-        <div class="info-text-extra">Пункт выдачи товаров: г. Саарбрюккен, ул. Триерер 1, ТЦ "Европа Галерея", 1 этаж</div>
+        <div class="info-text-main">2. {{translations.infoPickupMain}} - 0 EUR</div>
+        <div class="info-text-extra">{{translations.infoPickupExtra}}</div>
       </div>
 
     </div>
     <div class="info-item info-payment">
       <div class="info-image"><img ngSrc="/images/page/payment-circle.png" width="140" height="140" alt="Payment"></div>
-      <div class="info-text"><div class="info-text-main">1. Наличный расчет при получении</div></div>
-      <div class="info-text"><div class="info-text-main">2. Безналичный расчет при получении</div></div>
-      <div class="info-text"><div class="info-text-main">3. Оплата банковской картой в интернет-магазине</div></div>
+      <div class="info-text"><div class="info-text-main">1. {{translations.infoCashPayment}}</div></div>
+      <div class="info-text"><div class="info-text-main">2. {{translations.infoCashlessPayment}}</div></div>
+      <div class="info-text"><div class="info-text-main">3. {{translations.infoCardPayment}}</div></div>
     </div>
   </div>
 </section>
 <section class="reviews" id="reviews">
   <div class="container">
-    <div class="reviews-title">Отзывы о Amora Flowers</div>
+    <div class="reviews-title">{{translations.reviewsTitle}}</div>
     <div class="reviews-carousel">
       <owl-carousel-o [options]="customOptionsReviews" #owlCarRev>
         <ng-template carouselSlide *ngFor="let review of reviews">
@@ -103,5 +97,5 @@
   </div>
 </section>
 <section class="map">
-  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1548.9266428280855!2d6.990723541563074!3d49.23898740284311!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4795b6a960ac17fd%3A0xb9be345dd31096e!2sEuropa%20Galerie!5e0!3m2!1sru!2sde!4v1761340612027!5m2!1sru!2sde" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <iframe [src]="mapUrl" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 </section>

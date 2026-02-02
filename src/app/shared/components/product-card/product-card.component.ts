@@ -1,4 +1,4 @@
-import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {ProductType} from '../../../../assets/types/product.type';
 import {CartService} from '../../services/cart.service';
 import {Subscription} from 'rxjs';
@@ -12,27 +12,32 @@ import {AddToFavoritesResponseType} from '../../../../assets/types/responses/add
 import {AuthService} from '../../../core/auth/auth.service';
 import {FavoriteService} from '../../services/favorite.service';
 import {environment} from '../../../../environments/environment';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {ProductCardTranslationType} from '../../../../assets/types/translations/product-card-translation.type';
+import {productCardTranslations} from './product-card.translations';
 
 @Component({
   selector: 'product-card',
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
-class ProductCardComponent implements OnInit, OnDestroy{
+export class ProductCardComponent implements OnInit, OnChanges, OnDestroy{
   @Input() product!:ProductType;
   @Input() isLight:boolean=false;
+  @Input() appLanguage:AppLanguages=Config.defaultLanguage;
+
+  protected translations:ProductCardTranslationType = productCardTranslations[this.appLanguage];
+
   //countInCart:number = 0;
   cartService:CartService=inject(CartService);
   showSnackService:ShowSnackService=inject(ShowSnackService);
   authService:AuthService=inject(AuthService);
   favoriteService:FavoriteService=inject(FavoriteService);
+
   subscriptions$:Subscription=new Subscription();
+
   images:string = environment.images;
   count:number=1;
-
-  ngOnInit():void{
-    if (this.product.countInCart) this.count=this.product.countInCart;
-  }
 
   updateCart(count:number){
     this.subscriptions$.add(
@@ -110,9 +115,17 @@ class ProductCardComponent implements OnInit, OnDestroy{
     }
   }
 
+  ngOnInit():void{
+    if (this.product.countInCart) this.count=this.product.countInCart;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['appLanguage']) {
+      this.translations=productCardTranslations[this.appLanguage];
+    }
+  }
+
   ngOnDestroy() {
     this.subscriptions$.unsubscribe();
   }
 }
-
-export default ProductCardComponent

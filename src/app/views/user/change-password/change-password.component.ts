@@ -8,6 +8,11 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
 import {UserRequestService} from '../../../core/user-request.service';
 import {DlgWindowService} from '../../../shared/services/dlg-window.service';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {ChangePasswordTranslationType} from '../../../../assets/types/translations/change-password-translation.type';
+import {changePasswordDialogTranslations, changePasswordTranslations} from './change-password.translations';
+import {DialogBoxType} from '../../../../assets/types/dialog-box.type';
 
 @Component({
   selector: 'app-change-password',
@@ -16,6 +21,7 @@ import {DlgWindowService} from '../../../shared/services/dlg-window.service';
 })
 export class ChangePasswordComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
   private router: Router=inject(Router);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private fb: FormBuilder = inject(FormBuilder);
@@ -23,18 +29,23 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   private dlgWindowService: DlgWindowService=inject(DlgWindowService);
 
   private subscriptions$: Subscription = new Subscription();
+  protected appLanguage:AppLanguages;
+  protected translations:ChangePasswordTranslationType;
+
   protected rToken: string | null = null;
   protected requestSuccessful: boolean = false;
-  private dialogContents={
-      title:'Пароль изменен',
-      content:'<div class="additional-title">Новый пароль успешно сохранен.</div>' +
-        '<div class="message-string">Вы можете использовать новый пароль для входа в свою учетную запись.</div>\n',
-  }
+  private dialogContents:DialogBoxType;
 
   changePassForm = this.fb.group({
     password: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]],
     passwordRepeat: ['', [Validators.required, Validators.pattern(/^.{6,}$/)]]
   });
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+    this.translations = changePasswordTranslations[this.appLanguage];
+    this.dialogContents = changePasswordDialogTranslations[this.appLanguage];
+  }
 
   get password() {
     return this.changePassForm.get('password');
@@ -56,7 +67,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
           this.showSnackService.success(data.message);
           this.requestSuccessful = true;
           this.changePassForm.reset();
-          this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,'/login');
+          this.showDialog();
         },
         error: (errorResponse: HttpErrorResponse) => {
           this.showSnackService.error(errorResponse.error.message, ReqErrorTypes.saveNewPassword);
@@ -66,13 +77,22 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnInit() {
+  showDialog(redirect:boolean=true) {
+    this.dlgWindowService.openDialog(this.dialogContents.title,this.dialogContents.content,redirect?['/',this.appLanguage,'login']:null);
+  }
 
-    const lngParam:string|null = this.activatedRoute.snapshot.queryParams['lng']?this.activatedRoute.snapshot.queryParams['lng']:null;
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = changePasswordTranslations[this.appLanguage];
+        this.dialogContents = changePasswordDialogTranslations[this.appLanguage];
+      }
+    }));
     const rToken:string|null = this.activatedRoute.snapshot.queryParams['rToken']?this.activatedRoute.snapshot.queryParams['rToken']:null;
 
-    if (!rToken || !lngParam) {
-      this.router.navigate(['/404']);
+    if (!rToken) {
+      this.router.navigate(['/',this.appLanguage,'404']);
       return;
     }
     //Проверка токена на сервере
@@ -86,7 +106,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
               this.rToken = rToken;
             },
             error: () => {
-              this.router.navigate(['/404']);
+              this.router.navigate(['/',this.appLanguage,'404']);
               return;
             }
           }));

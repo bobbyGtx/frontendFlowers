@@ -11,6 +11,10 @@ import {environment} from '../../../../environments/environment';
 import {CartItemType} from '../../../../assets/types/cart-item.type';
 import {CartProductType} from '../../../../assets/types/cart-product.type';
 import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum';
+import {LanguageService} from '../../../core/language.service';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {CartTranslationType} from '../../../../assets/types/translations/cart-translation.type';
+import {cartTranslations} from './cart.translations';
 
 @Component({
   selector: 'app-cart',
@@ -18,16 +22,28 @@ import {ReqErrorTypes} from '../../../../assets/enums/auth-req-error-types.enum'
   styleUrl: './cart.component.scss'
 })
 export class CartComponent implements OnInit , OnDestroy {
+  private showSnackService:ShowSnackService=inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
   productService:ProductService=inject(ProductService);
   cartService:CartService=inject(CartService);
-  showSnackService:ShowSnackService=inject(ShowSnackService);
+
   subscriptions$:Subscription = new Subscription();
+  appLanguage:AppLanguages;
+  protected translations:CartTranslationType;
+
   serverImagesPath: string = environment.images;
   extraProducts:ProductType[]=[];
   cartItems:CartItemType[]=[];
   totalAmount:number=0;
   totalCount:number=0;
   showedMessages:Array<string>=[];
+
+
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+    this.translations = cartTranslations[this.appLanguage];
+  }
 
   editCount(cartProduct:CartProductType, count:number){
     this.subscriptions$.add(
@@ -85,7 +101,7 @@ export class CartComponent implements OnInit , OnDestroy {
     this.editCount(cartProduct,value);
   }
 
-  ngOnInit() {
+  doRequest(){
     this.subscriptions$.add(
       this.cartService.getCart(true).subscribe({
         next: (data: CartResponseType) => {
@@ -125,6 +141,17 @@ export class CartComponent implements OnInit , OnDestroy {
           console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
         }
       }));
+  }
+
+  ngOnInit() {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+      if (this.appLanguage!==language){
+        this.appLanguage = language;
+        this.translations = cartTranslations[this.appLanguage];
+      }
+      this.doRequest();
+    }));
+
   }
 
   ngOnDestroy() {

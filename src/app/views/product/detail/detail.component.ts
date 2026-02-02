@@ -4,7 +4,7 @@ import {catchError, combineLatest, Observable, of, Subscription} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProductService} from '../../../shared/services/product.service';
 import {ShowSnackService} from '../../../core/show-snack.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ProductType} from '../../../../assets/types/product.type';
 import {ProductResponseType} from '../../../../assets/types/responses/product-response.type';
 import {RecommendedProductsResponseType} from '../../../../assets/types/responses/recommended-products-response.type';
@@ -19,6 +19,10 @@ import {FavoriteProductType} from '../../../../assets/types/favorite-product.typ
 import {AuthService} from '../../../core/auth/auth.service';
 import {Config} from '../../../shared/config';
 import {environment} from '../../../../environments/environment';
+import {AppLanguages} from '../../../../assets/enums/app-languages.enum';
+import {LanguageService} from '../../../core/language.service';
+import {detailTranslations} from './detail.translations';
+import {DetailTranslationType} from '../../../../assets/types/translations/detail-translation.type';
 
 @Component({
   selector: 'app-detail',
@@ -26,20 +30,30 @@ import {environment} from '../../../../environments/environment';
   styleUrl: './detail.component.scss'
 })
 export class DetailComponent implements OnInit, OnDestroy {
-  private productService: ProductService = inject(ProductService);
   private showSnackService: ShowSnackService = inject(ShowSnackService);
+  private languageService:LanguageService=inject(LanguageService);
+  private productService: ProductService = inject(ProductService);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private cartService: CartService = inject(CartService);
   private authService: AuthService = inject(AuthService);
   private favoriteService: FavoriteService = inject(FavoriteService);
+  private router: Router = inject(Router);
+
+  subscriptions$: Subscription = new Subscription();
+  appLanguage:AppLanguages;
+  translations: DetailTranslationType;
 
   serverImagesPath: string = environment.images;
   recommendedProducts: ProductType[] = [];
   product: ProductType | null = null;
   cartProducts: CartItemType[] = [];
   favoriteProducts: FavoriteProductType[] = [];
-  subscriptions$: Subscription = new Subscription();
   count: number = 1;
+
+  constructor() {
+    this.appLanguage = this.languageService.appLang;
+    this.translations = detailTranslations[this.appLanguage];
+  }
 
   protected updateCount(value: number) {
     this.count = value;
@@ -139,19 +153,27 @@ export class DetailComponent implements OnInit, OnDestroy {
       if (productIndexInCart !== -1) productItem.countInCart = this.cartProducts[productIndexInCart].quantity;
     })
   }
-//Объединить все 3 запроса
+
   ngOnInit(): void {
+    this.subscriptions$.add(this.languageService.currentLanguage$.subscribe((language:AppLanguages)=>{
+        this.appLanguage = language;
+        this.translations = detailTranslations[this.appLanguage];
+    }));
     let initialized:boolean = false;
     this.subscriptions$.add(
       this.activatedRoute.params.subscribe(params => {
         initialized?window.scrollTo({top: 0, behavior: 'smooth'}):initialized = true;
-        const getProduct$: Observable<ProductResponseType> = this.productService.getProduct(params['url'])
+        const productUrl:string|null= params['url']?params['url']:null;
+        if (!productUrl){
+          this.router.navigate(['/',this.appLanguage,'404']);
+          return;
+        }
+        const getProduct$: Observable<ProductResponseType> = this.productService.getProduct(productUrl)
           .pipe(catchError((err: HttpErrorResponse): Observable<ProductResponseType> => of({__error: true, err} as any)));
         const getUserCart$: Observable<CartResponseType> = this.cartService.getCart()
           .pipe(catchError((err: HttpErrorResponse): Observable<CartResponseType> => of({__error: true, err} as any)));
         const getFavorites$:Observable<FavoritesResponseType|any> = this.authService.getIsLoggedIn()?this.favoriteService.getFavorites()
           .pipe(catchError((err: HttpErrorResponse):Observable<any> => of({ __error: true, err } as any))):of(null);
-
         const combinedRequests$: Observable<[ ProductResponseType | any,CartResponseType | any, FavoritesResponseType|any]> = combineLatest([getProduct$,getUserCart$,getFavorites$]);
         this.subscriptions$.add(combinedRequests$.subscribe({
           next:([getProductResp, getUserCartResp, getFavoritesResp]:[ProductResponseType|any,CartResponseType | any, FavoritesResponseType|any])=>{
@@ -160,10 +182,13 @@ export class DetailComponent implements OnInit, OnDestroy {
               const errorResponse: HttpErrorResponse = getProductResp.err;
               this.showSnackService.error(this.productService.getProductError);
               console.error(errorResponse.error.message ? errorResponse.error.message : `Unexpected error (getProduct)! Code:${errorResponse.status}`);
+              this.router.navigate(['/',this.appLanguage,'404']);
+              return;
             }
             const productResponse:ProductResponseType = getProductResp as ProductResponseType;
             if (productResponse.error || !productResponse.product) {
               this.showSnackService.error(this.productService.getProductError);
+              this.router.navigate(['/',this.appLanguage,'404']);
               throw new Error(productResponse.message);
             }
             this.product=productResponse.product;

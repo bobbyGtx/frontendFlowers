@@ -12,6 +12,7 @@ import {ResponseDataValidator} from '../../shared/utils/response-data-validator.
 import {AuthInfoType} from '../../../assets/types/auth-info.type';
 import {DefaultResponseType} from '../../../assets/types/responses/default-response.type';
 import {LoginResponseType} from '../../../assets/types/responses/login-response.type';
+import {Config} from '../../shared/config';
 
 @Injectable({providedIn: 'root'})
 
@@ -80,6 +81,7 @@ export class AuthService implements OnDestroy {
 
   logout(): Observable<DefaultResponseType> {
     const tokens = this.getTokens();
+    Config.verificationEmailClosed=false;
     if (tokens.refreshToken) {
       return this.http.post<DefaultResponseType>(environment.api + 'logout.php', {refreshToken: tokens.refreshToken});
     }

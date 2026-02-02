@@ -30,13 +30,16 @@ footer.footer{
     .footer-block{
       margin-top: 11px;
       &.footer-menu{
-        margin-right: 57px;
+        margin-right: 50px;
+        a{
+          text-wrap: nowrap;
+        }
       }
       &.footer-categories{
         margin-right: 34px;
       }
       &.footer-info{
-        margin-right: 66px;
+        margin-right: 50px;
         .footer-head{
           margin-bottom: 15px;
         }

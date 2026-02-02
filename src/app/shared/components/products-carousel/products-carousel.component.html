@@ -16,7 +16,7 @@
 <div class="carousel-items">
   <owl-carousel-o [options]="customOptions" #owlCar>
     <ng-template carouselSlide *ngFor="let product of products">
-      <product-card [product]="product" [isLight]="lightMode"></product-card>
+      <product-card [product]="product" [isLight]="lightMode" [appLanguage]="appLanguage"></product-card>
     </ng-template>
   </owl-carousel-o>
 </div>

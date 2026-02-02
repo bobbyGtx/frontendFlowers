@@ -3,7 +3,7 @@
 @import "data-form";
 
 .orders{
-  padding-top: 56px;
+  padding-top: 50px;
   padding-bottom: 156px;
   .container{
     font-size: 16px;
@@ -62,10 +62,10 @@
         padding-bottom: 46px;
         margin-bottom: 47px;
         display: flex;
-        align-items: baseline;
+        align-items: flex-start;
         justify-content: space-between;
 
-        *:last-child{
+        &:last-child{
           border-bottom: unset;
           padding-bottom: unset;
           margin-bottom: unset;

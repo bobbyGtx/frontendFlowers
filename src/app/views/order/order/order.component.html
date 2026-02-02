@@ -1,15 +1,15 @@
 <div class="order">
   <div class="container">
-    <div class="order-title">Оформление вашего заказа</div>
+    <div class="order-title">{{translations.pageHeader}}</div>
     <div class="order-info" *ngIf="cart && deliveryTypes.length && activeDeliveryType">
       <div class="data-form" [formGroup]="orderForm">
         <div class="data-form-block">
-          <div class="data-form-label">Выберите способ доставки</div>
+          <div class="data-form-label">{{translations.deliveryTypeTitle}}</div>
           <div class="data-form-types">
             <div class="data-form-type-item" *ngFor="let deliveryType of deliveryTypes"
                  [class.active]="activeDeliveryType.id === deliveryType.id"
                  [class.disabled]="deliveryType.disabled"
-                 [matTooltip]="deliveryType.disabled?'Метод доставки не доступен':''"
+                 [matTooltip]="deliveryType.disabled?translations.deliveryTypeDisabledHint:''"
                  matTooltipClass="mat-tooltip-compact"
                  matTooltipPosition="below"
                  matTooltipHideDelay="200"
@@ -19,42 +19,42 @@
         </div>
 
         <div class="data-form-block">
-          <div class="data-form-label">Заполните личные данные</div>
+          <div class="data-form-label">{{translations.privateDataTitle}}</div>
           <div class="data-form-inputs personal-data-inputs">
-            <input type="text" class="input" placeholder="Имя" formControlName="firstName" (blur)="changeFirstLetter(firstName)"
-                   matTooltip="Введите имя получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <input type="text" class="input" placeholder="Фамилия" formControlName="lastName" (blur)="changeFirstLetter(lastName)"
-                   matTooltip="Введите фамилию получателя" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <input type="text" class="input" placeholder="Телефон" formControlName="phone"
-                   matTooltip="Введите телефон получателя. +4912345678901" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <input type="text" class="input" placeholder="E-Mail" formControlName="email"
-                   [matTooltip]="email?.disabled?'Адрес электронной почты':'Введите адрес электронной почты'" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" [placeholder]="translations.firstNamePlaceholder" formControlName="firstName" (blur)="changeFirstLetter(firstName)"
+                   [matTooltip]="translations.firstNameHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" [placeholder]="translations.lastNamePlaceholder" formControlName="lastName" (blur)="changeFirstLetter(lastName)"
+                   [matTooltip]="translations.lastNameHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" [placeholder]="translations.phonePlaceholder" formControlName="phone"
+                   [matTooltip]="translations.phoneHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input" [placeholder]="translations.emailPlaceholder" formControlName="email"
+                   [matTooltip]="email?.disabled?translations.emailHint:translations.emailSetHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
           </div>
         </div>
 
         <div class="data-form-block" *ngIf="activeDeliveryType.addressNeed">
-          <div class="data-form-label">Заполните адрес доставки</div>
+          <div class="data-form-label">{{translations.addressTitle}}</div>
           <div class="data-form-inputs address-data-inputs">
             <mat-form-field class="select-input region"
-                            matTooltip="Выберите регион доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
-              <mat-label class="select-label">Регион</mat-label>
+                            [matTooltip]="translations.regionHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+              <mat-label class="select-label">{{translations.regionLabel}}</mat-label>
               <mat-select  formControlName="region">
                 <mat-option [value]="region" *ngFor="let region of regionList">{{region}}</mat-option>
               </mat-select>
             </mat-form-field>
-            <input type="text" class="input town" placeholder="Город" formControlName="city"
-                   matTooltip="Укажите город доставки" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <input type="text" class="input zip" placeholder="Индекс" formControlName="zip"
-                   matTooltip="Введите почтовый индекс" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <input type="text" class="input street" placeholder="Улица" formControlName="street"
-                   matTooltip="Введите улицу" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
-            <input type="text" class="input house" placeholder="№ дома" formControlName="house"
-                   matTooltip="Введите номер дома (10a)" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input town" [placeholder]="translations.townPlaceholder" formControlName="city"
+                   [matTooltip]="translations.townHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input zip" [placeholder]="translations.indexPlaceholder" formControlName="zip"
+                   [matTooltip]="translations.indexHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input street" [placeholder]="translations.streetPlaceholder" formControlName="street"
+                   [matTooltip]="translations.streetHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="before" matTooltipShowDelay="200" matTooltipHideDelay="200">
+            <input type="text" class="input house" [placeholder]="translations.housePlaceholder" formControlName="house"
+                   [matTooltip]="translations.houseHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200">
           </div>
         </div>
 
         <div class="data-form-block">
-          <div class="data-form-label">Выберите способ оплаты</div>
+          <div class="data-form-label">{{translations.paymentTypeTitle}}</div>
           <div class="data-form-radio">
             <div class="data-form-radio-block" *ngFor="let paymentType of paymentTypes">
               <input type="radio" [id]="'radio_'+paymentType.id" [value]="paymentType.id" formControlName="paymentType">
@@ -64,31 +64,31 @@
         </div>
 
         <div class="data-form-block">
-          <div class="data-form-label">Комментарий к заказу (необязательно)</div>
+          <div class="data-form-label">{{translations.commentTitle}}</div>
           <div class="data-form-inputs">
-            <textarea cols="30" rows="5" maxlength="500" class="input" placeholder="Оставьте свой комментарий..." formControlName="comment"
-                      matTooltip="Комментарий к заказу до 500 символов" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200"></textarea>
+            <textarea cols="30" rows="5" maxlength="500" class="input" [placeholder]="translations.commentPlaceholder" formControlName="comment"
+                      [matTooltip]="translations.commentHint" matTooltipClass="mat-tooltip-compact" matTooltipPosition="after" matTooltipShowDelay="200" matTooltipHideDelay="200"></textarea>
           </div>
         </div>
       </div>
 
       <div class="order-details">
         <div class="order-details-info">
-          <div class="order-details-info-title">Ваш заказ</div>
+          <div class="order-details-info-title">{{translations.orderDetailsTitle}}</div>
           <div class="order-details-info-item">
-            <div class="order-details-info-item-caption">Товаров:</div>
+            <div class="order-details-info-item-caption">{{translations.orderProductsCount}}:</div>
             <div class="order-details-info-item-data">{{ cart.count }}</div>
           </div>
           <div class="order-details-info-item">
-            <div class="order-details-info-item-caption">Общая стоимость:</div>
+            <div class="order-details-info-item-caption">{{translations.orderProductsAmount}}:</div>
             <div class="order-details-info-item-data">{{ cart.amount }} EUR</div>
           </div>
           <div class="order-details-info-item">
-            <div class="order-details-info-item-caption">Стоимость доставки:</div>
+            <div class="order-details-info-item-caption">{{translations.orderDeliveryPrice}}:</div>
             <div class="order-details-info-item-data"
                  [class.not-valid]="lowDeliveryPrice">{{ activeDeliveryType.delivery_price }} EUR
               <svg *ngIf="activeDeliveryType.lPMinPrice>0 && !lowDeliveryPrice"
-                   [matTooltip]="'Cкидка на доставку при покупке от '+ activeDeliveryType.lPMinPrice +' EUR'"
+                   [matTooltip]="translations.orderDeliveryDiscountAvailableHint + activeDeliveryType.lPMinPrice +' EUR'"
                    matTooltipClass="mat-tooltip-compact"
                    matTooltipPosition="below"
                    matTooltipHideDelay="200"
@@ -103,7 +103,7 @@
 
           </div>
           <div class="order-details-info-item discount" *ngIf="lowDeliveryPrice">
-            <div class="order-details-info-item-caption">Скидка на доставку:</div>
+            <div class="order-details-info-item-caption">{{translations.orderDeliveryDiscount}}:</div>
             <div
               class="order-details-info-item-data">{{ activeDeliveryType.low_price - activeDeliveryType.delivery_price }}
               EUR
@@ -111,11 +111,11 @@
 
           </div>
           <div class="order-details-info-item">
-            <div class="order-details-info-item-caption">Итоговая стоимость:</div>
+            <div class="order-details-info-item-caption">{{translations.orderTotalAmount}}:</div>
             <div class="order-details-info-item-data">{{ finalAmount }} EUR</div>
           </div>
         </div>
-        <button class="button" (click)="createOrder()">Подтвердить заказ</button>
+        <button class="button" (click)="createOrder()">{{translations.confirmOrderBtnCaption}}</button>
       </div>
     </div>
   </div>

@@ -12,6 +12,7 @@ $transparent-btn-border:$small-input-border;
 $transparent-background:transparent;
 $header-icon-color:#202B21;
 $header-icon-color-h: #519057;
+$checkbox-checked-color:#519157;
 
 
 $input-border:#2A592E;//reviews-border
@@ -44,6 +45,8 @@ $active-sort-bg-color:#B6D5B9;
 $pagination-arrows-color: $gray-text-color;
 $pagination-active-page-bg: #C5E6C8;
 $pagination-font-color: #292D32;
+$sort-color: $gray-text-color;
+$sort-color-h: #000000;
 
 //Details
 $main-title-color: $black-text-color;
@@ -93,5 +96,12 @@ $password-eye-color-h:$applied-filter-close-h;
 //count-selector
 $svg-color: #9AA89B;
 $svg-color-h: $green-button-color;
+
+//popup-message
+$popup-border-color:$small-input-border;
+$popup-background-color:#B6D5B9;
+
+$rest:#B6D5B9;
+$tetet: rgba(108, 172, 114, 0.44);
 
 

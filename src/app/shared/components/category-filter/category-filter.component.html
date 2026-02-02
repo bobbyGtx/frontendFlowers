@@ -24,10 +24,10 @@
       <span class="chk-title">{{type.name}}</span>
     </label>
     <div class="catalog-filter-from-to" *ngIf="type">
-      <span>от</span>
+      <span>{{translations?translations.fromText:'from'}}</span>
       <input #fromInp type="number" min="0" step="1" class="small-input" [ngModel]="from"
              (ngModelChange)="updateFilterFromTo(type+'From',$event)">
-      <span>до</span>
+      <span>{{translations?translations.toText:'to'}}</span>
       <input type="number" [min]="fromInp.value" step="1" class="small-input" [ngModel]="to"
              (ngModelChange)="updateFilterFromTo(type+'To',$event)">
       <span>{{units}}</span>
