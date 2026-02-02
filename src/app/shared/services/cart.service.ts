@@ -1,6 +1,16 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, finalize, Observable, of, shareReplay, tap} from 'rxjs';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {
+  BehaviorSubject,
+  catchError,
+  finalize,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+  timer
+} from 'rxjs';
 import {CartResponseType} from '../../../assets/types/responses/cart-response.type';
 import {environment} from '../../../environments/environment';
 import {AppLanguages} from '../../../assets/enums/app-languages.enum';
@@ -11,12 +21,14 @@ import {AuthService} from '../../core/auth/auth.service';
 import {ShowSnackService} from '../../core/show-snack.service';
 import {LanguageService} from '../../core/language.service';
 import {ReqErrorTypes} from '../../../assets/enums/auth-req-error-types.enum';
+import {TranslateCartProductsResponseType} from '../../../assets/types/responses/translate-cart-products-response.type';
 
 export type userErrorsType = {
   getCart: { [key in AppLanguages]: string; },
   updateCart: { [key in AppLanguages]: string; },
   rebaseCart: { [key in AppLanguages]: string; },
   cartEmpty: { [key in AppLanguages]: string; },
+  translateCart: { [key in AppLanguages]: string; },
 }
 
 @Injectable({
@@ -28,11 +40,12 @@ export class CartService {
   private showSnackService: ShowSnackService = inject(ShowSnackService);
   private languageService: LanguageService = inject(LanguageService);
   readonly cartLsKey: string = 'userCart';
+  readonly cartLngKey:string='cartLanguage';
   private cartRequest$?: Observable<CartResponseType>;//для предотвращения дублирования запроса
   private cartCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   private cartCache: CartResponseType | null = null;//Кэш ответа корзины. Пополняется по результатам 2х запросов
   readonly cartCacheLifetime: number = 30000;
-  clearCartCacheTimeout: ReturnType<typeof setTimeout> | null = null;//таймер для чистки кэша корзины
+  private clearCartCacheTimeout: ReturnType<typeof setTimeout> | null = null;//таймер для чистки кэша корзины
 
   private userErrors: userErrorsType = {
     getCart: {
@@ -54,6 +67,11 @@ export class CartService {
       [AppLanguages.ru]: 'В корзине нет товаров!',
       [AppLanguages.en]: 'There are no products in the cart!',
       [AppLanguages.de]: 'Der Warenkorb ist leer!',
+    },
+    translateCart: {
+      [AppLanguages.ru]: 'Корзина очищена из-за ошибки!',
+      [AppLanguages.en]: 'The cart was cleared due to an error!',
+      [AppLanguages.de]: 'Fehler! Warenkorb geleert.',
     },
   };
 
@@ -78,6 +96,9 @@ export class CartService {
   get cartEmptyError(): string {
     return this.userErrors.cartEmpty[this.languageService.appLang];
   }
+  get translateCartError(): string {
+    return this.userErrors.cartEmpty[this.languageService.appLang];
+  }
 
   getCartCount$(): Observable<number> {
     return this.cartCount$;
@@ -97,7 +118,31 @@ export class CartService {
   }//сброс кэша корзины, после создания заказа например
 
   getCart(forceUpdate: boolean = false): Observable<CartResponseType> {
-    if (!this.isLoggedIn) return of(this.getLSCart());
+    if (!this.isLoggedIn) {
+      const cartLanguage:AppLanguages|null = this.languageService.strToAppLanguage(localStorage.getItem(this.cartLngKey));
+      if (forceUpdate && cartLanguage && cartLanguage !== this.languageService.appLang){
+        if (this.cartRequest$) return this.cartRequest$;
+        this.cartRequest$ = this.changeLocalCartLanguage().pipe(
+          shareReplay(1),
+          finalize(() => {
+            //После выполнения запроса очищаем живой observable, чтоб в след раз создался новый
+            this.cartRequest$ = undefined;
+          })
+        );
+        return this.cartRequest$;
+      }else{
+        if (this.cartRequest$) return this.cartRequest$;
+        this.cartRequest$ = timer(200).pipe(
+          switchMap(()=>of(this.getLSCart())),
+          shareReplay(1),
+          finalize(() => {
+            //После выполнения запроса очищаем живой observable, чтоб в след раз создался новый
+            this.cartRequest$ = undefined;
+          })
+        );
+        return this.cartRequest$;
+      }
+    }
     if (!forceUpdate && this.cartCache) return of(this.cartCache);
     if (this.cartRequest$) return this.cartRequest$;
     this.cartRequest$ = this.http.get<CartResponseType>(environment.api + 'cart.php')
@@ -122,7 +167,6 @@ export class CartService {
           this.cartRequest$ = undefined;
         })
       );
-
     return this.cartRequest$;
   }
 
@@ -190,14 +234,17 @@ export class CartService {
       amount:0,
       createdAt: 0,
       updatedAt: 0,
-      items: []
+      items: [],
     };
     let response: CartResponseType = {
       error: false,
       message: "Request success!",
       cart: cart
     };
-    if (!localStorage.getItem(this.cartLsKey)) {
+    const cartLanguage:AppLanguages|null = this.languageService.strToAppLanguage(localStorage.getItem(this.cartLngKey));
+    if (!localStorage.getItem(this.cartLsKey) || !cartLanguage) {
+      localStorage.removeItem(this.cartLsKey);
+      localStorage.removeItem(this.cartLngKey);
       this.updateCartCount(0);
       return response;
     }//завершаем функцию, если нет корзины
@@ -205,6 +252,7 @@ export class CartService {
     if (!(userCart.count >= 0) && !Array.isArray(userCart.items)) {
       //чистим корзину если данные имеют не правильный формат
       localStorage.removeItem(this.cartLsKey);
+      localStorage.removeItem(this.cartLngKey);
       this.updateCartCount(0);
       return response;
     }
@@ -264,12 +312,90 @@ export class CartService {
         items: [newCartItem]
       }
       localStorage.setItem(this.cartLsKey, JSON.stringify(userCart));
+      localStorage.setItem(this.cartLngKey, this.languageService.appLang);
       this.updateCartCount(userCart.count);
       return {
         error: false,
         message: "Request Success!",
         cart: userCart
       }
+    }
+  }
+
+  saveTranslatedLSCart(cart:CartType):void{
+    localStorage.removeItem(this.cartLsKey);
+    localStorage.setItem(this.cartLsKey, JSON.stringify(cart));
+    localStorage.setItem(this.cartLngKey, this.languageService.appLang);
+  }
+
+  changeLocalCartLanguage():Observable<CartResponseType>{
+    let userLSCart: CartResponseType = this.getLSCart();
+    if (userLSCart.cart && userLSCart.cart.items.length > 0){
+      let cartProductIDs:number[] = [];
+      userLSCart.cart.items.forEach((cartItem:CartItemType)=> {
+        cartProductIDs.push(cartItem.product.id);
+      });
+      let newCart: CartType = {
+        count: 0,
+        amount:0,
+        createdAt: 0,
+        updatedAt: 0,
+        items: [],
+      };
+      let newResponse: CartResponseType = {
+        error: false,
+        message: "Request success!",
+        cart: newCart
+      };
+      return this.http.post<TranslateCartProductsResponseType>(environment.api + 'products', {productIDs:cartProductIDs}).pipe(
+        switchMap((translateCartResp:TranslateCartProductsResponseType):Observable<CartResponseType>=>{
+          if (translateCartResp.error){
+            this.showSnackService.infoObj(translateCartResp.message);
+            if (!translateCartResp.products || !translateCartResp.products.length){
+              this.updateCartCount(0);
+              return of(newResponse);
+            }
+          }else{
+            if (!translateCartResp.products || !Array.isArray(translateCartResp.products)) {
+              this.showSnackService.error(this.translateCartError);
+              console.error(this.userErrors.translateCart[AppLanguages.en]);
+              this.updateCartCount(0);
+              return of(newResponse);
+            }
+          }
+
+          const newProducts:CartProductType[] = translateCartResp.products;
+
+          //Компонуем новую корзину и переносим туда переведенные товары, новые цены и т.д.
+          if (userLSCart.cart){
+            newCart.createdAt = userLSCart.cart.createdAt;
+            newCart.updatedAt = userLSCart.cart.updatedAt;
+            userLSCart.cart.items.forEach((cartItem:CartItemType)=> {
+              const newProductIndex:number =  newProducts.findIndex((translCartItem:CartProductType)=>translCartItem.id === cartItem.product.id);
+              if (newProductIndex>=0){
+                newCart.items.push({
+                  quantity:cartItem.quantity,
+                  product:newProducts[newProductIndex],
+                });
+                newCart.count=newCart.count+cartItem.quantity;
+                newCart.amount = newCart.amount + (cartItem.quantity * cartItem.product.price);
+              }
+            });
+          }
+          this.saveTranslatedLSCart(newCart);
+          if (this.cartCount$.value !== newCart.count) this.updateCartCount(newCart.count);
+          return of(newResponse);
+        }),
+        catchError((errorResponse:HttpErrorResponse):Observable<CartResponseType>=>{
+          if (errorResponse.status >=400 && errorResponse.status < 500) {
+            this.showSnackService.error(this.translateCartError,ReqErrorTypes.cartGetCart);
+          }
+          console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected (get Cart) error! Code:${errorResponse.status}`);
+          return of(newResponse);
+        })
+      );
+    }else{
+      return of(userLSCart)
     }
   }
 
