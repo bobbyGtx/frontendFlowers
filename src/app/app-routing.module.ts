@@ -5,6 +5,7 @@ import {MainComponent} from './views/main/main.component';
 import {authForwardGuard} from './core/auth/auth-forward.guard';
 import {authGuard} from './core/auth/auth.guard';
 import {languageGuard} from './core/language.guard';
+import {Config} from './shared/config';
 
 const routes: Routes = [
   {
@@ -29,9 +30,9 @@ const routes: Routes = [
     ]
   },
   // редирект с корня
-  { path: '', redirectTo: 'ru', pathMatch: 'full' },
+  { path: '', redirectTo: Config.defaultLanguage, pathMatch: 'full' },
   // глобальный fallback
-  { path: '**', redirectTo: 'ru' }
+  { path: '**', redirectTo: Config.defaultLanguage }
 ];
 
 @NgModule({

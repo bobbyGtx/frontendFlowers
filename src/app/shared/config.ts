@@ -1,7 +1,7 @@
 import {AppLanguages} from '../../assets/enums/app-languages.enum';
 
 export class Config {
-  static defaultLanguage:AppLanguages = AppLanguages.en;
+  static defaultLanguage:AppLanguages = AppLanguages.de;
   static languageList:{code:AppLanguages,label:string}[] = [
     { code: AppLanguages.de, label: 'Deutsch' },
     { code: AppLanguages.en, label: 'English' },

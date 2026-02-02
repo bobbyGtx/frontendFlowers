@@ -399,6 +399,11 @@ export class CartService {
     }
   }
 
+  checkLSCart(): boolean {
+    const userLSCart: CartType | null = localStorage.getItem(this.cartLsKey) ? JSON.parse(localStorage.getItem(this.cartLsKey)!) : null;
+    return !!(userLSCart && userLSCart.items.length > 0);
+  }
+
   private resetCacheTimer() {
     if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
     this.clearCartCacheTimeout = setTimeout(() => {
