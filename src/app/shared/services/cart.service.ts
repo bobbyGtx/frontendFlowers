@@ -322,13 +322,13 @@ export class CartService {
     }
   }
 
-  saveTranslatedLSCart(cart:CartType):void{
+  private saveTranslatedLSCart(cart:CartType):void{
     localStorage.removeItem(this.cartLsKey);
     localStorage.setItem(this.cartLsKey, JSON.stringify(cart));
     localStorage.setItem(this.cartLngKey, this.languageService.appLang);
   }
 
-  changeLocalCartLanguage():Observable<CartResponseType>{
+  private changeLocalCartLanguage():Observable<CartResponseType>{
     let userLSCart: CartResponseType = this.getLSCart();
     if (userLSCart.cart && userLSCart.cart.items.length > 0){
       let cartProductIDs:number[] = [];
@@ -399,11 +399,6 @@ export class CartService {
     }
   }
 
-  checkLSCart(): boolean {
-    const userLSCart: CartType | null = localStorage.getItem(this.cartLsKey) ? JSON.parse(localStorage.getItem(this.cartLsKey)!) : null;
-    return !!(userLSCart && userLSCart.items.length > 0);
-  }
-
   private resetCacheTimer() {
     if (this.clearCartCacheTimeout) clearTimeout(this.clearCartCacheTimeout);
     this.clearCartCacheTimeout = setTimeout(() => {
@@ -412,7 +407,3 @@ export class CartService {
     }, this.cartCacheLifetime);
   }
 }
-
-//if (data.infoMessage) this.showSnackService.info(data.infoMessage);
-//this.showSnackService.error(errorResponse.error.message,ReqErrorTypes.cartUpdate);
-//console.error(errorResponse.error.message?errorResponse.error.message:`Unexpected error (update Cart)! Code:${errorResponse.status}`);

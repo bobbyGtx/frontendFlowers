@@ -23,7 +23,7 @@
           <table class="orders-list-item-products-list">
             <tr *ngFor="let item of order.items">
               <td><a class="product-link" [routerLink]="['/',appLanguage,'product',item.url]">&#183; {{item.name}}</a></td>
-              <td>{{item.quantity+translations.orderProductCount}}</td>
+              <td>{{item.quantity+translations.orderProductUnits}}</td>
             </tr>
           </table>
         </div>
