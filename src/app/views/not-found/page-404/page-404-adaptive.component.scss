@@ -1,0 +1,27 @@
+@import "variables";
+@import "mixins";
+@media screen and (max-width: 657px) {
+  .page-not-found{
+    padding: 40px 15px 50px 15px;
+  }
+}
+@media screen and (max-width: 473px) {
+  .page-not-found{
+    padding: 40px 15px 50px 15px;
+    .container{
+      .content{
+        .image{
+          width: 290px;
+          height: 290px;
+          margin-bottom: 20px;
+          img{
+            object-fit: contain;
+          }
+        }
+        .title{
+          @include head-lora(36px);
+        }
+      }
+    }
+  }
+}

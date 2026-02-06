@@ -8,7 +8,7 @@ import {footerTranslations} from './footer.translations';
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
-  styleUrl: './footer.component.scss'
+  styleUrls: ['./footer.component.scss','./footer-adaptive.component.scss'],
 })
 export class FooterComponent implements OnChanges {
   @Input() categories:CategoryWithTypesType[]=[];

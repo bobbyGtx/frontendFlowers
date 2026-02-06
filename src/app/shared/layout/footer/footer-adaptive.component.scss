@@ -1,0 +1,209 @@
+@import "variables";//Чтоб работало без путей, добавил раздел в angular.json
+@media screen and (max-width: 1260px){
+  footer.footer{
+    .container{
+      justify-content: space-between;
+      padding-right: 15px;
+      padding-left: 15px;
+      gap: 16px;
+
+      .logo{
+        margin-right: unset;
+      }
+
+      .footer-block{
+        margin-top: 11px;
+        &.footer-menu{
+          margin-right: unset;
+        }
+        &.footer-categories{
+          margin-right: unset;
+        }
+        &.footer-info{
+          margin-right: unset;
+          .footer-head{
+            margin-bottom: 15px;
+          }
+          .footer-social{
+
+          }
+          .footer-payment{
+          }
+        }
+        &.footer-contacts{
+          max-width: 324px;
+          .footer-contact{
+            margin-bottom: 15px;
+            color:$gray-text-color;
+            &:last-child{
+              margin-bottom: 0;
+            }
+            .footer-contact-head{
+              margin-bottom: 6px;
+              font-weight: 500;
+            }
+          }
+        }
+        .footer-head{
+
+        }
+        .footer-items{
+
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1080px){
+  footer.footer{
+    .container{
+
+      .footer-block{
+        margin-top: unset;
+        gap: 20px;
+        .footer-head{
+          margin-bottom: unset;
+        }
+        &.footer-menu, &.footer-categories{
+          display: none;
+        }
+        &.footer-menus{
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        &.footer-info{
+          margin-right: unset;
+          min-width: 150px;
+
+          .footer-head, .footer-social{
+            display: none;
+          }
+          .footer-payment{
+            min-width: 150px;
+            justify-content: center;
+            grid-template-columns: repeat(auto-fill,70px);
+          }
+        }
+        &.footer-contacts{
+          max-width: unset;
+        }
+      }
+    }
+  }
+
+}
+@media screen and (max-width: 810px){
+  footer.footer{
+    .container{
+      display: grid;
+      grid-template-columns:160px 110px 1fr;
+      grid-template-areas:
+      "logo menus contacts"
+      "payments payments contacts";
+      .logo{
+        grid-area: logo;
+      }
+      .footer-menus{
+        grid-area: menus;
+        justify-self: start;
+        margin-right: 40px;
+      }
+      .footer-info{
+        grid-area: payments;
+        justify-items: center;
+      }
+      .footer-contacts{
+        grid-area: contacts;
+        justify-self: end;
+      }
+
+    }
+  }
+}
+@media screen and (max-width: 660px){
+  footer.footer{
+    .container{
+      display: grid;
+      grid-template-columns:150px 1fr;
+      grid-template-areas:
+      "logo menus"
+      "contacts contacts";
+      .logo{
+        grid-area: logo;
+      }
+      .footer-menus{
+        grid-area: menus;
+        justify-self: end;
+      }
+      .footer-info{
+        display: none;
+      }
+      .footer-block.footer-contacts{
+        grid-area: contacts;
+        //justify-self: unset;
+        max-width: unset;
+        width: 100%;
+        .footer-head{
+          margin-bottom: 10px;
+          text-align: center;
+        }
+        .footer-contact{
+          display: flex;
+          flex-direction: row;
+          gap: 8px;
+          margin-bottom: 4px;
+        }
+      }
+
+    }
+  }
+}
+@media screen and (max-width: 536px){
+  footer.footer{
+    .container{
+
+      .footer-menus{
+        grid-area: menus;
+        justify-self: end;
+        margin-right: unset;
+      }
+      .footer-block.footer-contacts{
+        .footer-contact{
+          font-size: 14px;
+
+        }
+      }
+
+    }
+  }
+}
+@media screen and (max-width: 370px){
+  footer.footer{
+    .container{
+
+      .footer-menus{
+        grid-area: menus;
+        justify-self: end;
+        margin-right: unset;
+      }
+      .footer-block.footer-contacts{
+        gap:8px;
+        .footer-head{
+          display: none;
+        }
+        .footer-contact{
+          display: flex;
+          flex-direction: column;
+          gap: unset;
+          .footer-contact-head{
+            margin-bottom: unset;
+          }
+        }
+      }
+
+    }
+  }
+}

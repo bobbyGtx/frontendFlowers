@@ -28,7 +28,7 @@ import {HeaderTranslationType} from '../../../../assets/types/translations/heade
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrls: ['./header.component.scss','./header-adaptive.component.scss']
 })
 export class HeaderComponent implements OnInit, AfterViewInit,OnChanges, OnDestroy {
   @ViewChild('searchBox') private searchBox: ElementRef<HTMLInputElement>|null = null;
