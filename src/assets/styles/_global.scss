@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 @import "variables";
 @import "fonts";
+@import "mixins";
 
 html, body {
   margin: 0;
@@ -273,6 +274,7 @@ a.button{
 .mat-mdc-menu-item{
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
+  min-height: 32px !important;
   svg{
     fill:$header-icon-color;
     width:24px;
@@ -317,6 +319,12 @@ a.button{
       }
 
     }
+  }
+  .header-menu-item{
+    a{
+      font-size: 14px;
+    }
+    @include header-active-menu-item();
   }
 }
 //-----Меню-----

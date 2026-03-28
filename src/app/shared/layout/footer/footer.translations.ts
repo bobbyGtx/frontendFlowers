@@ -35,7 +35,7 @@ export const footerTranslations: { [key in AppLanguages]:  FooterTranslationType
     deliveryAndPay: 'Lieferung & Zahlung',
     reviews: 'Bewertungen',
     categoryHeader: 'Kategorien',
-    socialHeader: 'Wir sind in den sozialen Netzwerken',
+    socialHeader: 'Unsere sozialen Netzwerke',
     contactsHeader: 'Kontakte',
     addressTitle: 'Adresse',
     address: 'Saarbrücken, Trierer Straße 1, Europa-Galerie, 1. Etage',

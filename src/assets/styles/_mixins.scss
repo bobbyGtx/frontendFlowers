@@ -14,3 +14,16 @@
     object-fit: cover;
   }
 }
+
+@mixin header-active-menu-item(){
+  a {
+    color: $green-text-color;
+
+    line-height: 1;
+    cursor: pointer;
+    &.active{
+      font-weight: 500;
+      color: $header-icon-color-h;
+    }
+  }
+}
