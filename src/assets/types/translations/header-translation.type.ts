@@ -1,5 +1,6 @@
 
 export type HeaderTranslationType = {
+  menuHeader: string,
   home: string,
   catalog: string,
   reviews: string,
@@ -12,6 +13,7 @@ export type HeaderTranslationType = {
   tooltipFavorite: string,
   tooltipCart: string,
   tooltipProductsInCart: string,
+  categoryHeader: string,
   searchPlaceholder: string,
   tooltipSearch: string,
 }

@@ -3,6 +3,7 @@ import {HeaderTranslationType} from '../../../../assets/types/translations/heade
 
 export const headerTranslations: { [key in AppLanguages]:  HeaderTranslationType } = {
   [AppLanguages.ru]: {
+    menuHeader:'Меню',
     home: 'Главная',
     catalog: 'Каталог',
     reviews: 'Отзывы',
@@ -15,10 +16,12 @@ export const headerTranslations: { [key in AppLanguages]:  HeaderTranslationType
     tooltipFavorite: 'Перейти в избранное',
     tooltipCart: 'Корзина',
     tooltipProductsInCart: 'Товаров в корзине',
+    categoryHeader: 'Категории',
     searchPlaceholder: 'Начните искать',
     tooltipSearch: 'Поиск товаров (минимум 3 символа)',
   },
   [AppLanguages.en]: {
+    menuHeader:'Menu',
     home: 'Home',
     catalog: 'Catalog',
     reviews: 'Reviews',
@@ -31,10 +34,12 @@ export const headerTranslations: { [key in AppLanguages]:  HeaderTranslationType
     tooltipFavorite: 'Go to favorites',
     tooltipCart: 'Shopping cart',
     tooltipProductsInCart: 'Items in cart',
+    categoryHeader: 'Categories',
     searchPlaceholder: 'Typing to search',
     tooltipSearch: 'Search products (minimum 3 characters)',
   },
   [AppLanguages.de]: {
+    menuHeader:'Menü',
     home: 'Startseite',
     catalog: 'Katalog',
     reviews: 'Bewertungen',
@@ -47,6 +52,7 @@ export const headerTranslations: { [key in AppLanguages]:  HeaderTranslationType
     tooltipFavorite: 'Zu Favoriten',
     tooltipCart: 'Warenkorb',
     tooltipProductsInCart: 'Artikel im Warenkorb',
+    categoryHeader: 'Kategorien',
     searchPlaceholder: 'Suche starten',
     tooltipSearch: 'Produktsuche (mindestens 3 Zeichen)',
   },
