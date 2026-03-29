@@ -37,3 +37,28 @@
     }
   }
 }
+
+@media screen and (max-width: 640px) {
+  .carousel-items {
+    width: 291px;
+    margin: 0 auto;
+  }
+}
+@media screen and (max-width: 428px) {
+  .carousel-header {
+    .carousel-title {
+      @include head-lora(28px);
+    }
+  }
+}
+@media screen and (max-width: 380px) {
+  .carousel-header {
+    flex-direction: column;
+    gap:16px;
+    margin-bottom: 20px;
+    .carousel-title {
+      text-align: center;
+      @include head-lora(32px);
+    }
+  }
+}

@@ -30,13 +30,13 @@ export class ProductsCarouselComponent {
       0: {
         items: 1
       },
-      400: {
+      611: {
         items: 2
       },
-      740: {
+      940: {
         items: 3
       },
-      940: {
+      1240: {
         items: 4
       }
     },

@@ -29,7 +29,6 @@
       line-height: 22px;
       max-width: 528px;
     }
-
   }
 }
 
@@ -72,6 +71,8 @@
           }
 
           .offer-inner-content {
+            max-width: 396px;
+            width: 100%;
             .offer-text {
               margin-top: 16px;
               max-width: 234px;
@@ -79,7 +80,8 @@
             }
 
             .offer-button {
-              margin-left: 168px;
+              //margin-left: 168px;
+              text-align: right;
               margin-top: 22px;
 
               .button {
@@ -183,7 +185,6 @@
   margin: 130px 0;
 
   .container {
-
     .reviews-title {
       @include head-lora(32px);
       text-align: center;
@@ -200,6 +201,7 @@
         border-radius: 5px;
         border: 2px solid $input-border;
         box-sizing: border-box;
+        margin: 0 auto;
 
         .review-item-head {
           display: flex;

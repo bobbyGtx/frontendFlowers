@@ -24,7 +24,7 @@ import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
-  styleUrl: './main.component.scss'
+  styleUrls: ['./main.component.scss','./main-adaptive.component.scss']
 })
 export class MainComponent implements OnInit, OnDestroy {
   private showSnackService: ShowSnackService=inject(ShowSnackService);
@@ -60,10 +60,10 @@ export class MainComponent implements OnInit, OnDestroy {
       0: {
         items: 1
       },
-      400: {
+      820: {
         items: 2
       },
-      740: {
+      1240: {
         items: 3
       }
     },
